@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Detail Paket</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="../js/config.js"></script>
+<script src="../js/supabase.js"></script>
+
+</head>
+
+<body>
+
+<h1>Detail Paket</h1>
+
+<div id="packageInfo">
+Loading...
+</div>
+
+<hr>
+
+<h3>Tambah Rincian Belanja</h3>
+
+<input id="itemName" placeholder="Nama Barang/Jasa">
+
+<br><br>
+
+<textarea
+    id="specification"
+    placeholder="Spesifikasi"
+></textarea>
+
+<br><br>
+
+<input
+    id="quantity"
+    type="number"
+    value="1">
+
+<br><br>
+
+<input
+    id="unit"
+    placeholder="Satuan">
+
+<br><br>
+
+<input
+    id="estimatedPrice"
+    type="number"
+    placeholder="Perkiraan Harga">
+
+<br><br>
+
+<button onclick="saveItem()">
+    Simpan Item
+</button>
+
+<hr>
+
+<h3>Daftar Item</h3>
+
+<div id="itemList">
+Loading...
+</div>
+
+<script>
+
+const params =
+    new URLSearchParams(
+        window.location.search
+    );
+
+const packageId =
+    params.get("id");
+
+async function loadPackage() {
+
+    const { data, error } =
+        await window.supabaseClient
+            .from("packages")
+            .select("*")
+            .eq("id", packageId)
+            .single();
+
+    if(error){
+        console.error(error);
+        return;
+    }
+
+    document.getElementById(
+        "packageInfo"
+    ).innerHTML = `
+        <b>${data.package_name}</b>
+        <br>
+        Tahun: ${data.fiscal_year}
+        <br>
+        Metode: ${data.procurement_method}
+        <br>
+        Pagu: ${data.budget_ceiling}
+    `;
+}
+
+async function loadItems() {
+
+    const { data, error } =
+        await window.supabaseClient
+            .from("package_items")
+            .select("*")
+            .eq("package_id", packageId)
+            .order(
+                "created_at",
+                {
+                    ascending:false
+                }
+            );
+
+    if(error){
+        console.error(error);
+        return;
+    }
+
+    const html =
+        data.map(item => `
+            <div style="
+                border:1px solid #ccc;
+                padding:10px;
+                margin-bottom:10px;
+            ">
+                <b>${item.item_name}</b>
+                <br>
+                ${item.specification ?? ""}
+                <br>
+                Qty:
+                ${item.quantity}
+                ${item.unit}
+                <br>
+                Harga:
+                ${item.estimated_price}
+            </div>
+        `).join("");
+
+    document.getElementById(
+        "itemList"
+    ).innerHTML =
+        html || "Belum ada item";
+}
+
+async function saveItem() {
+
+    const { error } =
+        await window.supabaseClient
+            .from("package_items")
+            .insert([{
+
+                package_id:
+                    packageId,
+
+                item_name:
+                    document.getElementById(
+                        "itemName"
+                    ).value,
+
+                specification:
+                    document.getElementById(
+                        "specification"
+                    ).value,
+
+                quantity:
+                    parseFloat(
+                        document.getElementById(
+                            "quantity"
+                        ).value
+                    ),
+
+                unit:
+                    document.getElementById(
+                        "unit"
+                    ).value,
+
+                estimated_price:
+                    parseFloat(
+                        document.getElementById(
+                            "estimatedPrice"
+                        ).value || 0
+                    )
+
+            }]);
+
+    if(error){
+
+        alert(error.message);
+
+        console.error(error);
+
+        return;
+    }
+
+    alert(
+        "Item berhasil disimpan"
+    );
+
+    loadItems();
+}
+
+async function init(){
+
+    await loadPackage();
+
+    await loadItems();
+}
+
+init();
+
+</script>
+
+</body>
+</html>
