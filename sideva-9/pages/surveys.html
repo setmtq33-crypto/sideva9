@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Survey Harga</title>
+<title>Survey Harga - SI-DEVA 9</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -18,14 +18,33 @@
 
 <h1>Survey Harga</h1>
 
-<input id="vendorName"
-       placeholder="Nama Penyedia">
+<div id="packageItemInfo"></div>
+
+<hr>
+
+<input
+    id="vendorName"
+    placeholder="Nama Penyedia">
 
 <br><br>
 
-<input id="surveyPrice"
-       type="number"
-       placeholder="Harga Survey">
+<input
+    id="surveyPrice"
+    type="number"
+    placeholder="Harga Survey">
+
+<br><br>
+
+<input
+    id="negotiatedPrice"
+    type="number"
+    placeholder="Harga Negosiasi">
+
+<br><br>
+
+<textarea
+    id="notes"
+    placeholder="Catatan"></textarea>
 
 <br><br>
 
@@ -34,6 +53,8 @@
 </button>
 
 <hr>
+
+<h3>Daftar Survey</h3>
 
 <div id="surveyList">
 Loading...
@@ -46,21 +67,21 @@ const params =
         window.location.search
     );
 
-const packageId =
-    params.get("package_id");
+const packageItemId =
+    params.get("package_item_id");
 
-async function loadSurveys(){
+async function loadSurveys() {
 
     const { data, error } =
         await window.supabaseClient
             .from("price_surveys")
             .select("*")
             .eq(
-                "package_id",
-                packageId
+                "package_item_id",
+                packageItemId
             )
             .order(
-                "survey_price",
+                "negotiated_price",
                 {
                     ascending:true
                 }
@@ -84,23 +105,43 @@ async function loadSurveys(){
                 padding:10px;
                 margin-bottom:10px;
             ">
+
                 <b>${item.vendor_name}</b>
+
                 <br>
-                Harga:
+
+                Harga Survey:
                 ${item.survey_price}
+
+                <br>
+
+                Harga Nego:
+                ${item.negotiated_price ?? "-"}
+
+                <br>
+
+                Kandidat:
+                ${item.is_candidate ? "YA" : "TIDAK"}
+
+                <br>
+
+                Pemenang:
+                ${item.is_winner ? "YA" : "TIDAK"}
+
             </div>
         `).join("");
+
 }
 
-async function saveSurvey(){
+async function saveSurvey() {
 
     const { error } =
         await window.supabaseClient
             .from("price_surveys")
             .insert([{
 
-                package_id:
-                    packageId,
+                package_item_id:
+                    packageItemId,
 
                 vendor_name:
                     document
@@ -115,8 +156,29 @@ async function saveSurvey(){
                             .getElementById(
                                 "surveyPrice"
                             )
-                            .value
-                    )
+                            .value || 0
+                    ),
+
+                negotiated_price:
+                    parseFloat(
+                        document
+                            .getElementById(
+                                "negotiatedPrice"
+                            )
+                            .value || 0
+                    ),
+
+                notes:
+                    document
+                        .getElementById(
+                            "notes"
+                        )
+                        .value,
+
+                survey_date:
+                    new Date()
+                        .toISOString()
+                        .substring(0,10)
 
             }]);
 
