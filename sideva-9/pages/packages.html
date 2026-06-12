@@ -79,7 +79,6 @@ async function loadPackages() {
 
     const { data, error } =
         await window.supabaseClient
-            .schema("business")
             .from("packages")
             .select("*")
             .order("created_at", { ascending: false });
@@ -127,7 +126,6 @@ async function savePackage() {
 
     const { error } =
         await window.supabaseClient
-            .schema("business")
             .from("packages")
             .insert([{
                 tenant_id: profile.tenant_id,
