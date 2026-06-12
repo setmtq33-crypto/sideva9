@@ -16,6 +16,21 @@
 
 <h1>Survey Harga</h1>
 
+<hr>
+
+<a href="javascript:history.back()">
+    Kembali
+</a>
+
+|
+
+<button onclick="logout()">
+    Logout
+</button>
+
+<hr>
+
+
 <div id="surveyInfo">
 Loading...
 </div>
@@ -221,6 +236,19 @@ async function saveSurvey() {
     alert(
         "Survey berhasil disimpan"
     );
+
+    async function logout() {
+
+    await window.supabaseClient
+        .auth
+        .signOut();
+
+    window.location.href =
+        "login.html";
+}
+
+
+    
 
     loadSurveys();
 }
