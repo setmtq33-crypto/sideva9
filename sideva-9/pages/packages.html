@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paket Pengadaan - SI-DEVA 9</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/supabase.js"></script>
+</head>
+<body>
+
+<h1>Paket Pengadaan</h1>
+
+<hr>
+
+<h3>Tambah Paket</h3>
+
+<input id="packageName" placeholder="Nama Paket">
+
+<br><br>
+
+<input id="fiscalYear" type="number" value="2026">
+
+<br><br>
+
+<select id="procurementMethod">
+    <option value="ECATALOG">ECATALOG</option>
+    <option value="PENGADAAN_LANGSUNG">PENGADAAN_LANGSUNG</option>
+    <option value="MINI_KOMPETISI">MINI_KOMPETISI</option>
+</select>
+
+<br><br>
+
+<input id="budgetCeiling" type="number" placeholder="Pagu">
+
+<br><br>
+
+<button onclick="savePackage()">
+    Simpan Paket
+</button>
+
+<hr>
+
+<h3>Daftar Paket</h3>
+
+<div id="packageList">
+    Loading...
+</div>
+
+<script>
+
+let profile = null;
+
+async function loadProfile() {
+
+    const {
+        data: { user }
+    } = await window.supabaseClient.auth.getUser();
+
+    const { data } =
+        await window.supabaseClient
+            .from("profiles")
+            .select("*")
+            .eq("auth_user_id", user.id)
+            .single();
+
+    profile = data;
+}
+
+async function loadPackages() {
+
+    const { data, error } =
+        await window.supabaseClient
+            .from("packages")
+            .select("*")
+            .order("created_at", { ascending: false });
+
+    if(error) {
+        console.error(error);
+        return;
+    }
+
+    let html = "";
+
+    data.forEach(item => {
+
+        html += `
+            <div style="border:1px solid #ccc;padding:10px;margin-bottom:10px">
+                <b>${item.package_name}</b><br>
+                Tahun: ${item.fiscal_year}<br>
+                Metode: ${item.procurement_method}<br>
+                Pagu: ${item.budget_ceiling}
+            </div>
+        `;
+    });
+
+    document.getElementById("packageList").innerHTML =
+        html || "Belum ada paket";
+}
+
+async function savePackage() {
+
+    const package_name =
+        document.getElementById("packageName").value;
+
+    const fiscal_year =
+        parseInt(
+            document.getElementById("fiscalYear").value
+        );
+
+    const procurement_method =
+        document.getElementById("procurementMethod").value;
+
+    const budget_ceiling =
+        parseFloat(
+            document.getElementById("budgetCeiling").value || 0
+        );
+
+    const { error } =
+        await window.supabaseClient
+            .from("packages")
+            .insert([{
+                tenant_id: profile.tenant_id,
+                opd_id: profile.opd_id,
+                package_name,
+                fiscal_year,
+                procurement_method,
+                budget_ceiling
+            }]);
+
+    if(error) {
+        alert(error.message);
+        console.error(error);
+        return;
+    }
+
+    alert("Paket berhasil disimpan");
+
+    loadPackages();
+}
+
+async function init() {
+
+    await loadProfile();
+
+    await loadPackages();
+}
+
+init();
+
+</script>
+
+</body>
+</html>
