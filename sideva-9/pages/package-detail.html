@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -13,7 +12,6 @@
 <script src="../js/supabase.js"></script>
 
 </head>
-
 <body>
 
 <h1>Detail Paket</h1>
@@ -21,12 +19,6 @@
 <div id="packageInfo">
 Loading...
 </div>
-
-<hr>
-
-<a id="surveyLink">
-    Survey Harga
-</a>
 
 <hr>
 
@@ -86,11 +78,6 @@ const params =
 const packageId =
     params.get("id");
 
-document
-    .getElementById("surveyLink")
-    .href =
-    `surveys.html?package_id=${packageId}`;
-
 async function loadPackage() {
 
     const { data, error } =
@@ -113,7 +100,7 @@ async function loadPackage() {
         <b>${data.package_name}</b>
         <br>
         No RUP:
-        ${data.rup_number ?? '-'}
+        ${data.rup_number ?? "-"}
         <br>
         Tahun:
         ${data.fiscal_year}
@@ -151,41 +138,41 @@ async function loadItems() {
     }
 
     document.getElementById(
-    "itemList"
-).innerHTML =
-    data.map(item => `
-        <div style="
-            border:1px solid #ccc;
-            padding:10px;
-            margin-bottom:10px;
-        ">
+        "itemList"
+    ).innerHTML =
+        data.map(item => `
+            <div style="
+                border:1px solid #ccc;
+                padding:10px;
+                margin-bottom:10px;
+            ">
 
-            <b>${item.item_name}</b>
+                <b>${item.item_name}</b>
 
-            <br>
+                <br>
 
-            ${item.specification ?? ''}
+                ${item.specification ?? ""}
 
-            <br>
+                <br>
 
-            Volume:
-            ${item.quantity}
-            ${item.unit}
+                Volume:
+                ${item.quantity}
+                ${item.unit}
 
-            <br>
+                <br>
 
-            Perkiraan Harga:
-            ${item.estimated_price}
+                Perkiraan Harga:
+                ${item.estimated_price}
 
-            <br><br>
+                <br><br>
 
-            <a href="surveys.html?package_item_id=${item.id}">
-                Survey Harga
-            </a>
+                <a href="surveys.html?package_item_id=${item.id}">
+                    Survey Harga
+                </a>
 
-        </div>
-    `).join("")
-    || "Belum ada rincian belanja";
+            </div>
+        `).join("")
+        || "Belum ada rincian belanja";
 }
 
 async function saveItem() {
