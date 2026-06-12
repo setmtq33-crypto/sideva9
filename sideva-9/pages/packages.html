@@ -79,6 +79,7 @@ async function loadPackages() {
 
     const { data, error } =
         await window.supabaseClient
+            .schema("business")
             .from("packages")
             .select("*")
             .order("created_at", { ascending: false });
