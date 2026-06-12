@@ -151,27 +151,41 @@ async function loadItems() {
     }
 
     document.getElementById(
-        "itemList"
-    ).innerHTML =
-        data.map(item => `
-            <div style="
-                border:1px solid #ccc;
-                padding:10px;
-                margin-bottom:10px;
-            ">
-                <b>${item.item_name}</b>
-                <br>
-                ${item.specification ?? ''}
-                <br>
-                Volume:
-                ${item.quantity}
-                ${item.unit}
-                <br>
-                Perkiraan Harga:
-                ${item.estimated_price}
-            </div>
-        `).join("")
-        || "Belum ada rincian belanja";
+    "itemList"
+).innerHTML =
+    data.map(item => `
+        <div style="
+            border:1px solid #ccc;
+            padding:10px;
+            margin-bottom:10px;
+        ">
+
+            <b>${item.item_name}</b>
+
+            <br>
+
+            ${item.specification ?? ''}
+
+            <br>
+
+            Volume:
+            ${item.quantity}
+            ${item.unit}
+
+            <br>
+
+            Perkiraan Harga:
+            ${item.estimated_price}
+
+            <br><br>
+
+            <a href="surveys.html?package_item_id=${item.id}">
+                Survey Harga
+            </a>
+
+        </div>
+    `).join("")
+    || "Belum ada rincian belanja";
 }
 
 async function saveItem() {
