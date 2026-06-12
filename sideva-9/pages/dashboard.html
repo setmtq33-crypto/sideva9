@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dashboard SI-DEVA 9</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="../js/config.js"></script>
+<script src="../js/supabase.js"></script>
+
+</head>
+
+<body>
+
+<h1>Dashboard SI-DEVA 9</h1>
+
+<div id="userInfo"></div>
+
+<script>
+
+async function init() {
+
+    const {
+        data: { user }
+    } = await supabaseClient.auth.getUser();
+
+    if (!user) {
+
+        window.location.href =
+            'login.html';
+
+        return;
+    }
+
+    document.getElementById('userInfo')
+        .innerHTML =
+        `
+        UID : ${user.id}
+        <br>
+        Email : ${user.email}
+        `;
+}
+
+const {
+  data: { user }
+} = await supabaseClient.auth.getUser();
+
+const { data, error } =
+  await supabaseClient
+    .from('profiles')
+    .select('*')
+    .eq('auth_user_id', user.id)
+    .single();
+
+console.log(data);
+console.log(error);
+
+
+
+
+
+
+
+init();
+
+</script>
+
+</body>
+</html>

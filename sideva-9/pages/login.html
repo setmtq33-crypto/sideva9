@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SI-DEVA 9 Login</title>
+
+<link rel="stylesheet" href="../css/login.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="../js/config.js"></script>
+<script src="../js/supabase.js"></script>
+<script src="../js/auth.js"></script>
+
+</head>
+
+<body>
+
+<div class="login-card">
+
+    <h1>SI-DEVA 9</h1>
+
+    <input
+      type="email"
+      id="email"
+      placeholder="Email">
+
+    <input
+      type="password"
+      id="password"
+      placeholder="Password">
+
+    <button onclick="login()">
+      Login
+    </button>
+
+    <div id="msg"></div>
+
+</div>
+
+</body>
+</html>
