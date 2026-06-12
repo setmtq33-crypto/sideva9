@@ -1,76 +1,223 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SI-DEVA 9 Dashboard</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <script src="../js/config.js"></script>
-    <script src="../js/supabase.js"></script>
+<title>Dashboard SI-DEVA 9</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="../js/config.js"></script>
+<script src="../js/supabase.js"></script>
+
 </head>
-
 <body>
 
-    <h1>SI-DEVA 9</h1>
+<h1>SI-DEVA 9</h1>
 
-    <div id="status">Loading...</div>
+<div id="userInfo">
+Loading...
+</div>
 
-    <script>
+<hr>
 
-    async function init() {
+<h2>Menu Utama</h2>
 
-        try {
+<p>
+<a href="packages.html">
+    Kelola Paket Pengadaan
+</a>
+</p>
 
-            const {
-                data: { user }
-            } = await window.supabaseClient.auth.getUser();
+<p>
+<a href="packages.html">
+    Rincian Belanja & Survey Harga
+</a>
+</p>
 
-            if (!user) {
-                window.location.href = "login.html";
-                return;
-            }
+<hr>
 
-            const { data: profile, error } =
-                await window.supabaseClient
-                    .from("profiles")
-                    .select("*")
-                    .eq("auth_user_id", user.id)
-                    .single();
+<h2>Ringkasan</h2>
 
-            if (error) {
-                document.getElementById("status").innerHTML =
-                    "<pre>" + JSON.stringify(error, null, 2) + "</pre>";
-                return;
-            }
+<div id="summary">
 
-            document.getElementById("status").innerHTML = `
-                <h3>Login Berhasil</h3>
+    <p>
+        Jumlah Paket :
+        <span id="totalPackages">0</span>
+    </p>
 
-                <p><b>Nama:</b> ${profile.full_name}</p>
+    <p>
+        Jumlah Item :
+        <span id="totalItems">0</span>
+    </p>
 
-                <p><b>Email:</b> ${profile.email}</p>
+    <p>
+        Jumlah Survey :
+        <span id="totalSurveys">0</span>
+    </p>
 
-                <p><b>Role:</b> ${profile.role}</p>
+</div>
 
-                <p><b>Tenant ID:</b> ${profile.tenant_id}</p>
+<hr>
 
-                <p><b>OPD ID:</b> ${profile.opd_id ?? "-"}</p>
-            `;
+<button onclick="logout()">
+    Logout
+</button>
 
-        } catch (err) {
+<script>
 
-            console.error(err);
+let profile = null;
 
-            document.getElementById("status").innerHTML =
-                "<pre>" + err.message + "</pre>";
-        }
+async function loadProfile() {
+
+    const {
+        data: { user }
+    } =
+    await window.supabaseClient.auth.getUser();
+
+    if(!user){
+
+        window.location.href =
+            "login.html";
+
+        return;
     }
 
-    init();
+    const { data, error } =
+        await window.supabaseClient
+            .from("profiles")
+            .select("*")
+            .eq(
+                "auth_user_id",
+                user.id
+            )
+            .single();
 
-    </script>
+    if(error){
+
+        console.error(error);
+
+        return;
+    }
+
+    profile = data;
+
+    document.getElementById(
+        "userInfo"
+    ).innerHTML = `
+
+        <b>${data.full_name}</b>
+
+        <br>
+
+        Email :
+        ${data.email}
+
+        <br>
+
+        Role :
+        ${data.role}
+
+    `;
+}
+
+async function loadSummary() {
+
+    let packageQuery =
+        window.supabaseClient
+            .from("packages")
+            .select("*", {
+                count: "exact",
+                head: true
+            });
+
+    let itemQuery =
+        window.supabaseClient
+            .from("package_items")
+            .select("*", {
+                count: "exact",
+                head: true
+            });
+
+    let surveyQuery =
+        window.supabaseClient
+            .from("price_surveys")
+            .select("*", {
+                count: "exact",
+                head: true
+            });
+
+    if(profile.role === "ADMIN_OPD") {
+
+        packageQuery =
+            packageQuery.eq(
+                "opd_id",
+                profile.opd_id
+            );
+
+        itemQuery =
+            itemQuery.eq(
+                "opd_id",
+                profile.opd_id
+            );
+
+        surveyQuery =
+            surveyQuery.eq(
+                "opd_id",
+                profile.opd_id
+            );
+    }
+
+    const {
+        count: packageCount
+    } = await packageQuery;
+
+    const {
+        count: itemCount
+    } = await itemQuery;
+
+    const {
+        count: surveyCount
+    } = await surveyQuery;
+
+    document.getElementById(
+        "totalPackages"
+    ).innerText =
+        packageCount || 0;
+
+    document.getElementById(
+        "totalItems"
+    ).innerText =
+        itemCount || 0;
+
+    document.getElementById(
+        "totalSurveys"
+    ).innerText =
+        surveyCount || 0;
+}
+
+async function logout() {
+
+    await window.supabaseClient
+        .auth
+        .signOut();
+
+    window.location.href =
+        "login.html";
+}
+
+async function init() {
+
+    await loadProfile();
+
+    await loadSummary();
+}
+
+init();
+
+</script>
 
 </body>
 </html>
