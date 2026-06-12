@@ -60,8 +60,6 @@ async function loadProfile() {
         data: { user }
     } = await window.supabaseClient.auth.getUser();
 
-    console.log("USER", user);
-
     const { data, error } =
         await window.supabaseClient
             .from("profiles")
@@ -69,52 +67,41 @@ async function loadProfile() {
             .eq("auth_user_id", user.id)
             .single();
 
-    console.log("PROFILE", data);
-    console.log("PROFILE ERROR", error);
+    if (error) {
+        console.error(error);
+        return;
+    }
 
     profile = data;
 }
 
-<script>
-
 async function loadPackages() {
 
-    const {
-        data: { user }
-    } = await supabaseClient.auth.getUser();
-
-    const { data: profile } =
-        await supabaseClient
-            .from('profiles')
-            .select('*')
-            .eq('auth_user_id', user.id)
-            .single();
-
     let query =
-        supabaseClient
-            .from('packages')
-            .select('*')
-            .order('created_at', { ascending: false });
+        window.supabaseClient
+            .from("packages")
+            .select("*")
+            .order("created_at", {
+                ascending: false
+            });
 
-    if (profile.role === 'ADMIN_OPD') {
+    if (profile.role === "ADMIN_OPD") {
 
-        query =
-            query.eq(
-                'opd_id',
-                profile.opd_id
-            );
+        query = query.eq(
+            "opd_id",
+            profile.opd_id
+        );
     }
 
     const { data, error } =
         await query;
 
-    console.log(data);
-    console.log(error);
-
     const container =
-        document.getElementById('packageList');
+        document.getElementById("packageList");
 
     if (error) {
+
+        console.error(error);
 
         container.innerHTML =
             error.message;
@@ -125,7 +112,7 @@ async function loadPackages() {
     if (!data || data.length === 0) {
 
         container.innerHTML =
-            'Belum ada paket';
+            "Belum ada paket";
 
         return;
     }
@@ -137,41 +124,20 @@ async function loadPackages() {
                 padding:10px;
                 margin-bottom:10px;
             ">
-
                 <b>${pkg.package_name}</b>
-
                 <br>
-
-                Tahun:
-                ${pkg.fiscal_year}
-
+                Tahun: ${pkg.fiscal_year}
                 <br>
-
-                Metode:
-                ${pkg.procurement_method}
-
+                Metode: ${pkg.procurement_method}
                 <br>
-
-                Pagu:
-                ${pkg.budget_ceiling}
-
+                Pagu: ${pkg.budget_ceiling}
                 <br>
-
-                Status:
-                ${pkg.status}
-
+                Status: ${pkg.status}
                 <br>
-
-                OPD:
-                ${pkg.opd_id}
-
+                OPD: ${pkg.opd_id}
             </div>
-        `).join('');
+        `).join("");
 }
-
-loadPackages();
-
-</script>
 
 async function savePackage() {
 
@@ -203,7 +169,8 @@ async function savePackage() {
                 budget_ceiling
             }]);
 
-    if(error) {
+    if (error) {
+
         alert(error.message);
         console.error(error);
         return;
