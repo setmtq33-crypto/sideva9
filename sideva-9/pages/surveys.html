@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Survey Harga</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="../js/config.js"></script>
+<script src="../js/supabase.js"></script>
+
+</head>
+
+<body>
+
+<h1>Survey Harga</h1>
+
+<input id="vendorName"
+       placeholder="Nama Penyedia">
+
+<br><br>
+
+<input id="surveyPrice"
+       type="number"
+       placeholder="Harga Survey">
+
+<br><br>
+
+<button onclick="saveSurvey()">
+    Simpan Survey
+</button>
+
+<hr>
+
+<div id="surveyList">
+Loading...
+</div>
+
+<script>
+
+const params =
+    new URLSearchParams(
+        window.location.search
+    );
+
+const packageId =
+    params.get("package_id");
+
+async function loadSurveys(){
+
+    const { data, error } =
+        await window.supabaseClient
+            .from("price_surveys")
+            .select("*")
+            .eq(
+                "package_id",
+                packageId
+            )
+            .order(
+                "survey_price",
+                {
+                    ascending:true
+                }
+            );
+
+    if(error){
+
+        console.error(error);
+
+        return;
+    }
+
+    document
+        .getElementById(
+            "surveyList"
+        )
+        .innerHTML =
+        data.map(item => `
+            <div style="
+                border:1px solid #ccc;
+                padding:10px;
+                margin-bottom:10px;
+            ">
+                <b>${item.vendor_name}</b>
+                <br>
+                Harga:
+                ${item.survey_price}
+            </div>
+        `).join("");
+}
+
+async function saveSurvey(){
+
+    const { error } =
+        await window.supabaseClient
+            .from("price_surveys")
+            .insert([{
+
+                package_id:
+                    packageId,
+
+                vendor_name:
+                    document
+                        .getElementById(
+                            "vendorName"
+                        )
+                        .value,
+
+                survey_price:
+                    parseFloat(
+                        document
+                            .getElementById(
+                                "surveyPrice"
+                            )
+                            .value
+                    )
+
+            }]);
+
+    if(error){
+
+        alert(error.message);
+
+        console.error(error);
+
+        return;
+    }
+
+    alert(
+        "Survey berhasil disimpan"
+    );
+
+    loadSurveys();
+}
+
+loadSurveys();
+
+</script>
+
+</body>
+</html>
