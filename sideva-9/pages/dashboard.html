@@ -58,6 +58,43 @@ const { data, error } =
 console.log(data);
 console.log(error);
 
+<div id="profileInfo"></div>
+
+async function init() {
+
+    const {
+        data: { user }
+    } = await supabaseClient.auth.getUser();
+
+    if (!user) {
+
+        window.location.href = 'login.html';
+        return;
+    }
+
+    const { data, error } =
+        await supabaseClient
+            .from('profiles')
+            .select(`
+                *,
+                opds(name),
+                tenants(name)
+            `)
+            .eq('auth_user_id', user.id)
+            .single();
+
+    console.log(data);
+    console.log(error);
+
+    document.getElementById('profileInfo').innerHTML = `
+        <p><b>Nama:</b> ${data.full_name}</p>
+        <p><b>Role:</b> ${data.role}</p>
+        <p><b>Tenant:</b> ${data.tenants?.name ?? '-'}</p>
+        <p><b>OPD:</b> ${data.opds?.name ?? '-'}</p>
+    `;
+}
+
+init();
 
 
 
