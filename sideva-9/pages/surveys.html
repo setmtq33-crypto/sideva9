@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -13,14 +12,17 @@
 <script src="../js/supabase.js"></script>
 
 </head>
-
 <body>
 
 <h1>Survey Harga</h1>
 
-<div id="packageItemInfo"></div>
+<div id="surveyInfo">
+Loading...
+</div>
 
 <hr>
+
+<h3>Tambah Survey Harga</h3>
 
 <input
     id="vendorName"
@@ -91,6 +93,13 @@ async function loadSurveys() {
 
         console.error(error);
 
+        document
+            .getElementById(
+                "surveyList"
+            )
+            .innerHTML =
+            error.message;
+
         return;
     }
 
@@ -115,7 +124,7 @@ async function loadSurveys() {
 
                 <br>
 
-                Harga Nego:
+                Harga Negosiasi:
                 ${item.negotiated_price ?? "-"}
 
                 <br>
@@ -128,17 +137,35 @@ async function loadSurveys() {
                 Pemenang:
                 ${item.is_winner ? "YA" : "TIDAK"}
 
-            </div>
-        `).join("");
+                <br>
 
+                Catatan:
+                ${item.notes ?? "-"}
+
+            </div>
+        `).join("")
+        || "Belum ada survey";
 }
 
 async function saveSurvey() {
+
+    const { data: profile } =
+        await window.supabaseClient
+            .from("profiles")
+            .select("*")
+            .limit(1)
+            .single();
 
     const { error } =
         await window.supabaseClient
             .from("price_surveys")
             .insert([{
+
+                tenant_id:
+                    profile.tenant_id,
+
+                opd_id:
+                    profile.opd_id,
 
                 package_item_id:
                     packageItemId,
