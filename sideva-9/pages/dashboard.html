@@ -1,67 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SI-DEVA 9 Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/supabase.js"></script>
+</head>
+
 <body>
 
-<h1>Dashboard SI-DEVA 9</h1>
+    <h1>SI-DEVA 9</h1>
 
-<div id="userInfo"></div>
+    <div id="status">Loading...</div>
 
-<div id="profileInfo"></div>
+    <script>
 
-<script>
+    async function init() {
 
-async function init() {
+        try {
 
-    const {
-        data: { user }
-    } = await supabaseClient.auth.getUser();
+            const {
+                data: { user }
+            } = await window.supabaseClient.auth.getUser();
 
-    if (!user) {
-        window.location.href = 'login.html';
-        return;
+            if (!user) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            const { data: profile, error } =
+                await window.supabaseClient
+                    .from("profiles")
+                    .select("*")
+                    .eq("auth_user_id", user.id)
+                    .single();
+
+            if (error) {
+                document.getElementById("status").innerHTML =
+                    "<pre>" + JSON.stringify(error, null, 2) + "</pre>";
+                return;
+            }
+
+            document.getElementById("status").innerHTML = `
+                <h3>Login Berhasil</h3>
+
+                <p><b>Nama:</b> ${profile.full_name}</p>
+
+                <p><b>Email:</b> ${profile.email}</p>
+
+                <p><b>Role:</b> ${profile.role}</p>
+
+                <p><b>Tenant ID:</b> ${profile.tenant_id}</p>
+
+                <p><b>OPD ID:</b> ${profile.opd_id ?? "-"}</p>
+            `;
+
+        } catch (err) {
+
+            console.error(err);
+
+            document.getElementById("status").innerHTML =
+                "<pre>" + err.message + "</pre>";
+        }
     }
 
-    document.getElementById('userInfo').innerHTML = `
-        UID : ${user.id}
-        <br>
-        Email : ${user.email}
-    `;
+    init();
 
-    const { data, error } =
-        await supabaseClient
-            .from('profiles')
-            .select(`
-                *,
-                opds(name),
-                tenants(name)
-            `)
-            .eq('auth_user_id', user.id)
-            .single();
-
-    console.log(data);
-    console.log(error);
-
-    if (error) {
-        console.error(error);
-        return;
-    }
-
-    document.getElementById('profileInfo').innerHTML = `
-        <p><b>Nama:</b> ${data.full_name}</p>
-        <p><b>Role:</b> ${data.role}</p>
-        <p><b>Tenant:</b> ${data.tenants?.name ?? '-'}</p>
-        <p><b>OPD:</b> ${data.opds?.name ?? '-'}</p>
-    `;
-}
-
-init();
-
-</script>
-
-<script src="../js/supabase.js"></script>
-
-<script>
-console.log(window.SUPABASE_URL);
-console.log(window.supabaseClient);
-</script>
-
+    </script>
 
 </body>
+</html>
