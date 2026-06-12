@@ -191,10 +191,41 @@ async function loadItems() {
 
 async function saveItem() {
 
+    const {
+        data: { user }
+    } =
+    await window.supabaseClient.auth.getUser();
+
+    const {
+        data: profile,
+        error: profileError
+    } =
+    await window.supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq(
+            "auth_user_id",
+            user.id
+        )
+        .single();
+
+    if(profileError){
+
+        alert(profileError.message);
+
+        return;
+    }
+
     const { error } =
         await window.supabaseClient
             .from("package_items")
             .insert([{
+
+                tenant_id:
+                    profile.tenant_id,
+
+                opd_id:
+                    profile.opd_id,
 
                 package_id:
                     packageId,
