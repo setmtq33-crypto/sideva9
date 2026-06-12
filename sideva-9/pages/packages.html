@@ -75,36 +75,103 @@ async function loadProfile() {
     profile = data;
 }
 
+<script>
+
 async function loadPackages() {
 
-    const { data, error } =
-        await window.supabaseClient
-            .from("packages")
-            .select("*")
-            .order("created_at", { ascending: false });
+    const {
+        data: { user }
+    } = await supabaseClient.auth.getUser();
 
-    if(error) {
-        console.error(error);
+    const { data: profile } =
+        await supabaseClient
+            .from('profiles')
+            .select('*')
+            .eq('auth_user_id', user.id)
+            .single();
+
+    let query =
+        supabaseClient
+            .from('packages')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+    if (profile.role === 'ADMIN_OPD') {
+
+        query =
+            query.eq(
+                'opd_id',
+                profile.opd_id
+            );
+    }
+
+    const { data, error } =
+        await query;
+
+    console.log(data);
+    console.log(error);
+
+    const container =
+        document.getElementById('packageList');
+
+    if (error) {
+
+        container.innerHTML =
+            error.message;
+
         return;
     }
 
-    let html = "";
+    if (!data || data.length === 0) {
 
-    data.forEach(item => {
+        container.innerHTML =
+            'Belum ada paket';
 
-        html += `
-            <div style="border:1px solid #ccc;padding:10px;margin-bottom:10px">
-                <b>${item.package_name}</b><br>
-                Tahun: ${item.fiscal_year}<br>
-                Metode: ${item.procurement_method}<br>
-                Pagu: ${item.budget_ceiling}
+        return;
+    }
+
+    container.innerHTML =
+        data.map(pkg => `
+            <div style="
+                border:1px solid #ccc;
+                padding:10px;
+                margin-bottom:10px;
+            ">
+
+                <b>${pkg.package_name}</b>
+
+                <br>
+
+                Tahun:
+                ${pkg.fiscal_year}
+
+                <br>
+
+                Metode:
+                ${pkg.procurement_method}
+
+                <br>
+
+                Pagu:
+                ${pkg.budget_ceiling}
+
+                <br>
+
+                Status:
+                ${pkg.status}
+
+                <br>
+
+                OPD:
+                ${pkg.opd_id}
+
             </div>
-        `;
-    });
-
-    document.getElementById("packageList").innerHTML =
-        html || "Belum ada paket";
+        `).join('');
 }
+
+loadPackages();
+
+</script>
 
 async function savePackage() {
 
