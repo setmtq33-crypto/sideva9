@@ -119,6 +119,10 @@ async function loadPackages() {
 
     container.innerHTML =
         data.map(pkg => `
+            <br><br>
+            <a href="package-detail.html?id=${pkg.id}">
+            Detail
+            </a>
             <div style="
                 border:1px solid #ccc;
                 padding:10px;
