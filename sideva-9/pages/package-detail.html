@@ -16,6 +16,20 @@
 
 <h1>Detail Paket</h1>
 
+<hr>
+
+<a href="packages.html">
+    Kembali ke Paket
+</a>
+
+|
+
+<button onclick="logout()">
+    Logout
+</button>
+
+<hr>
+
 <div id="packageInfo">
 Loading...
 </div>
@@ -248,6 +262,17 @@ async function init(){
 
     await loadItems();
 }
+
+async function logout() {
+
+    await window.supabaseClient
+        .auth
+        .signOut();
+
+    window.location.href =
+        "login.html";
+}
+
 
 init();
 
