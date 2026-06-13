@@ -1,12 +1,284 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Master Pejabat Pengadaan</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="../js/config.js"></script>
+<script src="../js/supabase.js"></script>
+
+</head>
 <body>
 
-<h1>Dalam Pengembangan</h1>
+<h1>Master Pejabat Pengadaan</h1>
+
+<hr>
 
 <a href="dashboard.html">
 Kembali Dashboard
 </a>
+
+|
+
+<button onclick="logout()">
+Logout
+</button>
+
+<hr>
+
+<h3>Tambah Pejabat Pengadaan</h3>
+
+<input
+    id="fullName"
+    placeholder="Nama Pejabat Pengadaan"
+>
+
+<br><br>
+
+<input
+    id="nip"
+    placeholder="NIP"
+>
+
+<br><br>
+
+<input
+    id="position"
+    placeholder="Jabatan"
+>
+
+<br><br>
+
+<button onclick="saveOfficer()">
+Simpan
+</button>
+
+<hr>
+
+<h3>Daftar Pejabat Pengadaan</h3>
+
+<div id="officerList">
+
+Loading...
+
+</div>
+
+<script>
+
+let profile = null;
+
+async function loadProfile() {
+
+    const {
+        data: { user }
+    } =
+    await window.supabaseClient.auth.getUser();
+
+    if(!user){
+
+        window.location.href =
+            "login.html";
+
+        return;
+    }
+
+    const {
+        data,
+        error
+    } =
+    await window.supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq(
+            "auth_user_id",
+            user.id
+        )
+        .single();
+
+    if(error){
+
+        alert(error.message);
+
+        return;
+    }
+
+    profile = data;
+}
+
+async function saveOfficer() {
+
+    const full_name =
+        document
+            .getElementById(
+                "fullName"
+            )
+            .value;
+
+    const nip =
+        document
+            .getElementById(
+                "nip"
+            )
+            .value;
+
+    const position =
+        document
+            .getElementById(
+                "position"
+            )
+            .value;
+
+    if(
+        !full_name ||
+        !nip ||
+        !position
+    ){
+
+        alert(
+            "Nama, NIP dan Jabatan wajib diisi"
+        );
+
+        return;
+    }
+
+    const { error } =
+        await window.supabaseClient
+            .from("procurement_officers")
+            .insert([{
+
+                tenant_id:
+                    profile.tenant_id,
+
+                opd_id:
+                    profile.opd_id,
+
+                full_name,
+                nip,
+                position
+
+            }]);
+
+    if(error){
+
+        alert(error.message);
+
+        console.error(error);
+
+        return;
+    }
+
+    alert(
+        "Pejabat Pengadaan berhasil disimpan"
+    );
+
+    loadOfficers();
+}
+
+async function loadOfficers() {
+
+    let query =
+        window.supabaseClient
+            .from("procurement_officers")
+            .select("*")
+            .order(
+                "full_name"
+            );
+
+    if(
+        profile.role ===
+        "ADMIN_OPD"
+    ){
+
+        query =
+            query.eq(
+                "opd_id",
+                profile.opd_id
+            );
+    }
+
+    const {
+        data,
+        error
+    } =
+    await query;
+
+    const container =
+        document.getElementById(
+            "officerList"
+        );
+
+    if(error){
+
+        container.innerHTML =
+            error.message;
+
+        return;
+    }
+
+    if(
+        !data ||
+        data.length === 0
+    ){
+
+        container.innerHTML =
+            "Belum ada Pejabat Pengadaan";
+
+        return;
+    }
+
+    container.innerHTML =
+        data.map(item => `
+
+            <div style="
+                border:1px solid #ccc;
+                padding:10px;
+                margin-bottom:10px;
+            ">
+
+                <b>
+                ${item.full_name}
+                </b>
+
+                <br>
+
+                NIP:
+                ${item.nip}
+
+                <br>
+
+                Jabatan:
+                ${item.position}
+
+            </div>
+
+        `).join('');
+}
+
+async function logout() {
+
+    await window.supabaseClient
+        .auth
+        .signOut();
+
+    window.location.href =
+        "login.html";
+}
+
+async function init() {
+
+    await loadProfile();
+
+    await loadOfficers();
+}
+
+init();
+
+</script>
 
 </body>
 </html>
