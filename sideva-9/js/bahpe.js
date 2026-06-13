@@ -57,6 +57,14 @@ async function generateBahpe(packageId) {
 
         if (statusError) throw statusError;
 
+        await writeAuditLog(
+            'BAHPE',
+            'GENERATE',
+            packageId,
+            'Generate BAHPE'
+        
+        );
+
         alert('BAHPE berhasil dibuat');
 
         return true;
@@ -110,6 +118,13 @@ async function approveBahpe(bahpeId) {
 
         if (statusError) throw statusError;
 
+        await writeAuditLog(
+            'BAHPE',
+            'APPROVE',
+            bahpeId,
+            'Approve BAHPE'
+        );
+
         alert('BAHPE berhasil disetujui');
 
         return true;
@@ -139,6 +154,13 @@ async function submitToPBJ(packageId) {
                 .eq('id', packageId);
 
         if (error) throw error;
+
+        await writeAuditLog(
+            'PROCUREMENT',
+            'SUBMIT',
+            packageId,
+            'Serahkan paket ke PBJ'
+        );
 
         alert('Paket siap diserahkan ke PBJ');
 
