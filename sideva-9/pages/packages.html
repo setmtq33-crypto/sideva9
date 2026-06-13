@@ -652,6 +652,14 @@ async function loadPackages(){
                 <div class="d-flex gap-2">
 
                     <button
+                        class="btn btn-outline-info btn-sm"
+                        onclick="openDpp('${pkg.id}')">
+                    
+                        DPP
+                    
+                    </button>
+
+                    <button
                         class="btn btn-outline-primary btn-sm"
                         onclick="openItems('${pkg.id}')">
 
@@ -730,6 +738,12 @@ function openBahpe(id){
 
     location.href =
         `bahpe.html?id=${id}`;
+}
+
+function openDpp(id){
+
+    location.href =
+        `dpp.html?id=${id}`;
 }
     
     
