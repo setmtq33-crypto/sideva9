@@ -1,12 +1,284 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Master PPKOM - SI-DEVA 9</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="../js/config.js"></script>
+<script src="../js/supabase.js"></script>
+
+</head>
 <body>
 
-<h1>Dalam Pengembangan</h1>
+<h1>Master PPKOM</h1>
+
+<hr>
 
 <a href="dashboard.html">
 Kembali Dashboard
 </a>
+
+|
+
+<button onclick="logout()">
+Logout
+</button>
+
+<hr>
+
+<h3>Tambah PPKOM</h3>
+
+<input
+    id="fullName"
+    placeholder="Nama PPKOM"
+>
+
+<br><br>
+
+<input
+    id="nip"
+    placeholder="NIP"
+>
+
+<br><br>
+
+<input
+    id="position"
+    placeholder="Jabatan"
+>
+
+<br><br>
+
+<button onclick="savePPKOM()">
+Simpan PPKOM
+</button>
+
+<hr>
+
+<h3>Daftar PPKOM</h3>
+
+<div id="ppkomList">
+
+Loading...
+
+</div>
+
+<script>
+
+let profile = null;
+
+async function loadProfile() {
+
+    const {
+        data: { user }
+    } =
+    await window.supabaseClient.auth.getUser();
+
+    if(!user){
+
+        window.location.href =
+            "login.html";
+
+        return;
+    }
+
+    const {
+        data,
+        error
+    } =
+    await window.supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq(
+            "auth_user_id",
+            user.id
+        )
+        .single();
+
+    if(error){
+
+        alert(error.message);
+
+        return;
+    }
+
+    profile = data;
+}
+
+async function savePPKOM() {
+
+    const full_name =
+        document
+            .getElementById(
+                "fullName"
+            )
+            .value;
+
+    const nip =
+        document
+            .getElementById(
+                "nip"
+            )
+            .value;
+
+    const position =
+        document
+            .getElementById(
+                "position"
+            )
+            .value;
+
+    if(
+        !full_name ||
+        !nip ||
+        !position
+    ){
+
+        alert(
+            "Nama, NIP dan Jabatan wajib diisi"
+        );
+
+        return;
+    }
+
+    const { error } =
+        await window.supabaseClient
+            .from("ppkoms")
+            .insert([{
+
+                tenant_id:
+                    profile.tenant_id,
+
+                opd_id:
+                    profile.opd_id,
+
+                full_name,
+                nip,
+                position
+
+            }]);
+
+    if(error){
+
+        alert(error.message);
+
+        console.error(error);
+
+        return;
+    }
+
+    alert(
+        "PPKOM berhasil disimpan"
+    );
+
+    loadPPKOMs();
+}
+
+async function loadPPKOMs() {
+
+    let query =
+        window.supabaseClient
+            .from("ppkoms")
+            .select("*")
+            .order(
+                "full_name"
+            );
+
+    if(
+        profile.role ===
+        "ADMIN_OPD"
+    ){
+
+        query =
+            query.eq(
+                "opd_id",
+                profile.opd_id
+            );
+    }
+
+    const {
+        data,
+        error
+    } =
+    await query;
+
+    const container =
+        document.getElementById(
+            "ppkomList"
+        );
+
+    if(error){
+
+        container.innerHTML =
+            error.message;
+
+        return;
+    }
+
+    if(
+        !data ||
+        data.length === 0
+    ){
+
+        container.innerHTML =
+            "Belum ada PPKOM";
+
+        return;
+    }
+
+    container.innerHTML =
+        data.map(item => `
+
+            <div style="
+                border:1px solid #ccc;
+                padding:10px;
+                margin-bottom:10px;
+            ">
+
+                <b>
+                ${item.full_name}
+                </b>
+
+                <br>
+
+                NIP:
+                ${item.nip}
+
+                <br>
+
+                Jabatan:
+                ${item.position}
+
+            </div>
+
+        `).join('');
+}
+
+async function logout() {
+
+    await window.supabaseClient
+        .auth
+        .signOut();
+
+    window.location.href =
+        "login.html";
+}
+
+async function init() {
+
+    await loadProfile();
+
+    await loadPPKOMs();
+}
+
+init();
+
+</script>
 
 </body>
 </html>
