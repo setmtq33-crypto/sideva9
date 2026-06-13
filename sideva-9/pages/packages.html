@@ -336,10 +336,15 @@ async function initPage(){
 
 async function loadOpds(){
 
-    const { data } = await db
+    const { data, error } = await window.supabaseClient
         .from("opds")
         .select("*")
         .order("name");
+
+    if(error){
+        console.error(error);
+        return;
+    }
 
     const select =
         document.getElementById("opdSelect");
@@ -347,7 +352,7 @@ async function loadOpds(){
     select.innerHTML =
         '<option value="">Pilih OPD</option>';
 
-    data.forEach(opd=>{
+    data.forEach(opd => {
 
         select.innerHTML += `
             <option value="${opd.id}">
@@ -368,7 +373,7 @@ async function loadBidangs(){
         return;
     }
 
-    const { data } = await db
+    const { data } = window.supabaseClient
         .from("bidangs")
         .select("*")
         .eq("opd_id", opdId)
@@ -392,7 +397,7 @@ async function loadBidangs(){
 
 async function loadMak(){
 
-    const { data } = await db
+    const { data } = window.supabaseClient
         .from("budget_accounts")
         .select("*")
         .order("account_code");
@@ -478,7 +483,7 @@ async function savePackage(){
             document.getElementById("dppDate").value
     };
 
-    const { error } = await db
+    const { error } = window.supabaseClient
         .from("packages")
         .insert(payload);
 
