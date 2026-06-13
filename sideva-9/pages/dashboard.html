@@ -163,7 +163,7 @@ Paket Terbaru
 
 <script>
 
-const supabase = window.supabaseClient;
+const db = window.supabaseClient;
 
 function rupiah(v){
  return new Intl.NumberFormat('id-ID',{
@@ -188,10 +188,10 @@ async function init(){
 async function loadKPI(){
 
  const {data:packages} =
- await supabase.from('packages').select('*');
+ await db.from('packages').select('*');
 
  const {data:hps} =
- await supabase.from('package_hps').select('*');
+ await db.from('package_hps').select('*');
 
  const totalPackages =
  (packages||[]).length;
@@ -231,7 +231,7 @@ async function loadStatus(){
  ];
 
  const {data} =
- await supabase.from('packages')
+ await db.from('packages')
  .select('package_status');
 
  let html='';
@@ -255,7 +255,7 @@ async function loadStatus(){
 async function loadRecentPackages(){
 
  const {data} =
- await supabase
+ await db
  .from('packages')
  .select('*')
  .order('created_at',{ascending:false})
