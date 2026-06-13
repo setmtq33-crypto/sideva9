@@ -478,7 +478,7 @@ async function saveRup(){
             budgetCeiling,
 
         procurement_method:
-            procurementMethod,
+            'ECATALOG',
 
         source_url:
             sourceUrl,
@@ -517,6 +517,45 @@ async function saveRup(){
         'RUP berhasil disimpan'
     );
 }
+
+function mapProcurementMethod(
+    method
+){
+
+    if(!method)
+        return 'ECATALOG';
+
+    const value =
+        method
+        .toUpperCase();
+
+    if(
+        value.includes(
+            'E-PURCHASING'
+        )
+    ){
+        return 'ECATALOG';
+    }
+
+    if(
+        value.includes(
+            'LANGSUNG'
+        )
+    ){
+        return 'PENGADAAN_LANGSUNG';
+    }
+
+    if(
+        value.includes(
+            'MINI'
+        )
+    ){
+        return 'MINI_KOMPETISI';
+    }
+
+    return 'ECATALOG';
+}
+    
 
 async function importToPackage(
     rupId
@@ -585,7 +624,9 @@ async function importToPackage(
             rup.fiscal_year,
 
         procurement_method:
-            rup.procurement_method,
+            mapProcurementMethod(
+                rup.procurement_method
+            ),
 
         budget_ceiling:
             rup.budget_ceiling,
