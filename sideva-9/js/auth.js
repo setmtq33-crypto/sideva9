@@ -53,3 +53,32 @@ async function getProfile() {
 }
 
 window.getProfile = getProfile;
+
+async function requireAuth() {
+
+    const {
+        data: { user }
+    } = await supabaseClient.auth.getUser();
+
+    if (!user) {
+
+        window.location.href =
+            '/pages/login.html';
+
+        return false;
+    }
+
+    return true;
+}
+
+async function logout() {
+
+    await supabaseClient.auth.signOut();
+
+    window.location.href =
+        '/pages/login.html';
+}
+
+window.requireAuth = requireAuth;
+window.logout = logout;
+
