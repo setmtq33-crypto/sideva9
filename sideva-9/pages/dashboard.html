@@ -76,6 +76,16 @@ body{background:#f5f6fa}
 </div></div>
 </div>
 
+<div class="col-md-3">
+<div class="card">
+<div class="card-body">
+<small>Ready Procurement</small>
+<div id="readyProcurement" class="kpi">0</div>
+</div>
+</div>
+</div>
+
+ 
 </div>
 
 <div class="row mb-4">
@@ -145,6 +155,42 @@ OPD
 
 </div>
 
+<div class="row mb-4">
+
+<div class="col-md-12">
+
+<div class="card">
+
+<div class="card-header">
+Ringkasan OPD
+</div>
+
+<div class="card-body">
+
+<table class="table table-bordered">
+
+<thead>
+<tr>
+<th>OPD</th>
+<th>Jumlah Paket</th>
+<th>Total Pagu</th>
+</tr>
+</thead>
+
+<tbody id="opdSummaryTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
 <div class="row">
 
 <div class="col-md-12">
@@ -202,6 +248,7 @@ async function init(){
 
  await loadKPI();
  await loadStatus();
+ await loadOpdSummary();
  await loadRecentPackages();
 }
 
@@ -215,6 +262,13 @@ async function loadKPI(){
 
  const totalPackages =
  (packages||[]).length;
+
+ const readyProcurement =
+ (packages||[])
+ .filter(x =>
+ x.package_status ===
+ 'READY_PROCUREMENT'
+ ).length;
 
  const totalBudget =
  (packages||[]).reduce((a,b)=>
@@ -235,6 +289,9 @@ async function loadKPI(){
 
  document.getElementById('efficiency').innerText =
  rupiah(totalBudget-totalHps);
+
+ document.getElementById('readyProcurement').innerText =
+ readyProcurement;
 }
 
 async function loadStatus(){
@@ -273,6 +330,31 @@ async function loadStatus(){
  document.getElementById('statusTable').innerHTML=html;
 }
 
+async function loadOpdSummary(){
+
+ const { data } =
+ await dashboardDb
+ .from('dashboard_opd_summary')
+ .select('*');
+
+ let html='';
+
+ (data||[]).forEach(row=>{
+
+   html += `
+   <tr>
+     <td>${row.opd_name}</td>
+     <td>${row.total_packages}</td>
+     <td>${rupiah(row.total_budget)}</td>
+   </tr>`;
+ });
+
+ document.getElementById(
+ 'opdSummaryTable'
+ ).innerHTML = html;
+}
+
+
 async function loadRecentPackages(){
 
  const {data} =
@@ -296,6 +378,8 @@ async function loadRecentPackages(){
 
  document.getElementById('recentPackages').innerHTML=html;
 }
+
+
 
 
 init();
