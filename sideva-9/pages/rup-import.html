@@ -263,7 +263,7 @@ Loading...
 
 <script>
 
-const db =
+const rupDb =
     window.supabaseClient;
 
 let profile =
@@ -296,7 +296,7 @@ async function loadRupImports(){
         data,
         error
     } =
-    await db
+    await rupDb
     .from('rup_imports')
     .select('*')
     .order(
@@ -455,7 +455,7 @@ async function saveRup(){
     const {
         error
     } =
-    await db
+    await rupDb
     .from('rup_imports')
     .insert({
 
@@ -526,7 +526,7 @@ async function importToPackage(
         data: rup,
         error
     } =
-    await db
+    await rupDb
     .from('rup_imports')
     .select('*')
     .eq(
@@ -547,7 +547,7 @@ async function importToPackage(
     const {
         data: opd
     } =
-    await db
+    await rupDb
     .from('opds')
     .select('*')
     .eq(
@@ -568,7 +568,7 @@ async function importToPackage(
     const {
         error: packageError
     } =
-    await db
+    await rupDb
     .from('packages')
     .insert({
 
