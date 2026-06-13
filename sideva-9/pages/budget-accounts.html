@@ -1,12 +1,273 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Master MAK - SI-DEVA 9</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="../js/config.js"></script>
+<script src="../js/supabase.js"></script>
+
+</head>
 <body>
 
-<h1>Dalam Pengembangan</h1>
+<h1>Master Kode Rekening Belanja (MAK)</h1>
+
+<hr>
 
 <a href="dashboard.html">
 Kembali Dashboard
 </a>
+
+|
+
+<button onclick="logout()">
+Logout
+</button>
+
+<hr>
+
+<h3>Tambah MAK</h3>
+
+<input
+    id="accountCode"
+    placeholder="Kode Rekening"
+>
+
+<br><br>
+
+<input
+    id="accountName"
+    placeholder="Nama Rekening"
+    style="width:500px;"
+>
+
+<br><br>
+
+<input
+    id="ecatalogUrl"
+    placeholder="Link E-Katalog (opsional)"
+    style="width:500px;"
+>
+
+<br><br>
+
+<button onclick="saveAccount()">
+Simpan MAK
+</button>
+
+<hr>
+
+<h3>Daftar MAK</h3>
+
+<div id="accountList">
+
+Loading...
+
+</div>
+
+<script>
+
+let profile = null;
+
+async function loadProfile() {
+
+    const {
+        data: { user }
+    } =
+    await window.supabaseClient.auth.getUser();
+
+    if(!user){
+
+        window.location.href =
+            "login.html";
+
+        return;
+    }
+
+    const {
+        data,
+        error
+    } =
+    await window.supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq(
+            "auth_user_id",
+            user.id
+        )
+        .single();
+
+    if(error){
+
+        alert(error.message);
+
+        return;
+    }
+
+    profile = data;
+}
+
+async function saveAccount() {
+
+    const account_code =
+        document
+            .getElementById(
+                "accountCode"
+            )
+            .value;
+
+    const account_name =
+        document
+            .getElementById(
+                "accountName"
+            )
+            .value;
+
+    const ecatalog_url =
+        document
+            .getElementById(
+                "ecatalogUrl"
+            )
+            .value;
+
+    if(
+        !account_code ||
+        !account_name
+    ){
+
+        alert(
+            "Kode dan Nama Rekening wajib diisi"
+        );
+
+        return;
+    }
+
+    const { error } =
+        await window.supabaseClient
+            .from("budget_accounts")
+            .insert([{
+
+                tenant_id:
+                    profile.tenant_id,
+
+                account_code,
+                account_name,
+                ecatalog_url
+
+            }]);
+
+    if(error){
+
+        alert(error.message);
+
+        console.error(error);
+
+        return;
+    }
+
+    alert(
+        "MAK berhasil disimpan"
+    );
+
+    loadAccounts();
+}
+
+async function loadAccounts() {
+
+    const {
+        data,
+        error
+    } =
+    await window.supabaseClient
+        .from("budget_accounts")
+        .select("*")
+        .order(
+            "account_code"
+        );
+
+    const container =
+        document.getElementById(
+            "accountList"
+        );
+
+    if(error){
+
+        container.innerHTML =
+            error.message;
+
+        return;
+    }
+
+    if(
+        !data ||
+        data.length === 0
+    ){
+
+        container.innerHTML =
+            "Belum ada MAK";
+
+        return;
+    }
+
+    container.innerHTML =
+        data.map(item => `
+
+            <div style="
+                border:1px solid #ccc;
+                padding:10px;
+                margin-bottom:10px;
+            ">
+
+                <b>
+                ${item.account_code}
+                </b>
+
+                <br>
+
+                ${item.account_name}
+
+                <br><br>
+
+                ${
+                    item.ecatalog_url
+                    ?
+                    `<a href="${item.ecatalog_url}" target="_blank">
+                    Link E-Katalog
+                    </a>`
+                    :
+                    ''
+                }
+
+            </div>
+
+        `).join('');
+}
+
+async function logout() {
+
+    await window.supabaseClient
+        .auth
+        .signOut();
+
+    window.location.href =
+        "login.html";
+}
+
+async function init() {
+
+    await loadProfile();
+
+    await loadAccounts();
+}
+
+init();
+
+</script>
 
 </body>
 </html>
