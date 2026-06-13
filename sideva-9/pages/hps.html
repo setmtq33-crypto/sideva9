@@ -32,7 +32,22 @@ body{background:#f5f6fa}
 </div>
 
 <div>
-<a href="packages.html" class="btn btn-secondary">Kembali</a>
+
+<a href="packages.html"
+   class="btn btn-secondary">
+
+   Kembali
+
+</a>
+
+<button
+   class="btn btn-success"
+   onclick="saveHPS()">
+
+   Simpan HPS
+
+</button>
+
 </div>
 </div>
 
@@ -119,7 +134,19 @@ function rupiah(v){
 
 async function init(){
 
- packageId = new URLSearchParams(location.search).get('id');
+ packageId =
+   new URLSearchParams(location.search)
+   .get('id');
+
+ if(!packageId){
+
+   alert('Package ID tidak ditemukan');
+
+   location.href =
+     'packages.html';
+
+   return;
+ }
 
  await loadPackage();
  await calculateHPS();
@@ -200,6 +227,14 @@ async function saveHPS(){
         alert(error.message);
         return;
     }
+
+    await db
+       .from('packages')
+       .update({
+           package_status:
+           'HPS_COMPLETE'
+       })
+       .eq('id', packageId);
 
     alert('HPS berhasil disimpan');
 }
