@@ -218,6 +218,37 @@ Sync SIRUP 2026
 
 </div>
 
+<div class="card mb-4">
+
+    <div class="card-header">
+
+        Import JSON SIRUP
+
+    </div>
+
+    <div class="card-body">
+
+        <textarea
+            id="sirupJson"
+            class="form-control"
+            rows="10"
+            placeholder="Paste JSON response SIRUP di sini">
+        </textarea>
+
+        <button
+            id="importJsonBtn"
+            class="btn btn-success mt-3">
+
+            Import JSON SIRUP
+
+        </button>
+
+    </div>
+
+</div>
+
+    
+
 <div class="card">
 
 <div class="card-header">
@@ -303,6 +334,14 @@ async function init(){
     )
     .onclick =
     syncSirup;
+
+    document
+    .getElementById(
+        'importJsonBtn'
+    )
+    .onclick =
+    importSirupJson;
+    
 }
 
 async function loadRupImports(){
@@ -854,6 +893,162 @@ async function syncSirup(){
     }
 
 }
+
+async function importSirupJson(){
+
+    try{
+
+        const rawJson =
+            document
+            .getElementById(
+                'sirupJson'
+            )
+            .value
+            .trim();
+
+        if(
+            !rawJson
+        ){
+            alert(
+                'Paste JSON SIRUP terlebih dahulu'
+            );
+            return;
+        }
+
+        const json =
+            JSON.parse(
+                rawJson
+            );
+
+        const rows =
+            json.aaData || [];
+
+        if(
+            rows.length === 0
+        ){
+            alert(
+                'Tidak ada data paket'
+            );
+            return;
+        }
+
+        let imported = 0;
+
+        for(
+            const row of rows
+        ){
+
+            const rupNumber =
+                row[0];
+
+            const packageName =
+                row[1];
+
+            const budgetCeiling =
+                Number(
+                    row[2]
+                );
+
+            const sirupMethod =
+                row[3];
+
+            let procurementMethod =
+                'PENGADAAN_LANGSUNG';
+
+            if(
+                sirupMethod
+                ?.toUpperCase()
+                .includes(
+                    'E-PURCHASING'
+                )
+            ){
+                procurementMethod =
+                    'ECATALOG';
+            }
+
+            const {
+                error
+            } =
+            await rupDb
+            .from(
+                'rup_imports'
+            )
+            .upsert({
+
+                tenant_id:
+                    profile.tenant_id,
+
+                rup_number:
+                    rupNumber,
+
+                package_name:
+                    packageName,
+
+                budget_ceiling:
+                    budgetCeiling,
+
+                procurement_method:
+                    procurementMethod,
+
+                fiscal_year:
+                    2026,
+
+                sync_year:
+                    2026,
+
+                sirup_satker_id:
+                    '404567',
+
+                import_status:
+                    'PENDING',
+
+                imported_by:
+                    profile.id
+
+            },
+            {
+                onConflict:
+                'rup_number'
+            });
+
+            if(
+                !error
+            ){
+                imported++;
+            }
+            else{
+                console.error(
+                    error
+                );
+            }
+
+        }
+
+        await loadRupImports();
+
+        alert(
+
+            imported +
+
+            ' paket berhasil diimport'
+
+        );
+
+    }
+    catch(error){
+
+        console.error(
+            error
+        );
+
+        alert(
+            error.message
+        );
+
+    }
+
+}
+
 
 
 init();
