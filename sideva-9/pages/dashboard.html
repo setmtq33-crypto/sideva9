@@ -120,6 +120,14 @@ Documents
 HPS Engine
 </a>
 
+ <a href="procurement-ready.html"class="btn btn-success">
+ READY PROCUREMENT
+ </a>
+
+<a href="audit-logs.html"class="btn btn-dark">
+AUDIT LOGS
+</a>
+
 </div>
 </div>
 </div>
@@ -164,7 +172,7 @@ Paket Terbaru
 
 <script>
 
-const db = window.supabaseClient;
+const dashboardDb = window.supabaseClient;
 
 function rupiah(v){
  return new Intl.NumberFormat('id-ID',{
@@ -189,10 +197,10 @@ async function init(){
 async function loadKPI(){
 
  const {data:packages} =
- await db.from('packages').select('*');
+ await dashboardDb.from('packages').select('*');
 
  const {data:hps} =
- await db.from('package_hps').select('*');
+ await dashboardDb.from('package_hps').select('*');
 
  const totalPackages =
  (packages||[]).length;
@@ -226,13 +234,13 @@ async function loadStatus(){
  'SURVEY_COMPLETE',
  'DOCUMENT_COMPLETE',
  'HPS_COMPLETE',
+ 'BAHPE_DRAFT',
+ 'BAHPE_COMPLETE',
  'READY_PROCUREMENT',
- 'CONTRACT',
- 'FINISHED'
  ];
 
  const {data} =
- await db.from('packages')
+ await dashboardDb.from('packages')
  .select('package_status');
 
  let html='';
@@ -256,7 +264,7 @@ async function loadStatus(){
 async function loadRecentPackages(){
 
  const {data} =
- await db
+ await dashboardDb
  .from('packages')
  .select('*')
  .order('created_at',{ascending:false})
