@@ -513,12 +513,7 @@ async function loadPackages(){
     let query =
         window.supabaseClient
         .from("packages")
-        .select(`
-            *,
-            bidangs (
-                bidang_name
-            )
-        `)
+        .select("*")
         .order(
             "created_at",
             { ascending:false }
@@ -526,15 +521,26 @@ async function loadPackages(){
 
     if(opdId){
 
-        query =
-            query.eq(
-                "opd_id",
-                opdId
-            );
+        query = query.eq(
+            "opd_id",
+            opdId
+        );
     }
 
-    const { data } =
-        await query;
+    const {
+        data,
+        error
+    } = await query;
+
+    if(error){
+
+        console.error(
+            "loadPackages error",
+            error
+        );
+
+        return;
+    }
 
     const container =
         document.getElementById(
@@ -543,7 +549,7 @@ async function loadPackages(){
 
     container.innerHTML = "";
 
-    if(!data.length){
+    if(!data || data.length === 0){
 
         container.innerHTML = `
             <div class="alert alert-light">
@@ -563,7 +569,7 @@ async function loadPackages(){
             <div class="card-body">
 
                 <h5>
-                    ${pkg.package_name}
+                    ${pkg.package_name || '-'}
                 </h5>
 
                 <div class="row mt-3">
@@ -579,10 +585,10 @@ async function loadPackages(){
 
                     <div class="col-md-2">
                         <div class="label">
-                            Bidang
+                            Bidang ID
                         </div>
                         <div class="value">
-                            ${pkg.bidangs?.bidang_name || '-'}
+                            ${pkg.bidang_id || '-'}
                         </div>
                     </div>
 
@@ -609,8 +615,9 @@ async function loadPackages(){
                             Pagu
                         </div>
                         <div class="value">
-                            Rp ${Number(pkg.budget_ceiling)
-                                .toLocaleString('id-ID')}
+                            Rp ${Number(
+                                pkg.budget_ceiling || 0
+                            ).toLocaleString('id-ID')}
                         </div>
                     </div>
 
