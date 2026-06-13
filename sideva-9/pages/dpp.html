@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>DPP - SIDEVA9</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="../js/config.js"></script>
+<script src="../js/supabase.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/audit.js"></script>
+
+<style>
+
+body{
+    background:#f5f6fa;
+}
+
+.card{
+    border:none;
+}
+
+textarea{
+    min-height:120px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container-fluid p-4">
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+
+<div>
+
+<h3>DPP</h3>
+
+<div id="packageName">
+Loading...
+</div>
+
+</div>
+
+<div>
+
+<a href="packages.html"
+class="btn btn-secondary">
+
+Kembali
+
+</a>
+
+<button
+id="saveBtn"
+class="btn btn-success">
+
+Simpan DPP
+
+</button>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="card-body">
+
+<div class="mb-3">
+
+<label class="form-label">
+
+Latar Belakang
+
+</label>
+
+<textarea
+id="background"
+class="form-control"></textarea>
+
+</div>
+
+<div class="mb-3">
+
+<label class="form-label">
+
+Tujuan Pengadaan
+
+</label>
+
+<textarea
+id="objectives"
+class="form-control"></textarea>
+
+</div>
+
+<div class="mb-3">
+
+<label class="form-label">
+
+Ruang Lingkup
+
+</label>
+
+<textarea
+id="scopeOfWork"
+class="form-control"></textarea>
+
+</div>
+
+<div class="mb-3">
+
+<label class="form-label">
+
+Lokasi Pelaksanaan
+
+</label>
+
+<input
+type="text"
+id="implementationLocation"
+class="form-control">
+
+</div>
+
+<div class="mb-3">
+
+<label class="form-label">
+
+Jangka Waktu Pelaksanaan
+
+</label>
+
+<input
+type="text"
+id="implementationPeriod"
+class="form-control">
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const dppDb =
+    window.supabaseClient;
+
+let packageId = null;
+let profile = null;
+
+async function init(){
+
+    profile =
+        await getProfile();
+
+    packageId =
+        new URLSearchParams(
+            location.search
+        ).get('id');
+
+    if(!packageId){
+
+        alert(
+            'Package ID tidak ditemukan'
+        );
+
+        location.href =
+            'packages.html';
+
+        return;
+    }
+
+    await loadPackage();
+
+    await loadDpp();
+
+    document
+    .getElementById('saveBtn')
+    .onclick =
+        saveDpp;
+}
+
+async function loadPackage(){
+
+    const { data } =
+    await dppDb
+    .from('packages')
+    .select('*')
+    .eq('id', packageId)
+    .single();
+
+    if(data){
+
+        document
+        .getElementById(
+            'packageName'
+        )
+        .innerText =
+            data.package_name;
+    }
+}
+
+async function loadDpp(){
+
+    const { data } =
+    await dppDb
+    .from('package_dpp')
+    .select('*')
+    .eq('package_id', packageId)
+    .maybeSingle();
+
+    if(!data) return;
+
+    background.value =
+        data.background || '';
+
+    objectives.value =
+        data.objectives || '';
+
+    scopeOfWork.value =
+        data.scope_of_work || '';
+
+    implementationLocation.value =
+        data.implementation_location || '';
+
+    implementationPeriod.value =
+        data.implementation_period || '';
+}
+
+async function saveDpp(){
+
+    const payload = {
+
+        tenant_id:
+            profile.tenant_id,
+
+        opd_id:
+            profile.opd_id,
+
+        package_id:
+            packageId,
+
+        background:
+            background.value,
+
+        objectives:
+            objectives.value,
+
+        scope_of_work:
+            scopeOfWork.value,
+
+        implementation_location:
+            implementationLocation.value,
+
+        implementation_period:
+            implementationPeriod.value,
+
+        created_by:
+            profile.id
+    };
+
+    const { error } =
+    await dppDb
+    .from('package_dpp')
+    .upsert(
+        payload,
+        {
+            onConflict:'package_id'
+        }
+    );
+
+    if(error){
+
+        alert(error.message);
+
+        return;
+    }
+
+    await dppDb
+    .from('packages')
+    .update({
+        package_status:
+            'DPP_COMPLETE'
+    })
+    .eq('id', packageId);
+
+    await writeAuditLog(
+        'DPP',
+        'SAVE',
+        packageId,
+        'Simpan DPP'
+    );
+
+    alert(
+        'DPP berhasil disimpan'
+    );
+}
+
+init();
+
+</script>
+
+</body>
+</html>
