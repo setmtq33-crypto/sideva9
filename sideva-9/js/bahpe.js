@@ -1,10 +1,10 @@
-const db = window.supabaseClient;
+const bahpeDb = window.supabaseClient;
 
 async function generateBahpe(packageId) {
     try {
 
         const { data: pkg, error: pkgError } =
-            await db
+            await bahpeDb
                 .from('packages')
                 .select('*')
                 .eq('id', packageId)
@@ -13,7 +13,7 @@ async function generateBahpe(packageId) {
         if (pkgError) throw pkgError;
 
         const { data: hps, error: hpsError } =
-            await db
+            await bahpeDb
                 .from('package_hps')
                 .select('*')
                 .eq('package_id', packageId)
@@ -22,7 +22,7 @@ async function generateBahpe(packageId) {
         if (hpsError) throw hpsError;
 
         const { data: existing } =
-            await db
+            await bahpeDb
                 .from('package_bahpe')
                 .select('id')
                 .eq('package_id', packageId)
@@ -34,7 +34,7 @@ async function generateBahpe(packageId) {
         }
 
         const { error: insertError } =
-            await db
+            await bahpeDb
                 .from('package_bahpe')
                 .insert({
                     tenant_id: pkg.tenant_id,
@@ -48,7 +48,7 @@ async function generateBahpe(packageId) {
         if (insertError) throw insertError;
 
         const { error: statusError } =
-            await db
+            await bahpeDb
                 .from('packages')
                 .update({
                     package_status: 'BAHPE_DRAFT'
@@ -89,7 +89,7 @@ async function approveBahpe(bahpeId) {
             window.currentUser || {};
 
         const { data: bahpe, error: bahpeError } =
-            await db
+            await bahpeDb
                 .from('package_bahpe')
                 .select('*')
                 .eq('id', bahpeId)
@@ -98,7 +98,7 @@ async function approveBahpe(bahpeId) {
         if (bahpeError) throw bahpeError;
 
         const { error: approveError } =
-            await db
+            await bahpeDb
                 .from('package_bahpe')
                 .update({
                     approved_at: new Date().toISOString(),
@@ -109,7 +109,7 @@ async function approveBahpe(bahpeId) {
         if (approveError) throw approveError;
 
         const { error: statusError } =
-            await db
+            await bahpeDb
                 .from('packages')
                 .update({
                     package_status: 'BAHPE_COMPLETE'
@@ -146,7 +146,7 @@ async function submitToPBJ(packageId) {
     try {
 
         const { error } =
-            await db
+            await bahpeDb
                 .from('packages')
                 .update({
                     package_status: 'READY_PROCUREMENT'
@@ -182,7 +182,7 @@ async function submitToPBJ(packageId) {
 async function getBahpeList() {
 
     const { data, error } =
-        await db
+        await bahpeDb
             .from('package_bahpe')
             .select(`
                 *,
