@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Dashboard SI-DEVA 9</title>
+<title>SI-DEVA 9</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -23,47 +23,82 @@ Loading...
 
 <hr>
 
-<h2>Menu Utama</h2>
+<h2>MASTER DATA</h2>
 
-<p>
-<a href="packages.html">
-    Kelola Paket Pengadaan
-</a>
-</p>
+<ul>
 
-<p>
-<a href="packages.html">
-    Rincian Belanja & Survey Harga
+<li>
+<a href="bidangs.html">
+Bidang
 </a>
-</p>
+</li>
+
+<li>
+<a href="budget-accounts.html">
+Kode Rekening / MAK
+</a>
+</li>
+
+<li>
+<a href="ppkoms.html">
+PPKOM
+</a>
+</li>
+
+<li>
+<a href="procurement-officers.html">
+Pejabat Pengadaan
+</a>
+</li>
+
+</ul>
 
 <hr>
 
-<h2>Ringkasan</h2>
+<h2>PENGADAAN</h2>
 
-<div id="summary">
+<ul>
 
-    <p>
-        Jumlah Paket :
-        <span id="totalPackages">0</span>
-    </p>
+<li>
+<a href="packages.html">
+Paket Pengadaan
+</a>
+</li>
 
-    <p>
-        Jumlah Item :
-        <span id="totalItems">0</span>
-    </p>
+</ul>
 
-    <p>
-        Jumlah Survey :
-        <span id="totalSurveys">0</span>
-    </p>
+<hr>
 
-</div>
+<h2>REFERENSI</h2>
+
+<ul>
+
+<li>
+Referensi Belanja
+</li>
+
+<li>
+Referensi E-Catalog
+</li>
+
+<li>
+Penyedia
+</li>
+
+</ul>
+
+<hr>
+
+<h2>LAPORAN</h2>
+
+<p>
+Segera hadir
+</p>
 
 <hr>
 
 <button onclick="logout()">
-    Logout
+Logout
 </button>
 
 <script>
@@ -85,15 +120,18 @@ async function loadProfile() {
         return;
     }
 
-    const { data, error } =
-        await window.supabaseClient
-            .from("profiles")
-            .select("*")
-            .eq(
-                "auth_user_id",
-                user.id
-            )
-            .single();
+    const {
+        data,
+        error
+    } =
+    await window.supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq(
+            "auth_user_id",
+            user.id
+        )
+        .single();
 
     if(error){
 
@@ -112,7 +150,6 @@ async function loadProfile() {
 
         <br>
 
-        Email :
         ${data.email}
 
         <br>
@@ -121,81 +158,6 @@ async function loadProfile() {
         ${data.role}
 
     `;
-}
-
-async function loadSummary() {
-
-    let packageQuery =
-        window.supabaseClient
-            .from("packages")
-            .select("*", {
-                count: "exact",
-                head: true
-            });
-
-    let itemQuery =
-        window.supabaseClient
-            .from("package_items")
-            .select("*", {
-                count: "exact",
-                head: true
-            });
-
-    let surveyQuery =
-        window.supabaseClient
-            .from("price_surveys")
-            .select("*", {
-                count: "exact",
-                head: true
-            });
-
-    if(profile.role === "ADMIN_OPD") {
-
-        packageQuery =
-            packageQuery.eq(
-                "opd_id",
-                profile.opd_id
-            );
-
-        itemQuery =
-            itemQuery.eq(
-                "opd_id",
-                profile.opd_id
-            );
-
-        surveyQuery =
-            surveyQuery.eq(
-                "opd_id",
-                profile.opd_id
-            );
-    }
-
-    const {
-        count: packageCount
-    } = await packageQuery;
-
-    const {
-        count: itemCount
-    } = await itemQuery;
-
-    const {
-        count: surveyCount
-    } = await surveyQuery;
-
-    document.getElementById(
-        "totalPackages"
-    ).innerText =
-        packageCount || 0;
-
-    document.getElementById(
-        "totalItems"
-    ).innerText =
-        itemCount || 0;
-
-    document.getElementById(
-        "totalSurveys"
-    ).innerText =
-        surveyCount || 0;
 }
 
 async function logout() {
@@ -208,14 +170,7 @@ async function logout() {
         "login.html";
 }
 
-async function init() {
-
-    await loadProfile();
-
-    await loadSummary();
-}
-
-init();
+loadProfile();
 
 </script>
 
