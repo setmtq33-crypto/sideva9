@@ -127,7 +127,7 @@ async function loadPackage(){
 
 async function calculateHPS(){
 
- const {data:items} = await supabase
+ const {data:items} = await db
  .from('package_items')
  .select('*')
  .eq('package_id',packageId);
@@ -137,7 +137,7 @@ async function calculateHPS(){
 
  for(const item of (items||[])){
 
-   const {data:surveys} = await supabase
+   const {data:surveys} = await db
    .from('price_surveys')
    .select('*')
    .eq('package_item_id',item.id);
