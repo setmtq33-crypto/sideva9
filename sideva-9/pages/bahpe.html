@@ -124,6 +124,18 @@ Serahkan ke PBJ
 
 </button>
 
+<button
+
+id="printBtn"
+
+class="btn btn-danger">
+
+Cetak PDF
+
+</button>
+
+</div>
+
 </div>
 
 </div>
@@ -191,6 +203,17 @@ async function init(){
 
    await loadPackage();
  };
+
+ document
+ .getElementById('printBtn')
+ .onclick = () => {
+     window.open(
+         `bahpe-print.html?id=${packageId}`,
+         '_blank'
+     );
+ 
+ };
+
 }
 
 async function loadPackage(){
