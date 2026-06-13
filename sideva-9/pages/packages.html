@@ -488,7 +488,7 @@ async function savePackage(){
             document.getElementById("dppDate").value
     };
 
-    const { error } = window.supabaseClient
+    const { error } = await window.supabaseClient
         .from("packages")
         .insert(payload);
 
@@ -511,7 +511,7 @@ async function loadPackages(){
         : profile.opd_id;
 
     let query =
-        supabase
+        window.supabaseClient
         .from("packages")
         .select(`
             *,
