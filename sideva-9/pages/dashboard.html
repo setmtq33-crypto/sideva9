@@ -8,7 +8,16 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script src="../js/config.js"></script>
+<script src="../js/supabase.js"></script>
+<script src="../js/auth.js"></script>
+ 
+<link rel="stylesheet" href="../css/app.css">
+
+
+ 
 <style>
 body{background:#f5f6fa}
 .card{border:none;border-radius:12px}
@@ -267,9 +276,6 @@ async function loadRecentPackages(){
  document.getElementById('recentPackages').innerHTML=html;
 }
 
-<script src="../js/config.js"></script>
-<script src="../js/supabase.js"></script>
-<script src="../js/auth.js"></script>
 
 init();
 
