@@ -180,9 +180,9 @@ async function saveItem(){
  };
  let res;
  if(itemId.value){
-   res=await db.schema('business').from('package_items').update(payload).eq('id',itemId.value);
+   res=await db.from('package_items').update(payload).eq('id',itemId.value);
  }else{
-   res=await db.schema('business').from('package_items').insert(payload);
+   res=await db.from('package_items').insert(payload);
  }
  if(res.error) return Swal.fire('Error',res.error.message,'error');
  modal.hide();
@@ -192,7 +192,7 @@ async function saveItem(){
 async function deleteItem(id){
  const ok=await Swal.fire({title:'Hapus?',showCancelButton:true});
  if(!ok.isConfirmed) return;
- const {error}=await db.schema('business').from('package_items').delete().eq('id',id);
+ const {error}=await db.from('package_items').delete().eq('id',id);
  if(error) return Swal.fire('Error',error.message,'error');
  await loadItems();
 }
