@@ -276,6 +276,7 @@ TEST PACKAGE V2
 
 <script>
 
+const supabase = window.supabaseClient;
 const db = window.supabaseClient;
 
 let profile = null;
@@ -397,10 +398,15 @@ async function loadBidangs(){
 
 async function loadMak(){
 
-    const { data } = await db
+    const { data, error } = await window.supabaseClient
         .from("budget_accounts")
         .select("*")
         .order("account_code");
+
+    if(error){
+        console.error("loadMak", error);
+        return;
+    }
 
     const select =
         document.getElementById("makSelect");
@@ -408,7 +414,7 @@ async function loadMak(){
     select.innerHTML =
         '<option value="">Pilih MAK</option>';
 
-    data.forEach(row=>{
+    (data || []).forEach(row => {
 
         select.innerHTML += `
             <option value="${row.id}">
