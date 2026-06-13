@@ -17,6 +17,7 @@
 <script src="../js/config.js"></script>
 <script src="../js/supabase.js"></script>
 <script src="../js/auth.js"></script>
+<script src="../js/permissions.js"></script>
 
 <link rel="stylesheet" href="../css/app.css">
 
@@ -317,6 +318,15 @@ async function initPage(){
     if(!profile){
         return;
     }
+    if(
+        !await canCreatePackage()
+    ){
+    
+        document
+            .getElementById('saveBtn')
+            .style.display =
+            'none';
+    }
 
     if(profile.role === "SUPER_ADMIN"){
 
@@ -450,6 +460,16 @@ async function loadMak(){
 }
 
 async function savePackage(){
+    if(
+        !await canCreatePackage()
+    ){
+    
+        alert(
+            'Anda tidak memiliki hak membuat paket'
+        );
+    
+        return;
+    }
 
     const opdId =
         profile.role === "SUPER_ADMIN"
@@ -694,43 +714,35 @@ async function loadPackages(){
 
                     </button>
 
+                    ${canSeeHps(profile.role) ? `
                     <button
-
                         class="btn btn-outline-warning btn-sm"
                         onclick="openHps('${pkg.id}')">
-                    
                         HPS
-                    
                     </button>
-
+                    ` : ''}
+                    
+                   ${canSeeHps(profile.role) ? `
                     <button
                         class="btn btn-outline-success btn-sm"
                         onclick="openBahpe('${pkg.id}')">
-                    
                         BAHPE
-                    
                     </button>
+                    ` : ''}
 
                     <button
                         class="btn btn-outline-warning btn-sm"
                         onclick="
                         location.href=
-                        'review.html?id=${pkg.id}'
-                        ">
-                        
+                        'review.html?id=${pkg.id}')">
                         Review
-                        
                         </button>
 
                         <button
                             class="btn btn-outline-dark btn-sm"
                             onclick="
-                            location.href=
-                            'review-document.html?id=${pkg.id}'
-                            ">
-                            
+                            location.href='review-document.html?id=${pkg.id}')">
                             Review PDF
-                            
                             </button>
 
 
@@ -744,6 +756,24 @@ async function loadPackages(){
 
         `;
     });
+}
+
+function canSeeHps(role){
+
+    return [
+        'SUPER_ADMIN',
+        'ADMIN_OPD',
+        'PPK'
+    ].includes(role);
+}
+
+function canSeeBahpe(role){
+
+    return [
+        'SUPER_ADMIN',
+        'ADMIN_OPD',
+        'PPK'
+    ].includes(role);
 }
 
 function openItems(id){
