@@ -204,6 +204,14 @@ Simpan RUP
 
 </button>
 
+<button
+id="syncSirupBtn"
+class="btn btn-success ms-2">
+
+Sync SIRUP 2026
+
+</button>
+
 </div>
 
 </div>
@@ -288,6 +296,13 @@ async function init(){
         saveRup;
 
     await loadRupImports();
+
+    document
+    .getElementById(
+        'syncSirupBtn'
+    )
+    .onclick =
+    syncSirup;
 }
 
 async function loadRupImports(){
@@ -712,6 +727,134 @@ function clearForm(){
         )
         .value='';
 }
+
+async function syncSirup(){
+
+    try{
+
+        const endpoint =
+'https://sirup.inaproc.id/sirup/datatablectr/dataruppenyediasatker?tahun=2026&idSatker=404567&sEcho=1&iColumns=7&iDisplayStart=0&iDisplayLength=500';
+
+        const response =
+            await fetch(
+                endpoint,
+                {
+                    headers:{
+                        'X-Requested-With':
+                        'XMLHttpRequest'
+                    }
+                }
+            );
+
+        const result =
+            await response.json();
+
+        const rows =
+            result.aaData || [];
+
+        let imported = 0;
+
+        for(
+            const row of rows
+        ){
+
+            const rupNumber =
+                row[0];
+
+            const packageName =
+                row[1];
+
+            const budgetCeiling =
+                Number(
+                    row[2]
+                );
+
+            const procurementMethod =
+                row[3];
+
+            const sourceFund =
+                row[4];
+
+            const selectionSchedule =
+                row[6];
+
+            const {
+                error
+            } =
+            await rupDb
+            .from(
+                'rup_imports'
+            )
+            .upsert({
+
+                tenant_id:
+                    profile.tenant_id,
+
+                opd_name:
+'BADAN PERENCANAAN PEMBANGUNAN, RISET DAN INOVASI DAERAH',
+
+                rup_number:
+                    rupNumber,
+
+                package_name:
+                    packageName,
+
+                budget_ceiling:
+                    budgetCeiling,
+
+                procurement_method:
+                    procurementMethod,
+
+                source_fund:
+                    sourceFund,
+
+                selection_schedule:
+                    selectionSchedule,
+
+                fiscal_year:
+                    2026,
+
+                sync_year:
+                    2026,
+
+                sirup_satker_id:
+                    '404567',
+
+                imported_by:
+                    profile.id
+
+            });
+
+            if(
+                !error
+            ){
+                imported++;
+            }
+
+        }
+
+        await loadRupImports();
+
+        alert(
+            imported +
+            ' paket berhasil disinkronkan'
+        );
+
+    }
+    catch(err){
+
+        console.error(
+            err
+        );
+
+        alert(
+            'CORS Error atau gagal akses SIRUP'
+        );
+
+    }
+
+}
+
 
 init();
 
