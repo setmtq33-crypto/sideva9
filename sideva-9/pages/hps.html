@@ -141,6 +141,70 @@ async function loadPackage(){
  }
 }
 
+async function saveHPS(){
+
+    const profile = await getProfile();
+
+    const totalHps =
+        Number(
+            document
+            .getElementById('totalHps')
+            .innerText
+            .replace(/[^\d]/g,'')
+        ) || 0;
+
+    const pagu =
+        Number(packageData.budget_ceiling || 0);
+
+    const efficiency =
+        pagu - totalHps;
+
+    const efficiencyPercent =
+        pagu > 0
+        ? (efficiency / pagu) * 100
+        : 0;
+
+    const payload = {
+
+        tenant_id:
+            profile.tenant_id,
+
+        opd_id:
+            profile.opd_id,
+
+        package_id:
+            packageId,
+
+        total_hps:
+            totalHps,
+
+        efficiency:
+            efficiency,
+
+        efficiency_percent:
+            efficiencyPercent
+    };
+
+    const { error } =
+        await db
+        .from('package_hps')
+        .upsert(
+            payload,
+            {
+                onConflict:'package_id'
+            }
+        );
+
+    if(error){
+
+        alert(error.message);
+        return;
+    }
+
+    alert('HPS berhasil disimpan');
+}
+ 
+
 async function calculateHPS(){
 
  const {data:items} = await db
