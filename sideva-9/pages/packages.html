@@ -660,6 +660,17 @@ async function loadPackages(){
                     </button>
 
                     <button
+                        class="btn btn-outline-dark btn-sm"
+                        onclick="
+                        location.href=
+                        'dpp-document.html?id=${pkg.id}'
+                        ">
+                        
+                        DPP PDF
+                        
+                        </button>
+
+                    <button
                         class="btn btn-outline-primary btn-sm"
                         onclick="openItems('${pkg.id}')">
 
