@@ -397,7 +397,7 @@ async function loadBidangs(){
 
 async function loadMak(){
 
-    const { data } = window.supabaseClient
+    const { data } = await db
         .from("budget_accounts")
         .select("*")
         .order("account_code");
