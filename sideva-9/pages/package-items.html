@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package Items - SIDEVA9</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+body{background:#f5f6fa}
+.card{border:none}
+.money{text-align:right}
+</style>
+</head>
+<body>
+
+<div class="container-fluid p-4">
+
+<div class="d-flex justify-content-between mb-3">
+    <div>
+        <h3>Rincian Belanja Paket</h3>
+        <div id="packageName">Loading...</div>
+    </div>
+    <div>
+        <a href="packages.html" class="btn btn-secondary">Kembali</a>
+        <button class="btn btn-primary" onclick="openAddModal()">Tambah Item</button>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-4"><div class="card"><div class="card-body"><small>Pagu</small><h5 id="budgetCeiling">Rp 0</h5></div></div></div>
+    <div class="col-md-4"><div class="card"><div class="card-body"><small>Total Item</small><h5 id="totalValue">Rp 0</h5></div></div></div>
+    <div class="col-md-4"><div class="card"><div class="card-body"><small>Jumlah Item</small><h5 id="itemCount">0</h5></div></div></div>
+</div>
+
+<div class="card">
+<div class="card-body">
+<input id="searchInput" class="form-control mb-3" placeholder="Cari item...">
+<div class="table-responsive">
+<table class="table table-bordered">
+<thead>
+<tr>
+<th>Nama</th>
+<th>Spesifikasi</th>
+<th>Qty</th>
+<th>Satuan</th>
+<th>Harga</th>
+<th>Total</th>
+<th>Aksi</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+</div>
+</div>
+</div>
+
+</div>
+
+<div class="modal fade" id="itemModal">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+<div class="modal-header"><h5>Item</h5></div>
+<div class="modal-body">
+<input type="hidden" id="itemId">
+<div class="mb-2"><label>Nama Item</label><input id="itemName" class="form-control"></div>
+<div class="mb-2"><label>Spesifikasi</label><textarea id="specification" class="form-control"></textarea></div>
+<div class="row">
+<div class="col-md-4"><input id="quantity" type="number" class="form-control" placeholder="Qty"></div>
+<div class="col-md-4"><input id="unit" class="form-control" placeholder="Satuan"></div>
+<div class="col-md-4"><input id="estimatedPrice" type="number" class="form-control" placeholder="Harga"></div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+<button class="btn btn-primary" onclick="saveItem()">Simpan</button>
+</div>
+</div>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+const supabase = window.supabaseClient;
+const modal = new bootstrap.Modal(document.getElementById('itemModal'));
+
+let profile=null;
+let packageId=null;
+let packageData=null;
+let items=[];
+
+function rupiah(v){
+ return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(v||0);
+}
+
+async function init(){
+ profile = await getProfile();
+ packageId = new URLSearchParams(location.search).get('id');
+ await loadPackage();
+ await loadItems();
+}
+
+async function loadPackage(){
+ const {data,error}=await supabase.from('packages').select('*').eq('id',packageId).single();
+ if(error) return console.error(error);
+ packageData=data;
+ document.getElementById('packageName').innerText=data.package_name;
+ document.getElementById('budgetCeiling').innerText=rupiah(data.budget_ceiling);
+}
+
+async function loadItems(){
+ const {data,error}=await supabase.from('package_items').select('*').eq('package_id',packageId);
+ if(error) return console.error(error);
+ items=data||[];
+ render(items);
+}
+
+function render(rows){
+ let html='', total=0;
+ rows.forEach(r=>{
+  const rowTotal=(Number(r.quantity)||0)*(Number(r.estimated_price)||0);
+  total+=rowTotal;
+  html+=`<tr>
+   <td>${r.item_name||''}</td>
+   <td>${r.specification||''}</td>
+   <td>${r.quantity||0}</td>
+   <td>${r.unit||''}</td>
+   <td>${rupiah(r.estimated_price)}</td>
+   <td>${rupiah(rowTotal)}</td>
+   <td>
+   <button class="btn btn-warning btn-sm" onclick="editItem('${r.id}')">Edit</button>
+   <button class="btn btn-danger btn-sm" onclick="deleteItem('${r.id}')">Hapus</button>
+   </td>
+  </tr>`;
+ });
+ document.getElementById('tbody').innerHTML=html;
+ document.getElementById('itemCount').innerText=rows.length;
+ document.getElementById('totalValue').innerText=rupiah(total);
+}
+
+function openAddModal(){
+ itemId.value=''; itemName.value=''; specification.value=''; quantity.value=''; unit.value=''; estimatedPrice.value='';
+ modal.show();
+}
+
+function editItem(id){
+ const r=items.find(x=>x.id===id);
+ if(!r) return;
+ itemId.value=r.id;
+ itemName.value=r.item_name||'';
+ specification.value=r.specification||'';
+ quantity.value=r.quantity||0;
+ unit.value=r.unit||'';
+ estimatedPrice.value=r.estimated_price||0;
+ modal.show();
+}
+
+async function saveItem(){
+ const payload={
+  tenant_id:profile.tenant_id,
+  opd_id:profile.opd_id,
+  package_id:packageId,
+  item_name:itemName.value,
+  specification:specification.value,
+  quantity:Number(quantity.value||0),
+  unit:unit.value,
+  estimated_price:Number(estimatedPrice.value||0)
+ };
+ let res;
+ if(itemId.value){
+   res=await supabase.schema('business').from('package_items').update(payload).eq('id',itemId.value);
+ }else{
+   res=await supabase.schema('business').from('package_items').insert(payload);
+ }
+ if(res.error) return Swal.fire('Error',res.error.message,'error');
+ modal.hide();
+ await loadItems();
+}
+
+async function deleteItem(id){
+ const ok=await Swal.fire({title:'Hapus?',showCancelButton:true});
+ if(!ok.isConfirmed) return;
+ const {error}=await supabase.schema('business').from('package_items').delete().eq('id',id);
+ if(error) return Swal.fire('Error',error.message,'error');
+ await loadItems();
+}
+
+document.getElementById('searchInput').addEventListener('input',e=>{
+ const q=e.target.value.toLowerCase();
+ render(items.filter(x=>(x.item_name||'').toLowerCase().includes(q) || (x.specification||'').toLowerCase().includes(q)));
+});
+
+init();
+</script>
+</body>
+</html>
