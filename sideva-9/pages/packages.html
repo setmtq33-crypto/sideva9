@@ -276,7 +276,7 @@ TEST PACKAGE V2
 
 <script>
 
-const supabase = window.supabase;
+const db = window.supabaseClient;
 
 let profile = null;
 let currentOpdId = null;
@@ -336,7 +336,7 @@ async function initPage(){
 
 async function loadOpds(){
 
-    const { data } = await supabase
+    const { data } = await db
         .from("opds")
         .select("*")
         .order("name");
@@ -368,7 +368,7 @@ async function loadBidangs(){
         return;
     }
 
-    const { data } = await supabase
+    const { data } = await db
         .from("bidangs")
         .select("*")
         .eq("opd_id", opdId)
@@ -392,7 +392,7 @@ async function loadBidangs(){
 
 async function loadMak(){
 
-    const { data } = await supabase
+    const { data } = await db
         .from("budget_accounts")
         .select("*")
         .order("account_code");
@@ -478,7 +478,7 @@ async function savePackage(){
             document.getElementById("dppDate").value
     };
 
-    const { error } = await supabase
+    const { error } = await db
         .from("packages")
         .insert(payload);
 
