@@ -111,7 +111,7 @@ async function init(){
 
 async function loadPackage(){
 
- const {data} = await supabase
+ const {data} = await db
  .from('packages')
  .select('*')
  .eq('id',packageId)
