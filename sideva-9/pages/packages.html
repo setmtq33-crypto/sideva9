@@ -386,7 +386,7 @@ async function loadBidangs(){
         return;
     }
 
-    const { data } = window.supabaseClient
+    const { data } = await window.supabaseClient
         .from("bidangs")
         .select("*")
         .eq("opd_id", opdId)
@@ -664,6 +664,15 @@ async function loadPackages(){
 
                     </button>
 
+                    <button
+
+                        class="btn btn-outline-warning btn-sm"
+                        onclick="openHps('${pkg.id}')">
+                    
+                        HPS
+                    
+                    </button>
+
                 </div>
 
             </div>
@@ -691,6 +700,13 @@ function openDocs(id){
     location.href =
         `package-documents.html?id=${id}`;
 }
+
+function openHps(id){
+
+    location.href =
+        `hps.html?id=${id}`;
+}
+    
 
 </script>
 
