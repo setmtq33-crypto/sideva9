@@ -548,91 +548,71 @@ async function editSurvey(id){
 
 async function saveSurvey(){
 
- const payload = {
+alert('1 MASUK SAVE');
 
- vendor_name:
- vendorName.value,
+const payload = {
 
- brand:
- brand.value,
+vendor_name: vendorName.value,
+brand: brand.value,
+survey_price: Number(surveyPrice.value || 0),
+negotiated_price: Number(negotiatedPrice.value || 0),
+source_url: sourceUrl.value,
+survey_date: surveyDate.value,
+notes: notes.value,
+is_candidate: isCandidate.checked,
+is_winner: isWinner.checked
 
- survey_price:
- Number(
- surveyPrice.value || 0
- ),
+};
 
- negotiated_price:
- Number(
- negotiatedPrice.value || 0
- ),
+alert('2 PAYLOAD JADI');
 
- source_url:
- sourceUrl.value,
+let result;
 
- survey_date:
- surveyDate.value,
+if(currentSurveyId){
 
- notes:
- notes.value,
+alert('3 MODE EDIT');
 
- is_candidate:
- isCandidate.checked,
+result =
+await surveyDb
+.from('price_surveys')
+.update(payload)
+.eq('id',currentSurveyId);
 
- is_winner:
- isWinner.checked
+alert('4 UPDATE SELESAI');
 
- };
+}else{
 
- let result;
+alert('3 MODE INSERT');
 
- if(currentSurveyId){
+result =
+await surveyDb
+.from('price_surveys')
+.insert({
+...payload,
+tenant_id: profile.tenant_id,
+opd_id: profile.opd_id,
+package_item_id: selectedItemId
+});
 
- result =
- await surveyDb
- .from('price_surveys')
- .update(payload)
- .eq('id',currentSurveyId);
+alert('4 INSERT SELESAI');
+}
 
- }else{
+alert('5 SEBELUM CEK ERROR');
 
- result =
- await surveyDb
- .from('price_surveys')
- .insert({
+console.log(result);
 
- ...payload,
+if(result.error){
 
- tenant_id:
- profile.tenant_id,
+alert(result.error.message);
 
- opd_id:
- profile.opd_id,
+return;
+}
 
- package_item_id:
- selectedItemId
+alert('6 SUKSES');
 
- });
+modal.hide();
 
- }
-
- if(result.error){
-
- console.error(
- result.error
- );
-
- alert(
- result.error.message
- );
-
- return;
- }
-
- modal.hide();
-
- await loadSurveys(
- selectedItemId
- );
+await loadSurveys(selectedItemId);
 }
 
 async function deleteSurvey(id){
