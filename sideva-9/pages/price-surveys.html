@@ -278,6 +278,7 @@ async function init(){
 async function loadPackage(){
 
  const {data} = await surveyDb
+ .schema('business')
  .from('packages')
  .select('*')
  .eq('id',packageId)
@@ -291,6 +292,7 @@ async function loadPackage(){
 async function loadItems(){
 
  const {data} = await surveyDb
+ .schema('business')
  .from('package_items')
  .select('*')
  .eq('package_id',packageId)
@@ -334,10 +336,13 @@ async function selectItem(id){
  document.getElementById('selectedItemName').innerText=item.item_name;
 
  const {data} = await surveyDb
+ .schema('business')
  .from('price_surveys')
  .select('*')
  .eq('package_item_id',id)
  .order('survey_date',{ascending:false});
+ 
+ console.log('SURVEY ERROR',error);
  console.log('HASIL QUERY:', data);
 
  surveys=data||[];
@@ -541,25 +546,33 @@ async function saveSurvey(){
 
 async function deleteSurvey(id){
 
- const ok = await Swal.fire({
-   title:'Hapus data?',
-   showCancelButton:true
- });
+ const ok = confirm('Hapus survey ini?');
 
- if(!ok.isConfirmed) return;
+ if(!ok) return;
 
- const {error}=await surveyDb
+ const {error} = await surveyDb
  .schema('business')
  .from('price_surveys')
  .delete()
  .eq('id',id);
 
  if(error){
-   return Swal.fire('Error',error.message,'error');
+
+   console.error(error);
+
+   alert(error.message);
+
+   return;
  }
 
  await selectItem(selectedItemId);
+
 }
+
+window.editSurvey = editSurvey;
+window.deleteSurvey = deleteSurvey;
+window.saveSurvey = saveSurvey;
+ 
 
 init();
 
