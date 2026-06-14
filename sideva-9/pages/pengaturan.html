@@ -181,82 +181,105 @@ body { background: #f5f6fa; color: #333; }
 
 <script>
 (function() {
+    // Memastikan client Supabase terdeteksi dengan benar sesuai proyek SIDEVA
     const client = window.supabaseClient || window.supabase;
-    let currentOpdId = null; 
+    let currentOpdInternalId = null; 
     let currentLogoUrl = null;
     let currentKopUrl = null;
-    
-    // Default fallback TenantID (buat admin biasa)
-    let activeTenantId = "9940ceb7-cab2-49f0-aa86-dc13ee3d2f21"; 
     let isSuperAdmin = false;
 
     async function init() {
-        // DETEKSI ROLE USER BERDASARKAN SYSTEM AUTH SIDEVA9 KAMU
-        const sessionData = JSON.parse(localStorage.getItem('sb-auth-token') || localStorage.getItem('user_session') || '{}');
-        const userRole = sessionData?.user?.user_metadata?.role || sessionData?.role || 'admin'; 
+        Swal.fire({
+            title: 'Sinkronisasi Sesi...',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        // 1. Ambil profil user aktif via auth.js milik SIDEVA
+        if (typeof window.getProfile !== 'function') {
+            Swal.fire('Sistem Berhenti', 'Fungsi getProfile() tidak ditemukan di auth.js!', 'error');
+            return;
+        }
         
-        // Ambil tenant_id bawaan dari user yang login
-        if(sessionData?.user?.user_metadata?.tenant_id || sessionData?.tenant_id) {
-            activeTenantId = sessionData?.user?.user_metadata?.tenant_id || sessionData?.tenant_id;
+        const profile = await window.getProfile();
+        if (!profile) {
+            Swal.fire('Sesi Habis', 'Gagal memuat profil pengguna, silahkan login kembali.', 'error');
+            return;
         }
 
-        // JIKA SUPER ADMIN: Nyalakan Fitur Selector Bebas Pilih OPD!
-        if (userRole === 'superadmin' || userRole === 'super_admin') {
+        // Ambil role dan default OPD ID dari database user profile
+        const userRole = profile.role || 'admin';
+        const userDefaultOpdId = profile.opd_id || profile.id_opd; // Sesuaikan kolom opd_id di tabel profile Anda
+
+        // 2. Cek Role: Apakah Super Admin?
+        if (userRole === 'superadmin' || userRole === 'super_admin' || userRole === 'Super Admin') {
             isSuperAdmin = true;
             document.getElementById('superadmin-selector-zone').style.display = 'block';
-            await loadDaftarOPDUntukSelector();
+            await loadDaftarOPDUntukSelector(userDefaultOpdId);
         } else {
-            // Jika Admin Biasa, langsung load data OPD miliknya tanpa ba-bi-bu
-            await loadPengaturanDariOPD(activeTenantId);
+            // Jika Admin biasa, langsung kunci ke ID OPD miliknya tanpa selector
+            if (!userDefaultOpdId) {
+                // Fallback jika profile belum punya link opd_id (ambil baris pertama BAPPERIDA dari db kamu)
+                await loadPengaturanDariOPD("6961a60-de05-412e-b68c-25dd57c7b716");
+            } else {
+                await loadPengaturanDariOPD(userDefaultOpdId);
+            }
         }
 
         document.getElementById('cfg-namaInstansi').addEventListener('input', updateLiveFallbackPreview);
     }
 
-    // KHUSUS SUPER ADMIN: AMBIL SEMUA DATA OPD UNTUK DI-SELECT
-    async function loadDaftarOPDUntukSelector() {
+    // LOAD DROP-DOWN SELECTOR KHUSUS SUPER ADMIN (MENGGUNAKAN ID UNIK)
+    async function loadDaftarOPDUntukSelector(defaultSelectedId) {
         const { data, error } = await client
             .from('opds')
-            .select('tenant_id, name, code')
+            .select('id, name, code')
             .eq('is_active', true)
             .order('name', { ascending: true });
 
         if (error) {
             console.error("Gagal mengambil master list OPD:", error.message);
+            Swal.fire('Gagal', 'Gagal mengambil data master OPD.', 'error');
             return;
         }
 
+        if (!data || data.length === 0) {
+            Swal.fire('Kosong', 'Tidak ada data instansi di tabel opds.', 'warning');
+            return;
+        }
+
+        // Render isi opsi dropdown menggunakan id (bukan tenant_id)
         const selectorHtml = data.map(opd => 
-            `<option value="${opd.tenant_id}" ${opd.tenant_id === activeTenantId ? 'selected' : ''}>[${opd.code}] ${opd.name}</option>`
+            `<option value="${opd.id}" ${opd.id === defaultSelectedId ? 'selected' : ''}>[${opd.code}] ${opd.name}</option>`
         ).join('');
         
         document.getElementById('global-opd-selector').innerHTML = selectorHtml;
         
-        // Otomatis load data OPD urutan pertama/selected default
-        if(data.length > 0) {
-            activeTenantId = document.getElementById('global-opd-selector').value;
-            await loadPengaturanDariOPD(activeTenantId);
-        }
+        // Tentukan target id pertama yang akan di-load format pengaturannya
+        const targetId = document.getElementById('global-opd-selector').value || data[0].id;
+        await loadPengaturanDariOPD(targetId);
     }
 
-    // FUNGSI UTAMA LOAD DATA SATU OPD BERDASARKAN TENANT ID
-    async function loadPengaturanDariOPD(tenantId) {
+    // AMBIL DATA 1 INSTANSI BERDASARKAN ID UTAMA (ANTI BENTROK MULTIPLE ROWS)
+    async function loadPengaturanDariOPD(opdId) {
+        if (!opdId) return;
         Swal.showLoading();
         
         const { data, error } = await client
             .from('opds') 
             .select('*')
-            .eq('tenant_id', tenantId)
+            .eq('id', opdId) // Cari berdasarkan ID Unik, dijamin dapat 1 row pas!
             .maybeSingle();
 
         Swal.close();
         if (error) {
             console.error("Gagal memuat data OPD:", error.message);
+            Swal.fire('Eror Database', error.message, 'error');
             return;
         }
 
         if (data) {
-            currentOpdId = data.id;
+            currentOpdInternalId = data.id;
             document.getElementById('cfg-namaInstansi').value = data.name || '';
             document.getElementById('cfg-singkatan').value = data.code || '';
             document.getElementById('cfg-tahunAnggaran').value = data.tahun_anggaran || 2026;
@@ -267,29 +290,30 @@ body { background: #f5f6fa; color: #333; }
             renderMediaPreviews();
         } else {
             clearForm();
+            Swal.fire('Perhatian', 'Data detail instansi tidak ditemukan.', 'warning');
         }
     }
 
-    // KETIKA SUPER ADMIN PILIH OPD LAIN DI DROP-DOWN
-    window.switchTargetOPD = async function(tenantId) {
-        if(!tenantId) return;
-        activeTenantId = tenantId;
-        await loadPengaturanDariOPD(tenantId);
+    // TRIGER EVENT SAAT SUPER ADMIN GANTI PILIHAN DROP-DOWN
+    window.switchTargetOPD = async function(opdId) {
+        if (!opdId) return;
+        await loadPengaturanDariOPD(opdId);
     };
 
+    // PROSES UPLOAD MEDIA KE BUCKET STORAGE SUPABASE
     window.uploadFileMedia = async function(event, jenis) {
         const file = event.target.files[0];
         if (!file) return;
 
         if (file.size > 2 * 1024 * 1024) {
-            Swal.fire('File Terlalu Besar', 'Maksimal ukuran gambar adalah 2MB ya!', 'error');
+            Swal.fire('File Terlalu Besar', 'Maksimal ukuran gambar adalah 2MB!', 'error');
             return;
         }
 
-        Swal.fire({ title: 'Menyimpan gambar...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        Swal.fire({ title: 'Menyimpan gambar ke awan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
         const fileExt = file.name.split('.').pop();
-        const fileName = `${jenis}_${currentOpdId || 'opd'}_${Date.now()}.${fileExt}`;
+        const fileName = `${jenis}_${currentOpdInternalId || 'opd'}_${Date.now()}.${fileExt}`;
 
         const { data, error } = await client.storage
             .from('instansi')
@@ -311,7 +335,7 @@ body { background: #f5f6fa; color: #333; }
         }
 
         renderMediaPreviews();
-        Swal.fire({ icon: 'success', title: 'Pratinjau gambar berhasil dimuat!', showConfirmButton: false, timer: 1500 });
+        Swal.fire({ icon: 'success', title: 'Pratinjau gambar berhasil diperbarui!', showConfirmButton: false, timer: 1500 });
     };
 
     function renderMediaPreviews() {
@@ -341,7 +365,7 @@ body { background: #f5f6fa; color: #333; }
     function updateLiveFallbackPreview() {
         if (currentKopUrl) return; 
         const nama = document.getElementById('cfg-namaInstansi').value.toUpperCase() || 'NAMA INSTANSI / OPD';
-        if(document.getElementById('fallback-nama')) document.getElementById('fallback-nama').innerText = nama;
+        if (document.getElementById('fallback-nama')) document.getElementById('fallback-nama').innerText = nama;
     }
 
     window.hapusMedia = function(jenis) {
@@ -351,26 +375,27 @@ body { background: #f5f6fa; color: #333; }
     };
 
     window.resetFormPerubahan = async function() {
-        await loadPengaturanDariOPD(activeTenantId);
+        if (currentOpdInternalId) {
+            await loadPengaturanDariOPD(currentOpdInternalId);
+        }
     };
 
     function clearForm() {
-        currentOpdId = null;
         document.getElementById('mainConfigForm').reset();
         currentLogoUrl = null;
         currentKopUrl = null;
         renderMediaPreviews();
     }
 
-    // SIMPAN DATA KE OPD YANG TERSEDIA
+    // SIMPAN PERUBAHAN FORM KEMBALI KE SUPABASE
     window.saveSeluruhPengaturan = async function(event) {
         event.preventDefault();
-        if (!currentOpdId) {
-            Swal.fire('Eror', 'ID Data OPD tidak valid atau belum terdaftar.', 'error');
+        if (!currentOpdInternalId) {
+            Swal.fire('Eror', 'ID Data Instansi tidak valid atau tidak terbaca.', 'error');
             return;
         }
 
-        Swal.showLoading();
+        Swal.fire({ title: 'Menyimpan perubahan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
         const payload = {
             name: document.getElementById('cfg-namaInstansi').value.trim(),
@@ -383,15 +408,15 @@ body { background: #f5f6fa; color: #333; }
         const { error } = await client
             .from('opds')
             .update(payload)
-            .eq('id', currentOpdId);
+            .eq('id', currentOpdInternalId); // Eksekusi update dikunci pakai ID Unik
 
         if (error) {
             Swal.fire('Gagal Menyimpan', error.message, 'error');
             return;
         }
 
-        Swal.fire({ icon: 'success', title: 'Data OPD & Tahun Anggaran Berhasil Disimpan!', showConfirmButton: false, timer: 1500 });
-        await loadPengaturanDariOPD(activeTenantId);
+        Swal.fire({ icon: 'success', title: 'Konfigurasi OPD Berhasil Diperbarui!', showConfirmButton: false, timer: 1500 });
+        await loadPengaturanDariOPD(currentOpdInternalId);
     };
 
     document.addEventListener('DOMContentLoaded', init);
