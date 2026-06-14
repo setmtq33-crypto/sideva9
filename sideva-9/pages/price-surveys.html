@@ -511,7 +511,7 @@ function editSurvey(id){
       console.log('UPDATE PAYLOAD', updatePayload);
       
       result = await surveyDb
-      .from(‘price_surveys’)
+      .from('price_surveys')
       .update(updatePayload)
       .eq(‘id’, surveyId.value)
       .select();
@@ -539,7 +539,7 @@ function editSurvey(id){
       console.log('INSERT PAYLOAD', insertPayload);
       
       result = await surveyDb
-      .from(‘price_surveys’)
+      .from('price_surveys')
       .insert(insertPayload)
       .select();
       
@@ -559,7 +559,7 @@ function editSurvey(id){
       
       await selectItem(selectedItemId);
       
-      if(typeof updatePackageStatus === ‘function’){
+      if(typeof updatePackageStatus === 'function'){
       await updatePackageStatus(packageId);
       }
 
