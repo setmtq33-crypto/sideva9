@@ -1,0 +1,32 @@
+<!-- Di dalam file arsip.html -->
+<div class="header-arsip">
+    <!-- Tombol Kembali -->
+    <button onclick="window.location.href='dashboard-v9.html'">← Kembali ke Dashboard</button>
+    <h2>Arsip Paket</h2>
+</div>
+
+<div class="arsip-layout">
+    <div class="sidebar-list" id="paket-list">
+        <!-- Daftar paket dari Supabase akan muncul di sini -->
+    </div>
+
+    <div class="doc-area">
+        <!-- Navigasi 10 Dokumen (Awalnya tersembunyi) -->
+        <div id="nav-dokumen-v8" style="display:none; margin-bottom: 20px;">
+            <button onclick="renderDokumenV8('evat', selectedPackageId)">EVAT</button>
+            <button onclick="renderDokumenV8('evhp', selectedPackageId)">EVHP</button>
+            <button onclick="renderDokumenV8('formspek', selectedPackageId)">Spek</button>
+            <button onclick="renderDokumenV8('formdpp', selectedPackageId)">DPP</button>
+            <button onclick="renderDokumenV8('nodis', selectedPackageId)">Nodis</button>
+            <button onclick="renderDokumenV8('riviu', selectedPackageId)">Riviu</button>
+            <button onclick="renderDokumenV8('penetapan', selectedPackageId)">Penetapan</button>
+            <button onclick="renderDokumenV8('idkb', selectedPackageId)">IDKB</button>
+            <button onclick="renderDokumenV8('bahpe', selectedPackageId)">BAHPE</button>
+            <button onclick="renderDokumenV8('lainnya', selectedPackageId)">Lainnya</button>
+        </div>
+        
+        <div id="doc-render-area">
+            <p>Pilih paket di daftar sebelah kiri untuk memulai.</p>
+        </div>
+    </div>
+</div>
