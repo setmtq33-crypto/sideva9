@@ -1,79 +1,55 @@
-<div class="sidebar">
-
-    <h4>SIDEVA9</h4>
-
-    <a id="menuDashboard"
-       href="/pages/dashboard.html">
-        Dashboard
-    </a>
-
-    <hr>
-
-    <a id="menuPackages"
-       href="/pages/packages.html">
-        Packages
-    </a>
-
-    <a id="menuSurvey"
-       href="/pages/price-surveys.html">
-        Survey Harga
-    </a>
-
-    <a id="menuDocuments"
-       href="/pages/package-documents.html">
-        Dokumen
-    </a>
-
-    <a id="menuHps"
-       href="/pages/hps.html">
-        HPS
-    </a>
-
-    <a id="menuReady"
-       href="/pages/procurement-ready.html">
-        Ready Procurement
-    </a>
-
-    <hr>
-
-    <a id="menuUsers"
-       href="/pages/users.html">
-        Users
-    </a>
-
-    <a id="menuOpds"
-       href="/pages/opds.html">
-        OPD
-    </a>
-
-    <a id="menuAudit"
-       href="/pages/audit-logs.html">
-        Audit Logs
-    </a>
-
-    <hr>
-
-    <a id="menuBidangs"
-       href="/pages/bidangs.html">
-        Bidang
-    </a>
-
-    <a id="menuAccounts"
-       href="/pages/budget-accounts.html">
-        Rekening
-    </a>
-
-    <a href="pengaturan.html" class="nav-link text-white">
-    <i class="bi bi-gear-fill me-2"></i>
-    <span>Pengaturan Instansi</span>
-    </a>
-
+<nav class="sidebar border-end bg-white" style="width: 250px; min-height: 100vh;">
+    <div class="p-3 border-bottom text-center">
+        <h5 class="fw-bold text-primary">SIDEVA9</h5>
+    </div>
     
-      <a id="menuSurvey"
-       href="/pages/surveys.html">
-        Survey
-        </a>
+    <ul class="nav flex-column p-2">
+        <li class="nav-item">
+            <a href="dashboard.html" class="nav-link text-dark d-flex align-items-center gap-3">
+                <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+            </a>
+        </li>
 
-   
+        <li class="nav-item">
+            <a href="pengaturan.html" class="nav-link text-dark d-flex align-items-center gap-3">
+                <i class="bi bi-building-gear"></i> <span>Pengaturan Instansi</span>
+            </a>
+        </li>
 
-</div>
+        <li class="nav-item">
+            <a href="anggaran.html" class="nav-link text-dark d-flex align-items-center gap-3">
+                <i class="bi bi-wallet2"></i> <span>Data Anggaran</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a href="laporan.html" class="nav-link text-dark d-flex align-items-center gap-3">
+                <i class="bi bi-file-earmark-bar-graph"></i> <span>Laporan</span>
+            </a>
+        </li>
+
+        <li class="nav-item mt-4">
+            <hr class="dropdown-divider">
+            <a href="#" onclick="logout()" class="nav-link text-danger d-flex align-items-center gap-3">
+                <i class="bi bi-box-arrow-left"></i> <span>Keluar</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+<style>
+    .nav-link {
+        padding: 12px 16px;
+        transition: all 0.2s;
+        border-radius: 8px;
+    }
+    .nav-link:hover {
+        background-color: #f0f4ff;
+        color: #4f6ef7 !important;
+    }
+    .nav-link i {
+        font-size: 1.2rem;
+        width: 20px; /* Biar ikonnya sejajar rapi */
+        text-align: center;
+    }
+</style>
