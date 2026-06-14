@@ -224,7 +224,7 @@ Tambah Survey
 
 <script>
 
-const supabase = window.supabaseClient;
+const surveyDb = window.supabaseClient;
 
 let profile=null;
 let packageId=null;
@@ -250,7 +250,7 @@ async function init(){
 
 async function loadPackage(){
 
- const {data} = await supabase
+ const {data} = await surveyDb
  .from('packages')
  .select('*')
  .eq('id',packageId)
@@ -263,7 +263,7 @@ async function loadPackage(){
 
 async function loadItems(){
 
- const {data} = await supabase
+ const {data} = await surveyDb
  .from('package_items')
  .select('*')
  .eq('package_id',packageId)
@@ -304,7 +304,7 @@ async function selectItem(id){
 
  document.getElementById('selectedItemName').innerText=item.item_name;
 
- const {data} = await supabase
+ const {data} = await surveyDb
  .from('price_surveys')
  .select('*')
  .eq('package_item_id',id)
@@ -415,7 +415,7 @@ async function saveSurvey(){
 
  if(surveyId.value){
 
-   result=await supabase
+   result=await surveyDb
    .schema('business')
    .from('price_surveys')
    .update(payload)
@@ -423,7 +423,7 @@ async function saveSurvey(){
 
  }else{
 
-   result=await supabase
+   result=await surveyDb
    .schema('business')
    .from('price_surveys')
    .insert(payload);
@@ -448,7 +448,7 @@ async function deleteSurvey(id){
 
  if(!ok.isConfirmed) return;
 
- const {error}=await supabase
+ const {error}=await surveyDb
  .schema('business')
  .from('price_surveys')
  .delete()
