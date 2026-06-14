@@ -411,157 +411,157 @@ function openAddModal(){
 
 function editSurvey(id){
 
- const s = surveys.find(x=>x.id===id);
+   const s = surveys.find(x=>x.id===id);
+  
+   if(!s) return;
+  
+   surveyId.value=s.id;
+   vendorName.value=s.vendor_name||'';
+   brand.value=s.brand||'';
+   surveyPrice.value=s.survey_price||0;
+   negotiatedPrice.value=s.negotiated_price||0;
+   sourceUrl.value=s.source_url||'';
+   surveyDate.value=s.survey_date||'';
+   notes.value=s.notes||'';
+  
+   isCandidate.checked=s.is_candidate;
+   isWinner.checked=s.is_winner;
+  
+   modal.show();
+  }
+  
+  async function fetchCatalogData(){
+  
+      const url =
+          document
+          .getElementById(
+              'catalogUrl'
+          )
+          .value
+          .trim();
+  
+      if(!url){
+  
+          alert(
+              'Masukkan URL E-Katalog'
+          );
+  
+          return;
+      }
+  
+      const slug =
+          url.split('/')
+             .pop();
+  
+      document
+      .getElementById(
+          'vendorName'
+      )
+      .value =
+      'CV MURIA SETIA';
+  
+      document
+      .getElementById(
+          'brand'
+      )
+      .value =
+      slug
+          .replaceAll('-',' ')
+          .toUpperCase();
+  
+      document
+      .getElementById(
+          'surveyPrice'
+      )
+      .value =
+      99900;
+  
+      document
+      .getElementById(
+          'sourceUrl'
+      )
+      .value =
+      url;
+  
+  }
+   
+  
+  async function saveSurvey(){
 
- if(!s) return;
-
- surveyId.value=s.id;
- vendorName.value=s.vendor_name||'';
- brand.value=s.brand||'';
- surveyPrice.value=s.survey_price||0;
- negotiatedPrice.value=s.negotiated_price||0;
- sourceUrl.value=s.source_url||'';
- surveyDate.value=s.survey_date||'';
- notes.value=s.notes||'';
-
- isCandidate.checked=s.is_candidate;
- isWinner.checked=s.is_winner;
-
- modal.show();
-}
-
-async function fetchCatalogData(){
-
-    const url =
-        document
-        .getElementById(
-            'catalogUrl'
-        )
-        .value
-        .trim();
-
-    if(!url){
-
-        alert(
-            'Masukkan URL E-Katalog'
-        );
-
-        return;
-    }
-
-    const slug =
-        url.split('/')
-           .pop();
-
-    document
-    .getElementById(
-        'vendorName'
-    )
-    .value =
-    'CV MURIA SETIA';
-
-    document
-    .getElementById(
-        'brand'
-    )
-    .value =
-    slug
-        .replaceAll('-',' ')
-        .toUpperCase();
-
-    document
-    .getElementById(
-        'surveyPrice'
-    )
-    .value =
-    99900;
-
-    document
-    .getElementById(
-        'sourceUrl'
-    )
-    .value =
-    url;
-
-}
- 
-
-async function saveSurvey(){
-
-const isEdit = !!surveyId.value;
-
-let result;
-
-if(isEdit){
-
-const updatePayload = {
-vendor_name: vendorName.value,
-brand: brand.value,
-survey_price: Number(surveyPrice.value || 0),
-negotiated_price: Number(negotiatedPrice.value || 0),
-source_url: sourceUrl.value,
-survey_date: surveyDate.value,
-notes: notes.value,
-is_candidate: isCandidate.checked,
-is_winner: isWinner.checked
-};
-
-console.log(‘MODE EDIT’);
-console.log(‘EDIT ID’, surveyId.value);
-console.log(‘UPDATE PAYLOAD’, updatePayload);
-
-result = await surveyDb
-.from(‘price_surveys’)
-.update(updatePayload)
-.eq(‘id’, surveyId.value)
-.select();
-
-console.log(‘UPDATE RESULT’, result);
-
-}else{
-
-const insertPayload = {
-tenant_id: profile.tenant_id,
-opd_id: profile.opd_id,
-package_item_id: selectedItemId,
-vendor_name: vendorName.value,
-brand: brand.value,
-survey_price: Number(surveyPrice.value || 0),
-negotiated_price: Number(negotiatedPrice.value || 0),
-source_url: sourceUrl.value,
-survey_date: surveyDate.value,
-notes: notes.value,
-is_candidate: isCandidate.checked,
-is_winner: isWinner.checked
-};
-
-console.log(‘MODE INSERT’);
-console.log(‘INSERT PAYLOAD’, insertPayload);
-
-result = await surveyDb
-.from(‘price_surveys’)
-.insert(insertPayload)
-.select();
-
-console.log(‘INSERT RESULT’, result);
-}
-
-if(result.error){
-
-console.error(result.error);
-
-alert(result.error.message);
-
-return;
-}
-
-modal.hide();
-
-await selectItem(selectedItemId);
-
-if(typeof updatePackageStatus === ‘function’){
-await updatePackageStatus(packageId);
-}
+      const isEdit = !!surveyId.value;
+      
+      let result;
+      
+      if(isEdit){
+      
+      const updatePayload = {
+      vendor_name: vendorName.value,
+      brand: brand.value,
+      survey_price: Number(surveyPrice.value || 0),
+      negotiated_price: Number(negotiatedPrice.value || 0),
+      source_url: sourceUrl.value,
+      survey_date: surveyDate.value,
+      notes: notes.value,
+      is_candidate: isCandidate.checked,
+      is_winner: isWinner.checked
+      };
+      
+      console.log(‘MODE EDIT’);
+      console.log(‘EDIT ID’, surveyId.value);
+      console.log(‘UPDATE PAYLOAD’, updatePayload);
+      
+      result = await surveyDb
+      .from(‘price_surveys’)
+      .update(updatePayload)
+      .eq(‘id’, surveyId.value)
+      .select();
+      
+      console.log(‘UPDATE RESULT’, result);
+      
+      }else{
+      
+      const insertPayload = {
+      tenant_id: profile.tenant_id,
+      opd_id: profile.opd_id,
+      package_item_id: selectedItemId,
+      vendor_name: vendorName.value,
+      brand: brand.value,
+      survey_price: Number(surveyPrice.value || 0),
+      negotiated_price: Number(negotiatedPrice.value || 0),
+      source_url: sourceUrl.value,
+      survey_date: surveyDate.value,
+      notes: notes.value,
+      is_candidate: isCandidate.checked,
+      is_winner: isWinner.checked
+      };
+      
+      console.log(‘MODE INSERT’);
+      console.log(‘INSERT PAYLOAD’, insertPayload);
+      
+      result = await surveyDb
+      .from(‘price_surveys’)
+      .insert(insertPayload)
+      .select();
+      
+      console.log(‘INSERT RESULT’, result);
+      }
+      
+      if(result.error){
+      
+      console.error(result.error);
+      
+      alert(result.error.message);
+      
+      return;
+      }
+      
+      modal.hide();
+      
+      await selectItem(selectedItemId);
+      
+      if(typeof updatePackageStatus === ‘function’){
+      await updatePackageStatus(packageId);
+      }
 
 }
 
