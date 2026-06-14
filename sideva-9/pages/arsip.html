@@ -42,16 +42,18 @@
 <script src="../js/v9-legacy-bridge.js"></script>
 
 <script>
+    <script>
     async function initArsip() {
-        // Cek apakah supabaseClient sudah ada
-        if (!window.supabase) {
-            console.warn("Supabase belum siap, mencoba lagi dalam 500ms...");
+        // Kita tunggu sampai window.supabaseClient benar-benar ada
+        if (typeof window.supabaseClient === 'undefined') {
+            console.warn("Menunggu supabaseClient siap...");
             setTimeout(initArsip, 500);
             return;
         }
 
         try {
-            const { data, error } = await window.supabase
+            // Sekarang dia PASTI sudah ada
+            const { data, error } = await window.supabaseClient
                 .from('packages')
                 .select('id, rup, package_name');
             
@@ -66,13 +68,15 @@
             `).join('');
         } catch (err) {
             console.error("Gagal ambil data:", err);
-            document.getElementById('paket-list').innerHTML = "Gagal memuat paket. Cek koneksi.";
+            document.getElementById('paket-list').innerHTML = "Gagal memuat paket: " + err.message;
         }
     }
 
-    // Tunggu semua file dimuat baru jalankan
-    window.addEventListener('load', initArsip);
-</script>
+    // Jalankan
+    initArsip();
+    </script>
+
+</script>    
 
 </body>
 </html>
