@@ -414,17 +414,14 @@ function renderSurvey(){
 
     let surveyTotal = 0;
     let negoTotal = 0;
-    let lowest = 0;
+    let lowest = surveys.length > 0 ? Number(surveys[0].survey_price || 0) : 0; // Perbaikan di sini
 
-    surveys.forEach((s,index)=>{
+    surveys.forEach((s, index)=>{
 
         surveyTotal += Number(s.survey_price || 0);
         negoTotal += Number(s.negotiated_price || 0);
 
-        if(index === 0){
-            lowest = Number(s.survey_price || 0);
-        }
-
+        // Perbaikan logika perbandingan harga terendah
         if(Number(s.survey_price || 0) < lowest){
             lowest = Number(s.survey_price || 0);
         }
@@ -433,37 +430,12 @@ function renderSurvey(){
         <tr>
             <td>${s.vendor_name || ''}</td>
             <td>${s.brand || ''}</td>
-
-            <td>
-                <b>${s.survey_price || 0}</b>
-            </td>
-
-            <td>${s.negotiated_price || 0}</td>
-
-            <td>
-                ${s.is_candidate ? '✔' : ''}
-            </td>
-
-            <td>
-                ${s.is_winner ? '✔' : ''}
-            </td>
-
+            <td><b>${rupiah(s.survey_price)}</b></td> <td>${rupiah(s.negotiated_price)}</td>   <td>${s.is_candidate ? '✔' : ''}</td>
+            <td>${s.is_winner ? '✔' : ''}</td>
             <td>${s.survey_date || ''}</td>
-
             <td>
-
-                <button
-                    class="btn btn-warning btn-sm"
-                    onclick="editSurvey('${s.id}')">
-                    Edit
-                </button>
-
-                <button
-                    class="btn btn-danger btn-sm"
-                    onclick="deleteSurvey('${s.id}')">
-                    Hapus
-                </button>
-
+                <button class="btn btn-warning btn-sm" onclick="editSurvey('${s.id}')">Edit</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteSurvey('${s.id}')">Hapus</button>
             </td>
         </tr>
         `;
@@ -472,22 +444,10 @@ function renderSurvey(){
     document.getElementById('surveyTable').innerHTML = html;
 
     const count = surveys.length;
-
     document.getElementById('surveyCount').innerText = count;
-
-    document.getElementById('avgSurvey').innerText =
-        rupiah(count ? surveyTotal / count : 0);
-
-    document.getElementById('avgNegotiated').innerText =
-        rupiah(count ? negoTotal / count : 0);
-
-    document.getElementById('lowestPrice').innerText =
-        rupiah(lowest);
-
-    console.log('HTML TABEL');
-    console.log(html);
-
-    console.log('RENDER SELESAI');
+    document.getElementById('avgSurvey').innerText = rupiah(count ? surveyTotal / count : 0);
+    document.getElementById('avgNegotiated').innerText = rupiah(count ? negoTotal / count : 0);
+    document.getElementById('lowestPrice').innerText = rupiah(lowest);
 }
 
 function openAddModal(){
@@ -628,7 +588,7 @@ alert('6 SUKSES');
 
 modal.hide();
 
-await loadSurveys(selectedItemId);
+await selectedItemId(selectedItemId);
 }
 
 async function deleteSurvey(id){
