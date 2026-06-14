@@ -5,12 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pengaturan Instansi - SIDEVA9</title>
 
+<!-- Library Eksternal Standar SIDEVA9 -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<!-- Script Konfigurasi Jalur Lokal Proyek -->
 <script src="../js/config.js"></script>
 <script src="../js/supabase.js"></script>
 <script src="../js/auth.js"></script>
@@ -35,12 +37,13 @@ body { background: #f5f6fa; color: #333; }
 
 <div class="container p-4" style="max-width: 900px;">
 
+    <!-- 1. INTRO BANNER DENGAN TOMBOL KEMBALI INTERAKTIF -->
     <div class="card p-4 bg-white shadow-sm">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
             <div class="d-flex align-items-center gap-3">
                 <div style="font-size: 40px;">⚙️</div>
                 <div>
-                    <span class="badge bg-primary mb-1 fw-bold">SIDEVA9 Database Integrated</span>
+                    <span class="badge bg-primary mb-1 fw-bold">SIDEVA9 Gatekeeper Engine</span>
                     <h3 class="fw-bold m-0 text-dark">Pengaturan Instansi / OPD</h3>
                     <p class="text-muted small m-0">Konfigurasi identitas resmi, logo, kop surat, dan parameter filter OPD.</p>
                 </div>
@@ -53,8 +56,25 @@ body { background: #f5f6fa; color: #333; }
         </div>
     </div>
 
+    <!-- KHUSUS SUPER ADMIN: SELECTOR PILIH OPD (Awalnya tersembunyi) -->
+    <div class="card bg-white shadow-sm border border-warning" id="superadmin-selector-zone" style="display: none;">
+        <div class="card-header bg-warning bg-opacity-10">
+            <div class="card-title text-warning-emphasis"><i class="bi bi-shield-lock-fill me-2"></i> Konsol Super Admin: Pilih Ruang Kerja OPD</div>
+            <span class="badge bg-warning text-dark fw-bold">Super Admin Mode</span>
+        </div>
+        <div class="card-body">
+            <label class="form-label fw-bold">Silahkan Pilih Instansi / OPD yang ingin dikonfigurasi:</label>
+            <select class="form-select form-select-lg border-warning fw-semibold text-secondary" id="global-opd-selector" onchange="switchTargetOPD(this.value)">
+                <!-- Data OPD dari Supabase akan di-render di sini -->
+                <option value="">-- Memuat Daftar OPD --</option>
+            </select>
+            <div class="form-hint text-warning-emphasis mt-2">Sebagai Super Admin, perubahan yang Anda lakukan di bawah akan langsung berdampak pada OPD yang dipilih di atas.</div>
+        </div>
+    </div>
+
     <form id="mainConfigForm" onsubmit="saveSeluruhPengaturan(event)">
         
+        <!-- 2. IDENTITAS & FILTER ANGGARAN -->
         <div class="card bg-white">
             <div class="card-header">
                 <div class="card-title">🏛️ Identitas & Parameter Filter</div>
@@ -80,6 +100,7 @@ body { background: #f5f6fa; color: #333; }
             </div>
         </div>
 
+        <!-- 3. LOGO & KOP SURAT -->
         <div class="card bg-white">
             <div class="card-header">
                 <div class="card-title">🖼️ Logo & Kop Surat Instansi</div>
@@ -89,6 +110,7 @@ body { background: #f5f6fa; color: #333; }
                 <p class="text-muted small">File akan diunggah langsung ke cloud storage Supabase. Pratinjau otomatis diperbarui setelah proses upload berhasil.</p>
                 
                 <div class="row g-4">
+                    <!-- SEKSI LOGO -->
                     <div class="col-md-6">
                         <label class="form-label d-block mb-2">🏛️ Logo Instansi</label>
                         <div class="upload-zone" onclick="document.getElementById('logo-file-input').click()">
@@ -107,6 +129,7 @@ body { background: #f5f6fa; color: #333; }
                         </div>
                     </div>
 
+                    <!-- SEKSI KOP SURAT -->
                     <div class="col-md-6">
                         <label class="form-label d-block mb-2">📄 Gambar Kop Surat</label>
                         <div class="upload-zone" onclick="document.getElementById('kop-file-input').click()">
@@ -128,6 +151,7 @@ body { background: #f5f6fa; color: #333; }
             </div>
         </div>
 
+        <!-- 4. LIVE PREVIEW LAYOUT -->
         <div class="card bg-white">
             <div class="card-header">
                 <div class="card-title">👁️ Live Preview Layout Dokumen Cetak</div>
@@ -143,8 +167,9 @@ body { background: #f5f6fa; color: #333; }
             </div>
         </div>
 
+        <!-- 5. TOMBOL AKSI UTAMA -->
         <div class="d-flex justify-content-between align-items-center mb-5">
-            <button type="button" class="btn btn-outline-secondary px-4 rounded-pill fw-bold" onclick="loadPengaturanDariOPD()">
+            <button type="button" class="btn btn-outline-secondary px-4 rounded-pill fw-bold" onclick="resetFormPerubahan()">
                 <i class="bi bi-arrow-clockwise"></i> Reset Perubahan
             </button>
             <button type="submit" class="btn btn-primary px-5 rounded-pill fw-bold shadow">
@@ -160,23 +185,68 @@ body { background: #f5f6fa; color: #333; }
     let currentOpdId = null; 
     let currentLogoUrl = null;
     let currentKopUrl = null;
-
-    const finalTenantId = "9940ceb7-cab2-49f0-aa86-dc13ee3d2f21"; 
+    
+    // Default fallback TenantID (buat admin biasa)
+    let activeTenantId = "9940ceb7-cab2-49f0-aa86-dc13ee3d2f21"; 
+    let isSuperAdmin = false;
 
     async function init() {
-        await loadPengaturanDariOPD();
+        // DETEKSI ROLE USER BERDASARKAN SYSTEM AUTH SIDEVA9 KAMU
+        const sessionData = JSON.parse(localStorage.getItem('sb-auth-token') || localStorage.getItem('user_session') || '{}');
+        const userRole = sessionData?.user?.user_metadata?.role || sessionData?.role || 'admin'; 
+        
+        // Ambil tenant_id bawaan dari user yang login
+        if(sessionData?.user?.user_metadata?.tenant_id || sessionData?.tenant_id) {
+            activeTenantId = sessionData?.user?.user_metadata?.tenant_id || sessionData?.tenant_id;
+        }
+
+        // JIKA SUPER ADMIN: Nyalakan Fitur Selector Bebas Pilih OPD!
+        if (userRole === 'superadmin' || userRole === 'super_admin') {
+            isSuperAdmin = true;
+            document.getElementById('superadmin-selector-zone').style.display = 'block';
+            await loadDaftarOPDUntukSelector();
+        } else {
+            // Jika Admin Biasa, langsung load data OPD miliknya tanpa ba-bi-bu
+            await loadPengaturanDariOPD(activeTenantId);
+        }
+
         document.getElementById('cfg-namaInstansi').addEventListener('input', updateLiveFallbackPreview);
     }
 
-    async function loadPengaturanDariOPD() {
+    // KHUSUS SUPER ADMIN: AMBIL SEMUA DATA OPD UNTUK DI-SELECT
+    async function loadDaftarOPDUntukSelector() {
+        const { data, error } = await client
+            .from('opds')
+            .select('tenant_id, name, code')
+            .eq('is_active', true)
+            .order('name', { ascending: true });
+
+        if (error) {
+            console.error("Gagal mengambil master list OPD:", error.message);
+            return;
+        }
+
+        const selectorHtml = data.map(opd => 
+            `<option value="${opd.tenant_id}" ${opd.tenant_id === activeTenantId ? 'selected' : ''}>[${opd.code}] ${opd.name}</option>`
+        ).join('');
+        
+        document.getElementById('global-opd-selector').innerHTML = selectorHtml;
+        
+        // Otomatis load data OPD urutan pertama/selected default
+        if(data.length > 0) {
+            activeTenantId = document.getElementById('global-opd-selector').value;
+            await loadPengaturanDariOPD(activeTenantId);
+        }
+    }
+
+    // FUNGSI UTAMA LOAD DATA SATU OPD BERDASARKAN TENANT ID
+    async function loadPengaturanDariOPD(tenantId) {
         Swal.showLoading();
         
         const { data, error } = await client
             .from('opds') 
             .select('*')
-            .eq('tenant_id', finalTenantId)
-            .order('created_at', { ascending: false })
-            .limit(1)
+            .eq('tenant_id', tenantId)
             .maybeSingle();
 
         Swal.close();
@@ -195,8 +265,17 @@ body { background: #f5f6fa; color: #333; }
             currentKopUrl = data.kop_url || null;
 
             renderMediaPreviews();
+        } else {
+            clearForm();
         }
     }
+
+    // KETIKA SUPER ADMIN PILIH OPD LAIN DI DROP-DOWN
+    window.switchTargetOPD = async function(tenantId) {
+        if(!tenantId) return;
+        activeTenantId = tenantId;
+        await loadPengaturanDariOPD(tenantId);
+    };
 
     window.uploadFileMedia = async function(event, jenis) {
         const file = event.target.files[0];
@@ -271,10 +350,23 @@ body { background: #f5f6fa; color: #333; }
         renderMediaPreviews();
     };
 
+    window.resetFormPerubahan = async function() {
+        await loadPengaturanDariOPD(activeTenantId);
+    };
+
+    function clearForm() {
+        currentOpdId = null;
+        document.getElementById('mainConfigForm').reset();
+        currentLogoUrl = null;
+        currentKopUrl = null;
+        renderMediaPreviews();
+    }
+
+    // SIMPAN DATA KE OPD YANG TERSEDIA
     window.saveSeluruhPengaturan = async function(event) {
         event.preventDefault();
         if (!currentOpdId) {
-            Swal.fire('Eror', 'ID Data OPD tidak terdeteksi sistem.', 'error');
+            Swal.fire('Eror', 'ID Data OPD tidak valid atau belum terdaftar.', 'error');
             return;
         }
 
@@ -299,7 +391,7 @@ body { background: #f5f6fa; color: #333; }
         }
 
         Swal.fire({ icon: 'success', title: 'Data OPD & Tahun Anggaran Berhasil Disimpan!', showConfirmButton: false, timer: 1500 });
-        await loadPengaturanDariOPD();
+        await loadPengaturanDariOPD(activeTenantId);
     };
 
     document.addEventListener('DOMContentLoaded', init);
