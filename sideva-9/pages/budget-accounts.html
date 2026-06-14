@@ -34,7 +34,10 @@ body { background: #f5f6fa; }
                 <h3 class="fw-bold m-0 text-dark">Daftar Akun Anggaran</h3>
                 <p class="text-muted small m-0">Kelola kode rekening, pagu belanja, dan ploting anggaran instansi/OPD.</p>
             </div>
-            <div>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="dashboard.html" class="btn btn-outline-secondary px-3 py-2 rounded-pill shadow-sm fw-bold">
+                    <i class="bi bi-house-door-fill me-1"></i> Kembali ke Dashboard
+                </a>
                 <button class="btn btn-primary px-4 py-2 rounded-pill shadow-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalAccount">
                     <i class="bi bi-plus-circle-fill me-2"></i> Tambah Akun Anggaran
                 </button>
@@ -147,7 +150,6 @@ body { background: #f5f6fa; }
     }
 
     async function loadBudgetAccounts() {
-        // AMAN: Langsung membaca dari skema default 'public'
         const { data, error } = await client
             .from('budget_accounts')
             .select('*')
