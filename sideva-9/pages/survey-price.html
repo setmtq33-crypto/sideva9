@@ -1,33 +1,28 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>Survey Harga</title>
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-
 <body>
 
 <div class="container-fluid py-4">
 
-    <div class="d-flex justify-content-between mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
         <h3>Survey Harga E-Katalog</h3>
-    
+
         <a
             href="dashboard.html"
             class="btn btn-secondary">
-    
+
             Kembali
-    
+
         </a>
-    
+
     </div>
 
     <div class="card mb-4">
+
+        <div class="card-header">
+
+            Form Survey Harga
+
+        </div>
 
         <div class="card-body">
 
@@ -35,7 +30,65 @@
 
                 <div class="col-md-6">
 
-                    <label>Nama Produk</label>
+                    <label class="form-label">
+
+                        Package
+
+                    </label>
+
+                    <select
+                        id="packageId"
+                        class="form-select">
+
+                        <option value="">
+
+                            Pilih Package
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        URL Produk E-Katalog
+
+                    </label>
+
+                    <div class="input-group">
+
+                        <input
+                            id="productUrl"
+                            class="form-control"
+                            placeholder="https://katalog.inaproc.id/...">
+
+                        <button
+                            id="fetchBtn"
+                            type="button"
+                            class="btn btn-success">
+
+                            Ambil Data
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="row mt-3">
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        Nama Produk
+
+                    </label>
 
                     <input
                         id="productName"
@@ -45,7 +98,11 @@
 
                 <div class="col-md-3">
 
-                    <label>Harga</label>
+                    <label class="form-label">
+
+                        Harga Satuan
+
+                    </label>
 
                     <input
                         id="price"
@@ -56,7 +113,11 @@
 
                 <div class="col-md-3">
 
-                    <label>Satuan</label>
+                    <label class="form-label">
+
+                        Satuan
+
+                    </label>
 
                     <input
                         id="unit"
@@ -70,7 +131,11 @@
 
                 <div class="col-md-6">
 
-                    <label>Penyedia</label>
+                    <label class="form-label">
+
+                        Penyedia
+
+                    </label>
 
                     <input
                         id="supplier"
@@ -78,34 +143,60 @@
 
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-md-3">
 
-                    <label>URL Produk</label>
+                    <label class="form-label">
+
+                        Volume
+
+                    </label>
 
                     <input
-                        id="productUrl"
+                        id="quantity"
+                        type="number"
+                        value="1"
+                        min="1"
+                        class="form-control">
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <label class="form-label">
+
+                        Total
+
+                    </label>
+
+                    <input
+                        id="totalPrice"
+                        readonly
                         class="form-control">
 
                 </div>
 
             </div>
 
-            <button
-                id="saveBtn"
-                class="btn btn-primary mt-3">
-            
-                Simpan Survey
-            
-            </button>
-            
-            <button
-                id="cancelEditBtn"
-                class="btn btn-secondary mt-3 ms-2"
-                style="display:none;">
-            
-                Batal Edit
-            
-            </button>
+            <div class="mt-4">
+
+                <button
+                    id="saveBtn"
+                    class="btn btn-primary">
+
+                    Simpan Survey
+
+                </button>
+
+                <button
+                    id="cancelEditBtn"
+                    class="btn btn-secondary ms-2"
+                    style="display:none;">
+
+                    Batal Edit
+
+                </button>
+
+            </div>
 
         </div>
 
@@ -121,29 +212,47 @@
 
         <div class="card-body">
 
-            <table
-                class="table table-striped">
+            <div class="table-responsive">
 
-                <thead>
+                <table
+                    class="table table-bordered table-striped align-middle">
 
-                <tr>
+                    <thead>
 
-                    <th>Produk</th>
-                    <th>Harga</th>
-                    <th>Penyedia</th>
-                    <th>URL</th>
-                    <th>Aksi</th>
+                        <tr>
 
-                </tr>
+                            <th>Package</th>
 
-                </thead>
+                            <th>Produk</th>
 
-                <tbody
-                    id="surveyTable">
+                            <th>Harga</th>
 
-                </tbody>
+                            <th>Volume</th>
 
-            </table>
+                            <th>Total</th>
+
+                            <th>Penyedia</th>
+
+                            <th>URL</th>
+
+                            <th width="140">
+
+                                Aksi
+
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody
+                        id="surveyTable">
+
+                    </tbody>
+
+                </table>
+
+            </div>
 
         </div>
 
@@ -161,37 +270,207 @@ from '../assets/js/auth.js';
 const db =
     window.supabaseClient;
 
-let editingId = null;
 let profile;
+let editingId = null;
 
-async function saveSurvey(){
+function calculateTotal(){
 
-    const productName =
-        document.getElementById(
-            'productName'
-        ).value;
+    const qty =
+        Number(
+            document
+            .getElementById(
+                'quantity'
+            ).value
+        ) || 0;
 
     const price =
         Number(
-            document.getElementById(
+            document
+            .getElementById(
                 'price'
             ).value
+        ) || 0;
+
+    document
+    .getElementById(
+        'totalPrice'
+    )
+    .value =
+    qty * price;
+
+}
+
+async function loadPackages(){
+
+    const {
+        data,
+        error
+    } =
+    await db
+    .schema('business')
+    .from('packages')
+    .select(`
+        id,
+        package_name,
+        fiscal_year
+    `)
+    .order(
+        'package_name'
+    );
+
+    if(error){
+
+        console.error(error);
+
+        return;
+
+    }
+
+    const select =
+    document
+    .getElementById(
+        'packageId'
+    );
+
+    select.innerHTML = `
+        <option value="">
+            Pilih Package
+        </option>
+    `;
+
+    data.forEach(pkg=>{
+
+        select.innerHTML += `
+            <option value="${pkg.id}">
+                ${pkg.package_name}
+                (${pkg.fiscal_year})
+            </option>
+        `;
+
+    });
+
+}
+
+async function fetchCatalogData(){
+
+    const url =
+    document
+    .getElementById(
+        'productUrl'
+    )
+    .value
+    .trim();
+
+    if(!url){
+
+        alert(
+            'Masukkan URL Produk'
         );
 
-    const unit =
-        document.getElementById(
-            'unit'
-        ).value;
+        return;
 
-    const supplier =
-        document.getElementById(
-            'supplier'
-        ).value;
+    }
 
-    const productUrl =
-        document.getElementById(
-            'productUrl'
-        ).value;
+    const slug =
+    url.split('/')
+       .pop();
+
+    document
+    .getElementById(
+        'productName'
+    )
+    .value =
+    slug
+    .replaceAll(
+        '-',
+        ' '
+    )
+    .toUpperCase();
+
+}
+
+async function saveSurvey(){
+
+    const packageId =
+    document
+    .getElementById(
+        'packageId'
+    )
+    .value;
+
+    if(!packageId){
+
+        alert(
+            'Pilih Package'
+        );
+
+        return;
+
+    }
+
+    const payload = {
+
+        tenant_id:
+            profile.tenant_id,
+
+        package_id:
+            packageId,
+
+        product_name:
+            document
+            .getElementById(
+                'productName'
+            ).value,
+
+        supplier_name:
+            document
+            .getElementById(
+                'supplier'
+            ).value,
+
+        unit:
+            document
+            .getElementById(
+                'unit'
+            ).value,
+
+        price:
+            Number(
+                document
+                .getElementById(
+                    'price'
+                ).value
+            ),
+
+        quantity:
+            Number(
+                document
+                .getElementById(
+                    'quantity'
+                ).value
+            ),
+
+        total_price:
+            Number(
+                document
+                .getElementById(
+                    'totalPrice'
+                ).value
+            ),
+
+        product_url:
+            document
+            .getElementById(
+                'productUrl'
+            ).value,
+
+        source_url:
+            document
+            .getElementById(
+                'productUrl'
+            ).value
+
+    };
 
     let error;
 
@@ -199,25 +478,10 @@ async function saveSurvey(){
 
         ({ error } =
         await db
-        .from('catalog_products')
-        .update({
-
-            product_name:
-                productName,
-
-            supplier_name:
-                supplier,
-
-            unit:
-                unit,
-
-            price:
-                price,
-
-            product_url:
-                productUrl
-
-        })
+        .from(
+            'catalog_products'
+        )
+        .update(payload)
         .eq(
             'id',
             editingId
@@ -227,34 +491,18 @@ async function saveSurvey(){
 
         ({ error } =
         await db
-        .from('catalog_products')
-        .insert({
-
-            tenant_id:
-                profile.tenant_id,
-
-            product_name:
-                productName,
-
-            supplier_name:
-                supplier,
-
-            unit:
-                unit,
-
-            price:
-                price,
-
-            product_url:
-                productUrl
-
-        }));
+        .from(
+            'catalog_products'
+        )
+        .insert(payload));
 
     }
 
     if(error){
 
-        alert(error.message);
+        alert(
+            error.message
+        );
 
         return;
 
@@ -264,6 +512,10 @@ async function saveSurvey(){
 
     await loadData();
 
+    alert(
+        'Survey berhasil disimpan'
+    );
+
 }
 
 async function editSurvey(id){
@@ -272,9 +524,14 @@ async function editSurvey(id){
         data
     } =
     await db
-    .from('catalog_products')
+    .from(
+        'catalog_products'
+    )
     .select('*')
-    .eq('id',id)
+    .eq(
+        'id',
+        id
+    )
     .single();
 
     if(!data) return;
@@ -282,34 +539,67 @@ async function editSurvey(id){
     editingId =
         data.id;
 
-    document.getElementById(
+    document
+    .getElementById(
+        'packageId'
+    )
+    .value =
+    data.package_id || '';
+
+    document
+    .getElementById(
         'productName'
-    ).value =
+    )
+    .value =
     data.product_name || '';
 
-    document.getElementById(
+    document
+    .getElementById(
         'price'
-    ).value =
+    )
+    .value =
     data.price || '';
 
-    document.getElementById(
+    document
+    .getElementById(
         'unit'
-    ).value =
+    )
+    .value =
     data.unit || '';
 
-    document.getElementById(
+    document
+    .getElementById(
         'supplier'
-    ).value =
+    )
+    .value =
     data.supplier_name || '';
 
-    document.getElementById(
+    document
+    .getElementById(
         'productUrl'
-    ).value =
+    )
+    .value =
     data.product_url || '';
 
-    document.getElementById(
+    document
+    .getElementById(
+        'quantity'
+    )
+    .value =
+    data.quantity || 1;
+
+    document
+    .getElementById(
+        'totalPrice'
+    )
+    .value =
+    data.total_price || 0;
+
+    document
+    .getElementById(
         'cancelEditBtn'
-    ).style.display =
+    )
+    .style.display =
     'inline-block';
 
 }
@@ -341,48 +631,92 @@ function resetForm(){
 
     editingId = null;
 
-    document.getElementById(
+    document
+    .getElementById(
+        'packageId'
+    )
+    .value='';
+
+    document
+    .getElementById(
         'productName'
-    ).value='';
+    )
+    .value='';
 
-    document.getElementById(
+    document
+    .getElementById(
         'price'
-    ).value='';
+    )
+    .value='';
 
-    document.getElementById(
+    document
+    .getElementById(
         'unit'
-    ).value='';
+    )
+    .value='';
 
-    document.getElementById(
+    document
+    .getElementById(
         'supplier'
-    ).value='';
+    )
+    .value='';
 
-    document.getElementById(
+    document
+    .getElementById(
         'productUrl'
-    ).value='';
+    )
+    .value='';
 
-    document.getElementById(
+    document
+    .getElementById(
+        'quantity'
+    )
+    .value='1';
+
+    document
+    .getElementById(
+        'totalPrice'
+    )
+    .value='';
+
+    document
+    .getElementById(
         'cancelEditBtn'
-    ).style.display='none';
+    )
+    .style.display='none';
 
 }
 
 async function loadData(){
 
     const {
-        data
+        data,
+        error
     } =
     await db
     .from(
         'catalog_products'
     )
-    .select('*')
+    .select(`
+        *,
+        business_packages:package_id (
+            package_name
+        )
+    `)
     .order(
         'created_at',
         {
             ascending:false
         }
     );
+
+    if(error){
+
+        console.error(error);
+
+        return;
+
+    }
 
     const tbody =
     document
@@ -399,35 +733,59 @@ async function loadData(){
         <tr>
 
             <td>
+                ${row.business_packages?.package_name || '-'}
+            </td>
+
+            <td>
+                ${row.product_name || ''}
+            </td>
+
+            <td>
+                ${(row.price || 0).toLocaleString('id-ID')}
+            </td>
+
+            <td>
+                ${row.quantity || 0}
+            </td>
+
+            <td>
+                ${(row.total_price || 0).toLocaleString('id-ID')}
+            </td>
+
+            <td>
+                ${row.supplier_name || ''}
+            </td>
+
+            <td>
 
                 <a
-                    href="${row.product_url}"
+                    href="${row.product_url || '#'}"
                     target="_blank">
-            
+
                     Link
-            
+
                 </a>
-            
+
             </td>
-            
+
             <td>
-            
+
                 <button
                     class="btn btn-warning btn-sm"
                     onclick="editSurvey('${row.id}')">
-            
+
                     Edit
-            
+
                 </button>
-            
+
                 <button
                     class="btn btn-danger btn-sm ms-1"
                     onclick="deleteSurvey('${row.id}')">
-            
+
                     Hapus
-            
+
                 </button>
-            
+
             </td>
 
         </tr>
@@ -443,6 +801,10 @@ async function init(){
     profile =
     await getProfile();
 
+    await loadPackages();
+
+    await loadData();
+
     document
     .getElementById(
         'saveBtn'
@@ -450,7 +812,12 @@ async function init(){
     .onclick =
     saveSurvey;
 
-    await loadData();
+    document
+    .getElementById(
+        'fetchBtn'
+    )
+    .onclick =
+    fetchCatalogData;
 
     document
     .getElementById(
@@ -458,6 +825,24 @@ async function init(){
     )
     .onclick =
     resetForm;
+
+    document
+    .getElementById(
+        'quantity'
+    )
+    .addEventListener(
+        'input',
+        calculateTotal
+    );
+
+    document
+    .getElementById(
+        'price'
+    )
+    .addEventListener(
+        'input',
+        calculateTotal
+    );
 
 }
 
