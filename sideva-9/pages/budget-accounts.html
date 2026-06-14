@@ -21,7 +21,6 @@
 body { background: #f5f6fa; }
 .card { border: none; border-radius: 12px; }
 .table th { font-weight: 600; background-color: #f8f9fa !important; color: #495057; }
-.badge-budget { font-size: 0.85rem; padding: 6px 12px; border-radius: 30px; }
 </style>
 </head>
 <body>
@@ -31,7 +30,7 @@ body { background: #f5f6fa; }
     <div class="card p-4 mb-4 shadow-sm bg-white">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
             <div>
-                <span class="badge bg-success mb-1">Modul Keuangan v9</span>
+                <span class="badge bg-success mb-1">Modul Keuangan v9 (Public Schema)</span>
                 <h3 class="fw-bold m-0 text-dark">Daftar Akun Anggaran</h3>
                 <p class="text-muted small m-0">Kelola kode rekening, pagu belanja, dan ploting anggaran instansi/OPD.</p>
             </div>
@@ -67,9 +66,6 @@ body { background: #f5f6fa; }
                         <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
                         <input type="text" id="searchAccount" class="form-control border-start-0 ps-0" placeholder="Cari nomor rekening / nama akun..." onkeyup="filterAccountsTable()">
                     </div>
-                </div>
-                <div class="col-md-auto text-muted small">
-                    *Sinkronisasi basis data otomatis dengan skema bisnis SIDEVA
                 </div>
             </div>
 
@@ -115,7 +111,7 @@ body { background: #f5f6fa; }
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold text-secondary small">URAIAN / NAMA AKUN BELANJA</label>
-                        <textarea id="accountName" class="form-control" rows="3" placeholder="Masukkan nama komoditas atau rincian objek belanja..." required></textarea>
+                        <textarea id="accountName" class="form-control" rows="3" placeholder="Masukkan nama objek belanja..." required></textarea>
                     </div>
                     <div class="mb-2">
                         <label class="form-label fw-bold text-secondary small">JUMLAH ALOKASI PAGU DANA (RP)</label>
@@ -136,13 +132,11 @@ body { background: #f5f6fa; }
 
 <script>
 (function() {
-    // Memanfaatkan jaminan instansi Supabase murni dari SIDEVA9
     const client = window.supabaseClient || window.supabase;
 
     let profile = null;
     let rawAccountsData = [];
 
-    // Formatter Rupiah Standar Akuntansi Pemerintah
     const formatRp = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num || 0);
 
     async function init() {
@@ -153,16 +147,15 @@ body { background: #f5f6fa; }
     }
 
     async function loadBudgetAccounts() {
-        // Otomatisasi pembacaan schema bisnis multi-tenant SIDEVA
+        // AMAN: Langsung membaca dari skema default 'public'
         const { data, error } = await client
-            .schema('business')
             .from('budget_accounts')
             .select('*')
             .order('account_code', { ascending: true });
 
         if (error) {
             console.error("Gagal memuat anggaran:", error.message);
-            document.getElementById('budgetAccountsTable').innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4 small"><i class="bi bi-exclamation-octagon"></i> Gagal menyinkronkan data database: ${error.message}</td></tr>`;
+            document.getElementById('budgetAccountsTable').innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4 small"><i class="bi bi-exclamation-octagon"></i> Gagal menyinkronkan database: ${error.message}</td></tr>`;
             return;
         }
 
@@ -176,7 +169,7 @@ body { background: #f5f6fa; }
         let totalBudgetSum = 0;
 
         if (dataset.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted small">Belum ada daftar akun anggaran yang direkam.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted small">Belum ada daftar akun anggaran.</td></tr>';
             document.querySelector('.id-total-account').innerText = '0';
             document.querySelector('.id-total-budget').innerText = 'Rp 0';
             return;
@@ -191,10 +184,10 @@ body { background: #f5f6fa; }
                 <td><div class="fw-semibold text-dark text-wrap">${row.account_name || '-'}</div></td>
                 <td class="text-end fw-bold text-success">${formatRp(row.budget)}</td>
                 <td class="text-center">
-                    <button class="btn btn-outline-primary btn-sm py-1 px-2 me-1 border-0" onclick="openEditAccountModal('${row.id}')" title="Edit Akun">
+                    <button class="btn btn-outline-primary btn-sm py-1 px-2 me-1 border-0" onclick="openEditAccountModal('${row.id}')">
                         <i class="bi bi-pencil-square"></i>
                     </button>
-                    <button class="btn btn-outline-danger btn-sm py-1 px-2 border-0" onclick="deleteAccountRecord('${row.id}')" title="Hapus Akun">
+                    <button class="btn btn-outline-danger btn-sm py-1 px-2 border-0" onclick="deleteAccountRecord('${row.id}')">
                         <i class="bi bi-trash-fill"></i>
                     </button>
                 </td>
@@ -259,16 +252,12 @@ body { background: #f5f6fa; }
 
         let response;
         if (id) {
-            // Update mode
             response = await client
-                .schema('business')
                 .from('budget_accounts')
                 .update(payload)
                 .eq('id', id);
         } else {
-            // Insert mode
             response = await client
-                .schema('business')
                 .from('budget_accounts')
                 .insert([payload]);
         }
@@ -280,7 +269,6 @@ body { background: #f5f6fa; }
 
         Swal.fire({ icon: 'success', title: 'Berhasil menyimpan data', showConfirmButton: false, timer: 1500 });
         
-        // Tutup modal secara bersih
         const modalEl = document.getElementById('modalAccount');
         const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
         modalInstance.hide();
@@ -305,7 +293,6 @@ body { background: #f5f6fa; }
 
         Swal.showLoading();
         const { error } = await client
-            .schema('business')
             .from('budget_accounts')
             .delete()
             .eq('id', id);
