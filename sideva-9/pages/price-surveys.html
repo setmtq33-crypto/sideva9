@@ -338,9 +338,6 @@ async function selectItem(id){
         .eq('package_item_id', id)
         .order('survey_date', { ascending:false });
 
-    console.log('SURVEY ERROR', error);
-    console.log('SURVEY DATA', data);
-
     if(error){
         alert(error.message);
         return;
@@ -348,43 +345,19 @@ async function selectItem(id){
 
     surveys = data || [];
     renderSurvey();
-
-    console.log('RENDER SELESAI');
-    console.log('JUMLAH SURVEY', surveys.length);
-}
-
-async function loadSurveys(itemId){
- const {data,error} = await surveyDb
- .from('price_surveys')
- .select('*')
- .eq('package_item_id',itemId)
- .order('survey_date', { ascending:false });
-
- if(error){
-   console.error(error);
-   return;
- }
-
- surveys = data || [];
- renderSurvey();
 }
 
 function renderSurvey(){
-    console.log('RENDER SURVEY');
-    console.log(surveys);
-
     let html = '';
     let surveyTotal = 0;
     let negoTotal = 0;
     
-    // PERBAIKAN 1: Inisialisasi awal nilai modal lowest dengan data pertama jika ada
     let lowest = surveys.length > 0 ? Number(surveys[0].survey_price || 0) : 0;
 
     surveys.forEach((s)=>{
         surveyTotal += Number(s.survey_price || 0);
         negoTotal += Number(s.negotiated_price || 0);
 
-        // PERBAIKAN 2: Evaluasi harga terendah lebih bersih dan efisien tanpa if(index === 0)
         if(Number(s.survey_price || 0) < lowest){
             lowest = Number(s.survey_price || 0);
         }
@@ -414,10 +387,6 @@ function renderSurvey(){
     document.getElementById('avgSurvey').innerText = rupiah(count ? surveyTotal / count : 0);
     document.getElementById('avgNegotiated').innerText = rupiah(count ? negoTotal / count : 0);
     document.getElementById('lowestPrice').innerText = rupiah(lowest);
-
-    console.log('HTML TABEL');
-    console.log(html);
-    console.log('RENDER SELESAI');
 }
 
 function openAddModal(){
@@ -453,7 +422,6 @@ async function editSurvey(id){
  currentSurveyId = id;
  surveyId.value=id;
  
- // PERBAIKAN 3: Amankan value item ID yang sedang aktif agar data sync bekerja lancar
  selectedItemId = data.package_item_id; 
 
  vendorName.value = data.vendor_name || '';
@@ -484,18 +452,14 @@ const payload = {
     is_winner: isWinner.checked
 };
 
-alert('2 PAYLOAD JADI');
 let result;
 
 if(currentSurveyId){
-    alert('3 MODE EDIT');
     result = await surveyDb
     .from('price_surveys')
     .update(payload)
     .eq('id',currentSurveyId);
-    alert('4 UPDATE SELESAI');
 }else{
-    alert('3 MODE INSERT');
     result = await surveyDb
     .from('price_surveys')
     .insert({
@@ -504,11 +468,7 @@ if(currentSurveyId){
         opd_id: profile.opd_id,
         package_item_id: selectedItemId
     });
-    alert('4 INSERT SELESAI');
 }
-
-alert('5 SEBELUM CEK ERROR');
-console.log(result);
 
 if(result.error){
     alert(result.error.message);
@@ -518,7 +478,6 @@ if(result.error){
 alert('6 SUKSES');
 modal.hide();
 
-// PERBAIKAN 4: Ganti loadSurveys ke selectItem agar state data ter-refresh sempurna di layar
 await selectItem(selectedItemId);
 }
 
@@ -538,10 +497,10 @@ async function deleteSurvey(id){
   return;
  }
 
- // PERBAIKAN 5: Ganti loadSurveys ke selectItem agar tabel langsung bersih pasca-hapus
  await selectItem(selectedItemId);
 }
 
+// FUNGSI UTAMA YANG MENGGUNAKAN CLOUDFLARE WORKERS
 async function fetchCatalogData(){
     const url = catalogUrl.value.trim();
 
@@ -550,27 +509,24 @@ async function fetchCatalogData(){
         return;
     }
 
-    // Ubah status tombol menjadi Loading
     const btn = document.querySelector("button[onclick='fetchCatalogData()']");
     const originalText = btn.innerText;
     btn.innerText = "Memuat Data Riil...";
     btn.disabled = true;
 
     try {
-        // Ganti alamat ini dengan URL Cloudflare Worker Anda yang asli!
-        const workerUrl = "https://sideva9-sirup-proxy.PENGGUNA_ANDA.workers.dev";
+        // CEK DI SINI: Silakan ganti subdomain 'PENGGUNA_ANDA' dengan milik Anda
+        const workerUrl = "https://sideva9-sirup-proxy.terlanjurtamvan18.workers.dev";
 
-        // DI SINI HARUS TERTULIS METHOD: 'POST'
         const response = await fetch(workerUrl, {
             method: 'POST', 
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ url: url }) // Mengirim data URL dalam bentuk objek JSON
+            body: JSON.stringify({ url: url })
         });
 
         if (!response.ok) {
-            // Jika Worker mengembalikan error (seperti method salah), baca teks errornya
             const errRes = await response.json();
             throw new Error(errRes.error || 'Gagal terhubung ke Cloudflare Proxy');
         }
@@ -588,7 +544,6 @@ async function fetchCatalogData(){
             return;
         }
 
-        // Masukkan data RIIL dari server E-Katalog ke dalam Form otomatis
         vendorName.value = product.username ? product.username.toUpperCase().replaceAll('-', ' ') : 'TIDAK DIKETAHUI';
         brand.value = product.brand ? product.brand.toUpperCase() : 'TIDAK ADA MERK';
         sourceUrl.value = url;
