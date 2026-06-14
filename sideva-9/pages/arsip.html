@@ -44,14 +44,14 @@
 <script>
     async function initArsip() {
         // Cek apakah supabaseClient sudah ada
-        if (!window.arsipDb) {
+        if (!window.supabase) {
             console.warn("Supabase belum siap, mencoba lagi dalam 500ms...");
             setTimeout(initArsip, 500);
             return;
         }
 
         try {
-            const { data, error } = await window.arsipDb
+            const { data, error } = await window.supabase
                 .from('packages')
                 .select('id, rup, package_name');
             
