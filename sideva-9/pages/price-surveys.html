@@ -513,7 +513,7 @@ function editSurvey(id){
       result = await surveyDb
       .from('price_surveys')
       .update(updatePayload)
-      .eq(‘id’, surveyId.value)
+      .eq('id', surveyId.value)
       .select();
       
       console.log('UPDATE RESULT', result);
