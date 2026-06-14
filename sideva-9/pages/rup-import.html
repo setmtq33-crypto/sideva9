@@ -792,6 +792,11 @@ let editingRupId = null;
 
 async function editRup(id){
 
+    console.log(
+        'EDIT',
+        id
+    );
+    
     const {
         data,
         error
@@ -801,6 +806,11 @@ async function editRup(id){
     .select('*')
     .eq('id',id)
     .single();
+
+    console.log(
+    data,
+    error
+    );
 
     if(error){
         alert(error.message);
