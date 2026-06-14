@@ -181,39 +181,42 @@ body { background: #f5f6fa; color: #333; }
     let activeOpdId = "06961a60-de05-412e-b68c-25dd57c7b716"; 
 
     async function init() {
-        // Cek apakah fungsi ada sebelum dipanggil
         if (typeof window.getProfile !== 'function') {
-            console.error("Fungsi getProfile() belum siap, menunggu...");
             setTimeout(init, 500);
             return;
         }
 
+        Swal.fire({ title: 'Sinkronisasi...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
         try {
             const profile = await window.getProfile();
-            // Logging hasil lab ke console untuk diagnosa
             console.log("Hasil Lab Profil User:", profile); 
 
             if (!profile) {
-                // Jika tidak ada profil, arahkan ke login
                 window.location.href = "../pages/login.html";
                 return;
             }
 
-            // GANTI SESUAI NAMA KOLOM DI TABEL PROFILES KAMU
-            // Pastikan kolom ini di database kamu namanya 'opd_id'
-            const userRole = profile.role || 'admin';
-            const userOpdId = profile.opd_id; 
+            // PERBAIKAN LOGIKA: Gunakan .toUpperCase() agar role apa pun terbaca
+            const userRole = (profile.role || '').toUpperCase();
+            const userOpdId = profile.opd_id;
 
-            if (userRole === 'superadmin' || userRole === 'super_admin') {
+            // Selector muncul jika role mengandung SUPER_ADMIN
+            if (userRole.includes('SUPER_ADMIN')) {
                 isSuperAdmin = true;
                 document.getElementById('superadmin-selector-zone').style.display = 'block';
                 await loadDaftarOPDUntukSelector(userOpdId);
             } else {
-                // Gunakan ID dari profil jika ada, kalau tidak pakai fallback yang sudah diperbaiki
-                await loadPengaturanDariOPD(userOpdId || activeOpdId);
+                // Admin biasa tetap pakai opd_id mereka
+                if (userOpdId) {
+                    await loadPengaturanDariOPD(userOpdId);
+                } else {
+                    Swal.fire('Akses Dibatasi', 'Akun Anda tidak memiliki OPD yang terdaftar.', 'warning');
+                }
             }
         } catch (err) {
-            console.error("Gagal inisialisasi:", err);
+            console.error("Initialization Error:", err);
+            Swal.fire('Eror Sistem', 'Gagal sinkronisasi data.', 'error');
         }
     }
 
