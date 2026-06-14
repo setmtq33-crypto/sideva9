@@ -10,7 +10,8 @@ function selectPaket(id) {
 
 // Master Bridge 10 Dokumen
 async function renderDokumenV8(type, packageId) {
-    const { data: pkg } = await window.arsipDb
+    // Pastikan ini menggunakan window.supabaseClient
+    const { data: pkg } = await window.supabaseClient
         .from('packages')
         .select('*')
         .eq('id', packageId)
