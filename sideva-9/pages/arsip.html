@@ -30,3 +30,45 @@
         </div>
     </div>
 </div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-config.js"></script> ```
+<script src="../js/dashboard-documentsv8.js"></script>
+<script src="../js/v9-legacy-bridge.js"></script>
+
+<script>
+    // Inisialisasi daftar paket saat halaman dibuka
+    async function initArsip() {
+        try {
+            const { data, error } = await window.supabaseClient
+                .from('packages')
+                .select('id, rup, package_name');
+            
+            if (error) throw error;
+
+            const list = document.getElementById('paket-list');
+            list.innerHTML = data.map(p => `
+                <div class="paket-item" onclick="selectPaket('${p.id}')">
+                    <strong>${p.rup}</strong><br>
+                    <small>${p.package_name}</small>
+                </div>
+            `).join('');
+        } catch (err) {
+            console.error("Gagal ambil data:", err);
+        }
+    }
+
+    // Panggil saat halaman pertama kali load
+    window.onload = initArsip;
+</script>
+
+
+
+
+<body>
+<html>
+
+
+
+
