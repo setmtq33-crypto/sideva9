@@ -305,6 +305,7 @@ const db = window.supabaseClient;
 
 let profile = null;
 let currentOpdId = null;
+let editingPackageId = null;
 
 document.addEventListener(
     "DOMContentLoaded",
@@ -532,9 +533,30 @@ async function savePackage(){
             document.getElementById("dppDate").value
     };
 
-    const { error } = await window.supabaseClient
-        .from("packages")
-        .insert(payload);
+    let query;
+
+    if(editingPackageId){
+    
+        query =
+        window.supabaseClient
+            .from("packages")
+            .update(payload)
+            .eq(
+                "id",
+                editingPackageId
+            );
+    
+    }else{
+    
+        query =
+        window.supabaseClient
+            .from("packages")
+            .insert(payload);
+    
+    }
+    
+    const { error } =
+        await query;
 
     if(error){
 
@@ -542,9 +564,15 @@ async function savePackage(){
         return;
     }
 
-    alert("Paket berhasil disimpan");
-
-    location.reload();
+    alert(
+        editingPackageId
+        ? "Paket berhasil diperbarui"
+        : "Paket berhasil disimpan"
+    );
+    
+    editingPackageId = null;
+    
+    await loadPackages();
 }
 
 async function loadPackages(){
@@ -672,6 +700,22 @@ async function loadPackages(){
                 <div class="d-flex gap-2">
 
                     <button
+                        class="btn btn-warning btn-sm"
+                        onclick="editPackage('${pkg.id}')">
+                    
+                        Edit
+                    
+                    </button>
+                    
+                    <button
+                        class="btn btn-danger btn-sm"
+                        onclick="deletePackage('${pkg.id}')">
+                    
+                        Hapus
+                    
+                    </button>
+
+                    <button
                         class="btn btn-outline-info btn-sm"
                         onclick="openDpp('${pkg.id}')">
                     
@@ -758,6 +802,99 @@ async function loadPackages(){
     });
 }
 
+async function editPackage(id){
+        const {
+        data,
+        error
+    } =
+    await window.supabaseClient
+    .from("packages")
+    .select("*")
+    .eq("id", id)
+    .single();
+    
+    if(error){
+    
+        alert(error.message);
+    
+        return;
+    }
+    
+    editingPackageId = id;
+    
+    document.getElementById("rupNumber").value =
+        data.rup_number || "";
+    
+    document.getElementById("packageName").value =
+        data.package_name || "";
+    
+    document.getElementById("program").value =
+        data.program || "";
+    
+    document.getElementById("kegiatan").value =
+        data.kegiatan || "";
+    
+    document.getElementById("subKegiatan").value =
+        data.sub_kegiatan || "";
+    
+    document.getElementById("budget").value =
+        data.budget_ceiling || "";
+    
+    document.getElementById("method").value =
+        data.procurement_method || "ECATALOG";
+    
+    document.getElementById("bidangSelect").value =
+        data.bidang_id || "";
+    
+    document.getElementById("makSelect").value =
+        data.budget_account_id || "";
+    
+    document.getElementById("output").value =
+        data.output || "";
+    
+    document.getElementById("dppDate").value =
+        data.dpp_date || "";
+    
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+async function deletePackage(id){
+        const ok =
+        confirm(
+            "Hapus paket ini ?"
+        );
+    
+    if(!ok){
+        return;
+    }
+    
+    const {
+        error
+    } =
+    await window.supabaseClient
+    .from("packages")
+    .delete()
+    .eq("id", id);
+    
+    if(error){
+    
+        alert(error.message);
+    
+        return;
+    }
+    
+    alert(
+        "Paket berhasil dihapus"
+    );
+    
+    await loadPackages();
+}
+
+    
+
 function canSeeHps(role){
 
     return [
@@ -812,7 +949,12 @@ function openDpp(id){
         `dpp.html?id=${id}`;
 }
     
-    
+window.editPackage =
+    editPackage;
+
+window.deletePackage =
+    deletePackage;
+
 
 </script>
 
