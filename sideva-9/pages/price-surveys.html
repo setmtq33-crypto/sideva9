@@ -507,8 +507,8 @@ function editSurvey(id){
       };
       
       console.log('MODE EDIT');
-      console.log(‘EDIT ID’, surveyId.value);
-      console.log(‘UPDATE PAYLOAD’, updatePayload);
+      console.log('EDIT ID', surveyId.value);
+      console.log('UPDATE PAYLOAD', updatePayload);
       
       result = await surveyDb
       .from(‘price_surveys’)
@@ -516,7 +516,7 @@ function editSurvey(id){
       .eq(‘id’, surveyId.value)
       .select();
       
-      console.log(‘UPDATE RESULT’, result);
+      console.log('UPDATE RESULT', result);
       
       }else{
       
@@ -535,15 +535,15 @@ function editSurvey(id){
       is_winner: isWinner.checked
       };
       
-      console.log(‘MODE INSERT’);
-      console.log(‘INSERT PAYLOAD’, insertPayload);
+      console.log('MODE INSERT');
+      console.log('INSERT PAYLOAD', insertPayload);
       
       result = await surveyDb
       .from(‘price_surveys’)
       .insert(insertPayload)
       .select();
       
-      console.log(‘INSERT RESULT’, result);
+      console.log('INSERT RESULT', result);
       }
       
       if(result.error){
