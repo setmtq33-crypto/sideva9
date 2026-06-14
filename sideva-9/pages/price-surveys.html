@@ -335,7 +335,7 @@ async function selectItem(id){
 
  document.getElementById('selectedItemName').innerText=item.item_name;
 
- const {data} = await surveyDb
+ const {data,error} = await surveyDb
  .schema('business')
  .from('price_surveys')
  .select('*')
@@ -486,7 +486,6 @@ async function fetchCatalogData(){
  
 
 async function saveSurvey(){
-    alert('saveSurvey jalan');
 
  const payload={
   tenant_id:profile.tenant_id,
@@ -519,7 +518,6 @@ async function saveSurvey(){
  }else{
 
    console.log(payload);
-   alert('sebelum insert');
   
    result=await surveyDb
       .schema('business')
@@ -572,6 +570,9 @@ async function deleteSurvey(id){
 window.editSurvey = editSurvey;
 window.deleteSurvey = deleteSurvey;
 window.saveSurvey = saveSurvey;
+window.openAddModal = openAddModal;
+window.fetchCatalogData = fetchCatalogData;
+window.selectItem = selectItem;
  
 
 init();
