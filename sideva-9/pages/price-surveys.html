@@ -327,6 +327,8 @@ async function selectItem(id){
 
  selectedItemId=id;
 
+ console.log('ITEM DIPILIH:', id);
+
  const item = items.find(x=>x.id===id);
 
  document.getElementById('selectedItemName').innerText=item.item_name;
@@ -336,6 +338,7 @@ async function selectItem(id){
  .select('*')
  .eq('package_item_id',id)
  .order('survey_date',{ascending:false});
+ console.log('HASIL QUERY:', data);
 
  surveys=data||[];
 
