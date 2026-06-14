@@ -178,46 +178,43 @@ body { background: #f5f6fa; color: #333; }
     let isSuperAdmin = false;
 
     // Default Fallback ID jika profile user tidak mengikat ID spesifik (Mengambil ID BAPPERIDA milikmu)
-    let activeOpdId = "6961a60-de05-412e-b68c-25dd57c7b716"; 
+    let activeOpdId = "06961a60-de05-412e-b68c-25dd57c7b716"; 
 
     async function init() {
-        // Beri perlindungan jeda super singkat agar window.getProfile dari auth.js siap dibaca
+        // Cek apakah fungsi ada sebelum dipanggil
         if (typeof window.getProfile !== 'function') {
-            setTimeout(init, 100);
+            console.error("Fungsi getProfile() belum siap, menunggu...");
+            setTimeout(init, 500);
             return;
         }
 
-        Swal.fire({
-            title: 'Sinkronisasi Sesi...',
-            allowOutsideClick: false,
-            didOpen: () => Swal.showLoading()
-        });
-
         try {
             const profile = await window.getProfile();
-            console.log("Data Profil User:", profile);
+            // Logging hasil lab ke console untuk diagnosa
+            console.log("Hasil Lab Profil User:", profile); 
+
             if (!profile) {
-                Swal.fire('Sesi Habis', 'Gagal memuat profil pengguna, silakan login kembali.', 'error');
+                // Jika tidak ada profil, arahkan ke login
+                window.location.href = "../pages/login.html";
                 return;
             }
 
+            // GANTI SESUAI NAMA KOLOM DI TABEL PROFILES KAMU
+            // Pastikan kolom ini di database kamu namanya 'opd_id'
             const userRole = profile.role || 'admin';
-            const userDefaultOpdId = profile.opd_id || profile.id_opd;
+            const userOpdId = profile.opd_id; 
 
-            if (userRole === 'superadmin' || userRole === 'super_admin' || userRole === 'Super Admin') {
+            if (userRole === 'superadmin' || userRole === 'super_admin') {
                 isSuperAdmin = true;
                 document.getElementById('superadmin-selector-zone').style.display = 'block';
-                await loadDaftarOPDUntukSelector(userDefaultOpdId);
+                await loadDaftarOPDUntukSelector(userOpdId);
             } else {
-                if (userDefaultOpdId) activeOpdId = userDefaultOpdId;
-                await loadPengaturanDariOPD(activeOpdId);
+                // Gunakan ID dari profil jika ada, kalau tidak pakai fallback yang sudah diperbaiki
+                await loadPengaturanDariOPD(userOpdId || activeOpdId);
             }
         } catch (err) {
-            console.error("Initialization Error:", err);
-            Swal.fire('Eror Sistem', 'Gagal sinkronisasi data sesi profil.', 'error');
+            console.error("Gagal inisialisasi:", err);
         }
-
-        document.getElementById('cfg-namaInstansi').addEventListener('input', updateLiveFallbackPreview);
     }
 
     async function loadDaftarOPDUntukSelector(defaultSelectedId) {
