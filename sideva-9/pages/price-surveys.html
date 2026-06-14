@@ -509,11 +509,12 @@ async function saveSurvey(){
 
  }else{
 
+   console.log(payload);
+  
    result=await surveyDb
-   .schema('business')
-   .from('price_surveys')
-    console.log(payload);
-   .insert(payload);
+      .schema('business')
+      .from('price_surveys')
+      .insert(payload);
  }
 
  if(result.error){
