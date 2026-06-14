@@ -2,7 +2,33 @@
 //  SI-DEVA — Dokumen Pengadaan (EV_AT, EV_HP, FormSpek, dll)
 //  Dipisahkan dari dashboard.js untuk maintenance
 // ============================================================
+// ============================================================
+// SI-DEVA — Dokumen Pengadaan (EV_AT, EV_HP, FormSpek, dll)
+// ============================================================
 
+// SAFETY GUARD: Pastikan fungsi global tersedia sebelum dipanggil
+if (typeof window.loadAppConfig !== 'function') {
+  window.loadAppConfig = function() {
+    console.warn("loadAppConfig belum dimuat. Pastikan dashboard.js dimuat sebelum file ini.");
+    if (!window.appConfig) window.appConfig = { singkatan: 'SIDEVA' };
+  };
+}
+
+// Perbaikan pada fungsi saveToPDF (agar tidak error saat appConfig kosong)
+function saveToPDF(slug) {
+  const areaId = slug + '-print-area';
+  const printArea = document.getElementById(areaId);
+  if (!printArea) { if(typeof toast === 'function') toast('Pilih No RUP terlebih dahulu', 'error'); return; }
+
+  const meta     = _PDF_META[slug] || { title: slug };
+  // Menggunakan optional chaining dan fallback global
+  const config   = window.appConfig || { singkatan: 'SIDEVA' };
+  const instansi = (config.singkatan || 'SIDEVA').replace(/\s+/g,'_');
+  const tgl      = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const filename = `${meta.title}_${instansi}_${tgl}`;
+
+  // ... sisa kode fungsi saveToPDF selanjutnya ...
+}
 // ── Helper: getActiveDocConfig, getDocOrg, getDefaultDocNumber sudah ada di dashboard.js
 //    Namun agar file ini mandiri, kita gunakan yang sudah ada di global.
 //    Pastikan fungsi-fungsi tersebut sudah didefinisikan sebelum file ini di-load.
