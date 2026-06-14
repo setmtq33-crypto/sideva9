@@ -494,6 +494,9 @@ async function saveSurvey(){
   is_winner:isWinner.checked
  };
 
+ console.log('selectedItemId', selectedItemId);
+ console.log('profile', profile);
+
  let result;
 
  if(surveyId.value){
@@ -509,11 +512,16 @@ async function saveSurvey(){
    result=await surveyDb
    .schema('business')
    .from('price_surveys')
+    console.log(payload);
    .insert(payload);
  }
 
  if(result.error){
-   return Swal.fire('Error',result.error.message,'error');
+   console.error(result.error);
+
+    alert(result.error.message);
+
+    return;
  }
 
  modal.hide();
