@@ -509,57 +509,56 @@ async function fetchCatalogData(){
         return;
     }
 
+    // Ubah status tombol menjadi Loading sejenak agar terlihat responsif
     const btn = document.querySelector("button[onclick='fetchCatalogData()']");
     const originalText = btn.innerText;
-    btn.innerText = "Memuat Data Riil...";
+    btn.innerText = "Mengurai URL...";
     btn.disabled = true;
 
     try {
-        // CEK DI SINI: Silakan ganti subdomain 'PENGGUNA_ANDA' dengan milik Anda
-        const workerUrl = "https://sideva9-sirup-proxy.terlanjurtamvan18.workers.dev";
-
-        const response = await fetch(workerUrl, {
-            method: 'POST', 
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ url: url })
-        });
-
-        if (!response.ok) {
-            const errRes = await response.json();
-            throw new Error(errRes.error || 'Gagal terhubung ke Cloudflare Proxy');
+        // 1. Ambil slug produk (elemen terakhir dari URL)
+        // Contoh: "https://katalog.inaproc.id/cv-muria-setia/kertas-hvs-f4" -> "kertas-hvs-f4"
+        const urlObj = new URL(url);
+        const pathSegments = urlObj.pathname.split('/').filter(p => p.length > 0);
+        
+        if (pathSegments.length < 1) {
+            throw new Error('Struktur URL E-Katalog tidak dikenali');
         }
 
-        const data = await response.json();
+        const slug = pathSegments[pathSegments.length - 1];
+        const cleanBrand = slug.replaceAll('-', ' ').toUpperCase();
 
-        if (data.errors) {
-            throw new Error(data.errors[0].message);
+        // 2. Deteksi Nama Vendor secara cerdas dari Path URL
+        // Biasanya struktur URL E-Katalog: /id/produk/nama-vendor/nama-produk atau /nama-vendor/nama-produk
+        let detectedVendor = 'PENYEDIA E-KATALOG';
+        
+        if (pathSegments.length >= 2) {
+            // Mengambil segment tepat sebelum nama produk sebagai nama vendor
+            const vendorSegment = pathSegments[pathSegments.length - 2];
+            if (vendorSegment !== 'product' && vendorSegment !== 'produk') {
+                detectedVendor = vendorSegment.replaceAll('-', ' ').toUpperCase();
+            }
         }
 
-        const product = data.data ? data.data._v0_getProductBySlug : null;
-
-        if (!product) {
-            alert('Produk tidak ditemukan di server E-Katalog. Pastikan URL valid.');
-            return;
-        }
-
-        vendorName.value = product.username ? product.username.toUpperCase().replaceAll('-', ' ') : 'TIDAK DIKETAHUI';
-        brand.value = product.brand ? product.brand.toUpperCase() : 'TIDAK ADA MERK';
+        // 3. Masukkan data hasil urai otomatis ke dalam Form Modal
+        vendorName.value = detectedVendor;
+        brand.value = cleanBrand;
         sourceUrl.value = url;
         
-        if (product.variants && product.variants.length > 0) {
-            const hargaRiil = product.variants[0].priceWithTax || 0;
-            surveyPrice.value = hargaRiil;
-            negotiatedPrice.value = hargaRiil; 
-        }
+        // Berikan nilai default Rp0 agar User terbiasa mengetikkan harga asli dari tab sebelah
+        surveyPrice.value = 0;
+        negotiatedPrice.value = 0;
 
-        alert('Berhasil menarik DATA RIIL & HARGA TERBARU lewat Cloudflare Proxy!');
+        alert('Berhasil mengurai data lokal! Proteksi E-Katalog ketat, silakan input manual harga aslinya.');
+
+        // Fokuskan kursor langsung ke input harga agar user tinggal mengetik
+        setTimeout(() => { surveyPrice.focus(); }, 300);
 
     } catch (error) {
-        console.error('Error fetching riil data:', error);
-        alert('Gagal mengambil data via Cloudflare.\nError: ' + error.message);
+        console.error('Error parsing catalog:', error);
+        alert('Gagal membaca URL. Pastikan format URL utuh dan benar.');
     } finally {
+        // Kembalikan status tombol ke semula
         btn.innerText = originalText;
         btn.disabled = false;
     }
