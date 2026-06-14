@@ -253,54 +253,74 @@ Tambah Survey
 
 const surveyDb = window.supabaseClient;
 
-let profile=null;
-let packageId=null;
-let selectedItemId=null;
-let items=[];
-let surveys=[];
+let profile = null;
+let packageId = null;
+let selectedItemId = null;
+let currentSurveyId = null;
 
-const modal = new bootstrap.Modal(document.getElementById('surveyModal'));
+let items = [];
+let surveys = [];
+
+const modal =
+new bootstrap.Modal(
+document.getElementById('surveyModal')
+);
 
 function rupiah(v){
- return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(v||0);
+ return new Intl.NumberFormat(
+ 'id-ID',
+ {
+  style:'currency',
+  currency:'IDR',
+  maximumFractionDigits:0
+ }).format(v||0);
 }
 
 async function init(){
 
  profile = await getProfile();
 
- packageId = new URLSearchParams(location.search).get('id');
+ packageId =
+ new URLSearchParams(location.search)
+ .get('id');
 
  await loadPackage();
  await loadItems();
 }
 
 async function loadPackage(){
-  console.log('LOAD PACKAGE V2 BUSINESS');
 
- const {data} = await surveyDb
+ const {data,error} =
+ await surveyDb
  .from('packages')
- .select('*')
+ .select('id,package_name')
  .eq('id',packageId)
- 
+ .single();
 
- if(data){
-   document.getElementById('packageName').innerText=data.package_name;
+ if(error){
+   console.error(error);
+   return;
  }
+
+ packageName.innerText =
+ data.package_name;
 }
 
 async function loadItems(){
 
- const {data,error} = await surveyDb
+ const {data,error} =
+ await surveyDb
  .from('package_items')
  .select('*')
  .eq('package_id',packageId)
  .order('item_name');
 
- console.log('ITEM ERROR', error);
- console.log('ITEM DATA', data);
+ if(error){
+   console.error(error);
+   return;
+ }
 
- items=data||[];
+ items = data || [];
 
  renderItems();
 }
@@ -311,16 +331,17 @@ function renderItems(){
 
  items.forEach(item=>{
 
-   html += `
-   <button
-   class="list-group-item list-group-item-action"
-   onclick="selectItem('${item.id}')">
-   ${item.item_name}
-   </button>`;
+ html += `
+ <button
+ class="list-group-item list-group-item-action"
+ onclick="selectItem('${item.id}')">
+ ${item.item_name}
+ </button>
+ `;
 
  });
 
- document.getElementById('itemList').innerHTML=html;
+ itemList.innerHTML = html;
 
  if(items.length){
    selectItem(items[0].id);
@@ -329,24 +350,37 @@ function renderItems(){
 
 async function selectItem(id){
 
- selectedItemId=id;
+ selectedItemId = id;
 
- console.log('ITEM DIPILIH:', id);
+ const item =
+ items.find(x=>x.id===id);
 
- const item = items.find(x=>x.id===id);
+ if(item){
+  selectedItemName.innerText =
+  item.item_name;
+ }
 
- document.getElementById('selectedItemName').innerText=item.item_name;
+ await loadSurveys(id);
+}
 
- const {data,error} = await surveyDb
+async function loadSurveys(itemId){
+
+ const {data,error} =
+ await surveyDb
  .from('price_surveys')
  .select('*')
- .eq('package_item_id',id)
- .order('survey_date',{ascending:false});
- 
- console.log('SURVEY ERROR',error);
- console.log('HASIL QUERY:', data);
+ .eq('package_item_id',itemId)
+ .order('survey_date',
+ {
+  ascending:false
+ });
 
- surveys=data||[];
+ if(error){
+   console.error(error);
+   return;
+ }
+
+ surveys = data || [];
 
  renderSurvey();
 }
@@ -361,44 +395,91 @@ function renderSurvey(){
 
  surveys.forEach((s,index)=>{
 
-   surveyTotal += Number(s.survey_price||0);
-   negoTotal += Number(s.negotiated_price||0);
+ surveyTotal +=
+ Number(s.survey_price||0);
 
-   if(index===0) lowest=Number(s.survey_price||0);
+ negoTotal +=
+ Number(s.negotiated_price||0);
 
-   if(Number(s.survey_price||0)<lowest){
-      lowest=Number(s.survey_price||0);
-   }
+ if(index===0){
+  lowest =
+  Number(s.survey_price||0);
+ }
 
-   html += `
-   <tr>
-   <td>${s.vendor_name||''}</td>
-   <td>${s.brand||''}</td>
-   <td>${rupiah(s.survey_price)}</td>
-   <td>${rupiah(s.negotiated_price)}</td>
-   <td>${s.is_candidate ? '✔' : ''}</td>
-   <td>${s.is_winner ? '✔' : ''}</td>
-   <td>${s.survey_date||''}</td>
-   <td>
-     <button class="btn btn-warning btn-sm" onclick="editSurvey('${s.id}')">Edit</button>
-     <button class="btn btn-danger btn-sm" onclick="deleteSurvey('${s.id}')">Hapus</button>
-   </td>
-   </tr>`;
+ if(
+ Number(s.survey_price||0)
+ <
+ lowest
+ ){
+  lowest =
+  Number(s.survey_price||0);
+ }
+
+ html += `
+ <tr>
+ <td>${s.vendor_name||''}</td>
+ <td>${s.brand||''}</td>
+ <td>${rupiah(s.survey_price)}</td>
+ <td>${rupiah(s.negotiated_price)}</td>
+ <td>${s.is_candidate ? '✔' : ''}</td>
+ <td>${s.is_winner ? '✔' : ''}</td>
+ <td>${s.survey_date||''}</td>
+ <td>
+
+ <button
+ class="btn btn-warning btn-sm"
+ onclick="editSurvey('${s.id}')">
+ Edit
+ </button>
+
+ <button
+ class="btn btn-danger btn-sm"
+ onclick="deleteSurvey('${s.id}')">
+ Hapus
+ </button>
+
+ </td>
+ </tr>
+ `;
+
  });
 
- document.getElementById('surveyTable').innerHTML=html;
+ surveyTable.innerHTML = html;
 
- const count=surveys.length;
+ const count =
+ surveys.length;
 
- document.getElementById('surveyCount').innerText=count;
- document.getElementById('avgSurvey').innerText=rupiah(count?surveyTotal/count:0);
- document.getElementById('avgNegotiated').innerText=rupiah(count?negoTotal/count:0);
- document.getElementById('lowestPrice').innerText=rupiah(lowest);
+ surveyCount.innerText =
+ count;
+
+ avgSurvey.innerText =
+ rupiah(
+ count
+ ?
+ surveyTotal/count
+ :
+ 0
+ );
+
+ avgNegotiated.innerText =
+ rupiah(
+ count
+ ?
+ negoTotal/count
+ :
+ 0
+ );
+
+ lowestPrice.innerText =
+ rupiah(lowest);
 }
 
 function openAddModal(){
 
+ currentSurveyId = null;
+
  surveyId.value='';
+
  vendorName.value='';
  brand.value='';
  surveyPrice.value='';
@@ -406,205 +487,235 @@ function openAddModal(){
  sourceUrl.value='';
  notes.value='';
 
+ surveyDate.value =
+ new Date()
+ .toISOString()
+ .split('T')[0];
+
+ isCandidate.checked=false;
+ isWinner.checked=false;
+
  modal.show();
+}
+
+async function editSurvey(id){
+
+ const {data,error} =
+ await surveyDb
+ .from('price_surveys')
+ .select('*')
+ .eq('id',id)
+ .single();
+
+ if(error){
+  console.error(error);
+  return;
+ }
+
+ currentSurveyId = id;
+
+ surveyId.value=id;
+
+ vendorName.value =
+ data.vendor_name || '';
+
+ brand.value =
+ data.brand || '';
+
+ surveyPrice.value =
+ data.survey_price || 0;
+
+ negotiatedPrice.value =
+ data.negotiated_price || 0;
+
+ sourceUrl.value =
+ data.source_url || '';
+
+ surveyDate.value =
+ data.survey_date || '';
+
+ notes.value =
+ data.notes || '';
+
+ isCandidate.checked =
+ data.is_candidate;
+
+ isWinner.checked =
+ data.is_winner;
+
+ modal.show();
+}
+
+async function saveSurvey(){
+
+ const payload = {
+
+ vendor_name:
+ vendorName.value,
+
+ brand:
+ brand.value,
+
+ survey_price:
+ Number(
+ surveyPrice.value || 0
+ ),
+
+ negotiated_price:
+ Number(
+ negotiatedPrice.value || 0
+ ),
+
+ source_url:
+ sourceUrl.value,
+
+ survey_date:
+ surveyDate.value,
+
+ notes:
+ notes.value,
+
+ is_candidate:
+ isCandidate.checked,
+
+ is_winner:
+ isWinner.checked
+
+ };
+
+ let result;
+
+ if(currentSurveyId){
+
+ result =
+ await surveyDb
+ .from('price_surveys')
+ .update(payload)
+ .eq('id',currentSurveyId);
+
+ }else{
+
+ result =
+ await surveyDb
+ .from('price_surveys')
+ .insert({
+
+ ...payload,
+
+ tenant_id:
+ profile.tenant_id,
+
+ opd_id:
+ profile.opd_id,
+
+ package_item_id:
+ selectedItemId
+
+ });
+
+ }
+
+ if(result.error){
+
+ console.error(
+ result.error
+ );
+
+ alert(
+ result.error.message
+ );
+
+ return;
+ }
+
+ modal.hide();
+
+ await loadSurveys(
+ selectedItemId
+ );
 }
 
 async function deleteSurvey(id){
 
- const ok = confirm('Hapus survey ini?');
-
- if(!ok) return;
-
- const result = await surveyDb
-
-   .from('price_surveys')
-
-   .delete()
-
-   .eq('id', id)
-
-   .select();
-
- console.log('DELETE RESULT', result);
-
- if(result.error){
-
-   console.error(result.error);
-
-   alert(result.error.message);
-
-   return;
-
+ if(
+ !confirm(
+ 'Hapus survey ini?'
+ )
+ ){
+  return;
  }
 
- await selectItem(selectedItemId);
+ const {error} =
+ await surveyDb
+ .from('price_surveys')
+ .delete()
+ .eq('id',id);
 
+ if(error){
+
+  console.error(error);
+
+  alert(
+  error.message
+  );
+
+  return;
+ }
+
+ await loadSurveys(
+ selectedItemId
+ );
 }
 
-function editSurvey(id){
+async function fetchCatalogData(){
 
-   const s = surveys.find(x=>x.id===id);
-  
-   if(!s) return;
-  
-   surveyId.value=s.id;
-   vendorName.value=s.vendor_name||'';
-   brand.value=s.brand||'';
-   surveyPrice.value=s.survey_price||0;
-   negotiatedPrice.value=s.negotiated_price||0;
-   sourceUrl.value=s.source_url||'';
-   surveyDate.value=s.survey_date||'';
-   notes.value=s.notes||'';
-  
-   isCandidate.checked=s.is_candidate;
-   isWinner.checked=s.is_winner;
-  
-   modal.show();
-  }
-  
-  async function fetchCatalogData(){
-  
-      const url =
-          document
-          .getElementById(
-              'catalogUrl'
-          )
-          .value
-          .trim();
-  
-      if(!url){
-  
-          alert(
-              'Masukkan URL E-Katalog'
-          );
-  
-          return;
-      }
-  
-      const slug =
-          url.split('/')
-             .pop();
-  
-      document
-      .getElementById(
-          'vendorName'
-      )
-      .value =
-      'CV MURIA SETIA';
-  
-      document
-      .getElementById(
-          'brand'
-      )
-      .value =
-      slug
-          .replaceAll('-',' ')
-          .toUpperCase();
-  
-      document
-      .getElementById(
-          'surveyPrice'
-      )
-      .value =
-      99900;
-  
-      document
-      .getElementById(
-          'sourceUrl'
-      )
-      .value =
-      url;
-  
-  }
-   
-  
-  async function saveSurvey(){
+ const url =
+ catalogUrl.value.trim();
 
-      const isEdit = !!surveyId.value;
-      
-      let result;
-      
-      if(isEdit){
-      
-      const updatePayload = {
-      vendor_name: vendorName.value,
-      brand: brand.value,
-      survey_price: Number(surveyPrice.value || 0),
-      negotiated_price: Number(negotiatedPrice.value || 0),
-      source_url: sourceUrl.value,
-      survey_date: surveyDate.value,
-      notes: notes.value,
-      is_candidate: isCandidate.checked,
-      is_winner: isWinner.checked
-      };
-      
-      console.log('MODE EDIT');
-      console.log('EDIT ID', surveyId.value);
-      console.log('UPDATE PAYLOAD', updatePayload);
-      
-      result = await surveyDb
-      .from('price_surveys')
-      .update(updatePayload)
-      .eq('id', surveyId.value)
-      .select();
-      
-      console.log('UPDATE RESULT', result);
-      alert(JSON.stringify(result));
-      
-      }else{
-      
-      const insertPayload = {
-      tenant_id: profile.tenant_id,
-      opd_id: profile.opd_id,
-      package_item_id: selectedItemId,
-      vendor_name: vendorName.value,
-      brand: brand.value,
-      survey_price: Number(surveyPrice.value || 0),
-      negotiated_price: Number(negotiatedPrice.value || 0),
-      source_url: sourceUrl.value,
-      survey_date: surveyDate.value,
-      notes: notes.value,
-      is_candidate: isCandidate.checked,
-      is_winner: isWinner.checked
-      };
-      
-      console.log('MODE INSERT');
-      console.log('INSERT PAYLOAD', insertPayload);
-      
-      result = await surveyDb
-      .from('price_surveys')
-      .insert(insertPayload)
-      .select();
-      
-      console.log('INSERT RESULT', result);
-      }
-      
-      if(result.error){
-      
-      console.error(result.error);
-      
-      alert(result.error.message);
-      
-      return;
-      }
-      
-      modal.hide();
-      
-      await selectItem(selectedItemId);
-      
-      if(typeof updatePackageStatus === 'function'){
-      await updatePackageStatus(packageId);
-      }
+ if(!url){
 
+ alert(
+ 'Masukkan URL E-Katalog'
+ );
+
+ return;
+ }
+
+ const slug =
+ url.split('/').pop();
+
+ vendorName.value =
+ 'CV MURIA SETIA';
+
+ brand.value =
+ slug
+ .replaceAll('-',' ')
+ .toUpperCase();
+
+ surveyPrice.value =
+ 99900;
+
+ sourceUrl.value =
+ url;
 }
 
-window.editSurvey = editSurvey;
-window.deleteSurvey = deleteSurvey;
-window.saveSurvey = saveSurvey;
-window.openAddModal = openAddModal;
-window.fetchCatalogData = fetchCatalogData;
-window.selectItem = selectItem;
- 
+window.openAddModal =
+openAddModal;
+
+window.editSurvey =
+editSurvey;
+
+window.deleteSurvey =
+deleteSurvey;
+
+window.saveSurvey =
+saveSurvey;
+
+window.selectItem =
+selectItem;
+
+window.fetchCatalogData =
+fetchCatalogData;
 
 init();
 
