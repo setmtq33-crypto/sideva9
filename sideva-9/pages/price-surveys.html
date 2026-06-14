@@ -557,19 +557,23 @@ async function fetchCatalogData(){
     btn.disabled = true;
 
     try {
-        // PERBAIKAN: Ganti alamat di bawah ini dengan URL Cloudflare Worker Anda yang asli!
+        // Ganti alamat ini dengan URL Cloudflare Worker Anda yang asli!
         const workerUrl = "https://sideva9-sirup-proxy.PENGGUNA_ANDA.workers.dev";
 
-        // Tembak API Proxy via Cloudflare Worker
+        // DI SINI HARUS TERTULIS METHOD: 'POST'
         const response = await fetch(workerUrl, {
-            method: 'POST',
+            method: 'POST', 
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ url: url })
+            body: JSON.stringify({ url: url }) // Mengirim data URL dalam bentuk objek JSON
         });
 
-        if (!response.ok) throw new Error('Gagal terhubung ke Cloudflare Proxy');
+        if (!response.ok) {
+            // Jika Worker mengembalikan error (seperti method salah), baca teks errornya
+            const errRes = await response.json();
+            throw new Error(errRes.error || 'Gagal terhubung ke Cloudflare Proxy');
+        }
 
         const data = await response.json();
 
@@ -584,16 +588,15 @@ async function fetchCatalogData(){
             return;
         }
 
-        // Masukkan data RIIL dari server E-Katalog ke dalam Form otomatis!
+        // Masukkan data RIIL dari server E-Katalog ke dalam Form otomatis
         vendorName.value = product.username ? product.username.toUpperCase().replaceAll('-', ' ') : 'TIDAK DIKETAHUI';
         brand.value = product.brand ? product.brand.toUpperCase() : 'TIDAK ADA MERK';
         sourceUrl.value = url;
         
-        // Mengambil harga asli setelah pajak (PPN) dari database pusat E-Katalog
         if (product.variants && product.variants.length > 0) {
             const hargaRiil = product.variants[0].priceWithTax || 0;
             surveyPrice.value = hargaRiil;
-            negotiatedPrice.value = hargaRiil; // Default sebelum dinegosiasi manual
+            negotiatedPrice.value = hargaRiil; 
         }
 
         alert('Berhasil menarik DATA RIIL & HARGA TERBARU lewat Cloudflare Proxy!');
@@ -602,7 +605,6 @@ async function fetchCatalogData(){
         console.error('Error fetching riil data:', error);
         alert('Gagal mengambil data via Cloudflare.\nError: ' + error.message);
     } finally {
-        // Kembalikan status tombol ke semula
         btn.innerText = originalText;
         btn.disabled = false;
     }
