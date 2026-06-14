@@ -398,14 +398,28 @@ async function loadRupImports(){
 
                 <button
                 class="btn btn-success btn-sm"
-                onclick="importToPackage(
-                    '${row.id}'
-                )">
-
+                onclick="importToPackage('${row.id}')">
+            
                 Import
-
+            
                 </button>
-
+            
+                <button
+                class="btn btn-warning btn-sm ms-1"
+                onclick="editRup('${row.id}')">
+            
+                Edit
+            
+                </button>
+            
+                <button
+                class="btn btn-danger btn-sm ms-1"
+                onclick="deleteRup('${row.id}')">
+            
+                Hapus
+            
+                </button>
+            
             </td>
 
         </tr>
@@ -440,14 +454,14 @@ async function loadRupImports(){
 
 async function saveRup(){
 
-    const rupNumber =
+        const rupNumber =
         document
         .getElementById(
             'rupNumber'
         )
         .value
         .trim();
-
+    
     const opdName =
         document
         .getElementById(
@@ -455,7 +469,7 @@ async function saveRup(){
         )
         .value
         .trim();
-
+    
     const packageName =
         document
         .getElementById(
@@ -463,21 +477,21 @@ async function saveRup(){
         )
         .value
         .trim();
-
+    
     const fiscalYear =
         document
         .getElementById(
             'fiscalYear'
         )
         .value;
-
+    
     const budgetCeiling =
         document
         .getElementById(
             'budgetCeiling'
         )
         .value;
-
+    
     const procurementMethod =
         document
         .getElementById(
@@ -485,7 +499,7 @@ async function saveRup(){
         )
         .value
         .trim();
-
+    
     const sourceUrl =
         document
         .getElementById(
@@ -493,82 +507,134 @@ async function saveRup(){
         )
         .value
         .trim();
-
+    
     if(
         !rupNumber ||
         !packageName
     ){
-
+    
         alert(
             'Kode RUP dan Nama Paket wajib diisi'
         );
-
+    
         return;
     }
-
+    
+    let query;
+    
+    if(editingRupId){
+    
+        query =
+        rupDb
+        .from('rup_imports')
+        .update({
+    
+            opd_name:
+                opdName,
+    
+            rup_number:
+                rupNumber,
+    
+            package_name:
+                packageName,
+    
+            fiscal_year:
+                fiscalYear,
+    
+            budget_ceiling:
+                budgetCeiling,
+    
+            procurement_method:
+                procurementMethod,
+    
+            source_url:
+                sourceUrl
+    
+        })
+        .eq(
+            'id',
+            editingRupId
+        );
+    
+    }else{
+    
+        query =
+        rupDb
+        .from('rup_imports')
+        .insert({
+    
+            tenant_id:
+                profile.tenant_id,
+    
+            opd_name:
+                opdName,
+    
+            rup_number:
+                rupNumber,
+    
+            package_name:
+                packageName,
+    
+            fiscal_year:
+                fiscalYear,
+    
+            budget_ceiling:
+                budgetCeiling,
+    
+            procurement_method:
+                procurementMethod || 'ECATALOG',
+    
+            source_url:
+                sourceUrl,
+    
+            imported_by:
+                profile.id
+    
+        });
+    
+    }
+    
     const {
         error
     } =
-    await rupDb
-    .from('rup_imports')
-    .insert({
-
-        tenant_id:
-            profile.tenant_id,
-
-        opd_name:
-            opdName,
-
-        rup_number:
-            rupNumber,
-
-        package_name:
-            packageName,
-
-        fiscal_year:
-            fiscalYear,
-
-        budget_ceiling:
-            budgetCeiling,
-
-        procurement_method:
-            'ECATALOG',
-
-        source_url:
-            sourceUrl,
-
-        imported_by:
-            profile.id
-
-    });
-
+    await query;
+    
     if(error){
-
+    
         alert(
             error.message
         );
-
+    
         return;
     }
-
+    
     await writeAuditLog(
-
+    
         'RUP_IMPORT',
-
-        'CREATE',
-
-        null,
-
-        `Import RUP ${rupNumber}`
-
+    
+        editingRupId
+            ? 'UPDATE'
+            : 'CREATE',
+    
+        editingRupId,
+    
+        editingRupId
+            ? `Update RUP ${rupNumber}`
+            : `Import RUP ${rupNumber}`
+    
     );
 
+    let editingRupId = null;
     clearForm();
-
+    
     await loadRupImports();
-
+    
     alert(
-        'RUP berhasil disimpan'
+    
+        editingRupId
+        ? 'RUP berhasil diperbarui'
+        : 'RUP berhasil disimpan'
+    
     );
 }
 
@@ -721,6 +787,102 @@ async function importToPackage(
         'Berhasil import ke Packages'
     );
 }
+
+let editingRupId = null;
+
+async function editRup(id){
+
+    const {
+        data,
+        error
+    } =
+    await rupDb
+    .from('rup_imports')
+    .select('*')
+    .eq('id',id)
+    .single();
+
+    if(error){
+        alert(error.message);
+        return;
+    }
+
+    editingRupId = id;
+
+    document.getElementById(
+        'rupNumber'
+    ).value =
+    data.rup_number || '';
+
+    document.getElementById(
+        'opdName'
+    ).value =
+    data.opd_name || '';
+
+    document.getElementById(
+        'packageName'
+    ).value =
+    data.package_name || '';
+
+    document.getElementById(
+        'fiscalYear'
+    ).value =
+    data.fiscal_year || '';
+
+    document.getElementById(
+        'budgetCeiling'
+    ).value =
+    data.budget_ceiling || '';
+
+    document.getElementById(
+        'procurementMethod'
+    ).value =
+    data.procurement_method || '';
+
+    document.getElementById(
+        'sourceUrl'
+    ).value =
+    data.source_url || '';
+
+}
+
+async function deleteRup(id){
+
+    const ok =
+    confirm(
+        'Hapus data RUP ini ?'
+    );
+
+    if(!ok){
+        return;
+    }
+
+    const {
+        error
+    } =
+    await rupDb
+    .from('rup_imports')
+    .delete()
+    .eq('id',id);
+
+    if(error){
+
+        alert(
+            error.message
+        );
+
+        return;
+    }
+
+    await loadRupImports();
+
+    alert(
+        'RUP berhasil dihapus'
+    );
+
+}
+    
+    
 
 function clearForm(){
 
@@ -1049,7 +1211,11 @@ async function importSirupJson(){
 
 }
 
+window.editRup =
+    editRup;
 
+window.deleteRup =
+    deleteRup;
 
 init();
 
