@@ -517,6 +517,9 @@ async function saveSurvey(){
       .insert(payload);
  }
 
+ console.log('PAYLOAD:', payload);
+ console.log('RESULT:', result);
+ 
  if(result.error){
    console.error(result.error);
 
