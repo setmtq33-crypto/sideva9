@@ -550,87 +550,59 @@ async function fetchCatalogData(){
         return;
     }
 
-    // 1. Ambil slug dari ujung URL
-    const slug = url.split('/').pop();
-    if(!slug) {
-        alert('Format URL tidak valid');
-        return;
-    }
-
     // Ubah status tombol menjadi Loading
     const btn = document.querySelector("button[onclick='fetchCatalogData()']");
     const originalText = btn.innerText;
-    btn.innerText = "Memuat...";
+    btn.innerText = "Memuat Data Riil...";
     btn.disabled = true;
 
     try {
-        // 2. Siapkan Query GraphQL untuk menembak API E-Katalog
-        const graphqlQuery = {
-            query: `
-                query GetProductBySlug($slug: String!, $regionId: String) {
-                    _v0_getProductBySlug(slug: $slug, regionId: $regionId) {
-                        name
-                        brand
-                        username
-                        variants {
-                            priceWithTax
-                        }
-                    }
-                }
-            `,
-            variables: { slug: slug, regionId: null }
-        };
+        // PERBAIKAN: Ganti alamat di bawah ini dengan URL Cloudflare Worker Anda yang asli!
+        const workerUrl = "https://sideva9-sirup-proxy.PENGGUNA_ANDA.workers.dev";
 
-        // 3. Gunakan CORS Proxy agar tidak di-block oleh browser
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent('https://katalog.inaproc.id/api/graphql')}`;
-
-        const response = await fetch(proxyUrl, {
+        // Tembak API Proxy via Cloudflare Worker
+        const response = await fetch(workerUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(graphqlQuery)
-            })
+            body: JSON.stringify({ url: url })
         });
 
-        if (!response.ok) throw new Error('Gagal terhubung ke proxy server');
+        if (!response.ok) throw new Error('Gagal terhubung ke Cloudflare Proxy');
 
-        const proxyData = await response.json();
-        // AllOrigins mengembalikan data dalam bentuk string di properti 'contents'
-        const resBody = JSON.parse(proxyData.contents); 
+        const data = await response.json();
 
-        if (resBody.errors) {
-            throw new Error(resBody.errors[0].message);
+        if (data.errors) {
+            throw new Error(data.errors[0].message);
         }
 
-        const product = resBody.data._v0_getProductBySlug;
+        const product = data.data ? data.data._v0_getProductBySlug : null;
 
         if (!product) {
-            alert('Produk tidak ditemukan di E-Katalog. Pastikan URL benar dan publik.');
+            alert('Produk tidak ditemukan di server E-Katalog. Pastikan URL valid.');
             return;
         }
 
-        // 4. Masukkan data asli dari database E-Katalog ke Form Anda secara otomatis!
+        // Masukkan data RIIL dari server E-Katalog ke dalam Form otomatis!
         vendorName.value = product.username ? product.username.toUpperCase().replaceAll('-', ' ') : 'TIDAK DIKETAHUI';
-        brand.value = product.brand ? product.brand.toUpperCase() : (slug.replaceAll('-', ' ').toUpperCase());
+        brand.value = product.brand ? product.brand.toUpperCase() : 'TIDAK ADA MERK';
         sourceUrl.value = url;
         
-        // Ambil harga dari varian pertama produk
+        // Mengambil harga asli setelah pajak (PPN) dari database pusat E-Katalog
         if (product.variants && product.variants.length > 0) {
-            surveyPrice.value = product.variants[0].priceWithTax || 0;
-            negotiatedPrice.value = product.variants[0].priceWithTax || 0; // Default disamakan sebelum nego manual
+            const hargaRiil = product.variants[0].priceWithTax || 0;
+            surveyPrice.value = hargaRiil;
+            negotiatedPrice.value = hargaRiil; // Default sebelum dinegosiasi manual
         }
 
-        alert('Data produk E-Katalog berhasil ditarik secara riil!');
+        alert('Berhasil menarik DATA RIIL & HARGA TERBARU lewat Cloudflare Proxy!');
 
     } catch (error) {
-        console.error('Error fetching catalog:', error);
-        alert('Gagal mengambil data otomatis. Silakan isi form secara manual.\nError: ' + error.message);
+        console.error('Error fetching riil data:', error);
+        alert('Gagal mengambil data via Cloudflare.\nError: ' + error.message);
     } finally {
-        // Kembalikan status tombol
+        // Kembalikan status tombol ke semula
         btn.innerText = originalText;
         btn.disabled = false;
     }
