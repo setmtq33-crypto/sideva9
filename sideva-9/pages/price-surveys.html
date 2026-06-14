@@ -409,6 +409,38 @@ function openAddModal(){
  modal.show();
 }
 
+async function deleteSurvey(id){
+
+ const ok = confirm('Hapus survey ini?');
+
+ if(!ok) return;
+
+ const result = await surveyDb
+
+   .from('price_surveys')
+
+   .delete()
+
+   .eq('id', id)
+
+   .select();
+
+ console.log('DELETE RESULT', result);
+
+ if(result.error){
+
+   console.error(result.error);
+
+   alert(result.error.message);
+
+   return;
+
+ }
+
+ await selectItem(selectedItemId);
+
+}
+
 function editSurvey(id){
 
    const s = surveys.find(x=>x.id===id);
