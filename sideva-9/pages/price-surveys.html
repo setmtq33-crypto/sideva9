@@ -350,17 +350,37 @@ function renderItems(){
 
 async function selectItem(id){
 
- selectedItemId = id;
+    selectedItemId = id;
 
- const item =
- items.find(x=>x.id===id);
+    console.log('SELECT ITEM DIPANGGIL', id);
 
- if(item){
-  selectedItemName.innerText =
-  item.item_name;
- }
+    const item = items.find(x => x.id === id);
 
- await loadSurveys(id);
+    if(item){
+        document.getElementById('selectedItemName').innerText =
+            item.item_name;
+    }
+
+    const { data, error } = await surveyDb
+        .from('price_surveys')
+        .select('*')
+        .eq('package_item_id', id)
+        .order('survey_date', { ascending:false });
+
+    console.log('SURVEY ERROR', error);
+    console.log('SURVEY DATA', data);
+
+    if(error){
+        alert(error.message);
+        return;
+    }
+
+    surveys = data || [];
+
+    renderSurvey();
+
+    console.log('RENDER SELESAI');
+    console.log('JUMLAH SURVEY', surveys.length);
 }
 
 async function loadSurveys(itemId){
