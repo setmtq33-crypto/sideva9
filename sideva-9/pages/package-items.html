@@ -94,7 +94,7 @@ body{background:#f5f6fa}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-const db = window.supabaseClient;
+const itemDb = window.supabaseClient;
 const modal = new bootstrap.Modal(document.getElementById('itemModal'));
 
 let profile=null;
@@ -114,7 +114,7 @@ async function init(){
 }
 
 async function loadPackage(){
- const {data,error}=await db.from('packages').select('*').eq('id',packageId).single();
+ const {data,error}=await itemDb.from('packages').select('*').eq('id',packageId).single();
  if(error) return console.error(error);
  packageData=data;
  document.getElementById('packageName').innerText=data.package_name;
@@ -122,7 +122,7 @@ async function loadPackage(){
 }
 
 async function loadItems(){
- const {data,error}=await db.from('package_items').select('*').eq('package_id',packageId);
+ const {data,error}=await itemDb.from('package_items').select('*').eq('package_id',packageId);
  if(error) return console.error(error);
  items=data||[];
  render(items);
@@ -181,9 +181,9 @@ async function saveItem(){
  };
  let res;
  if(itemId.value){
-   res=await db.from('package_items').update(payload).eq('id',itemId.value);
+   res=await itemDb.from('package_items').update(payload).eq('id',itemId.value);
  }else{
-   res=await db.from('package_items').insert(payload);
+   res=await itemDb.from('package_items').insert(payload);
  }
  if(res.error) return Swal.fire('Error',res.error.message,'error');
  modal.hide();
@@ -194,7 +194,7 @@ async function saveItem(){
 async function deleteItem(id){
  const ok=await Swal.fire({title:'Hapus?',showCancelButton:true});
  if(!ok.isConfirmed) return;
- const {error}=await db.from('package_items').delete().eq('id',id);
+ const {error}=await itemDb.from('package_items').delete().eq('id',id);
  if(error) return Swal.fire('Error',error.message,'error');
  await loadItems();
 }
