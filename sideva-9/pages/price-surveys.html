@@ -478,6 +478,7 @@ async function fetchCatalogData(){
  
 
 async function saveSurvey(){
+    alert('saveSurvey jalan');
 
  const payload={
   tenant_id:profile.tenant_id,
@@ -510,6 +511,7 @@ async function saveSurvey(){
  }else{
 
    console.log(payload);
+   alert('sebelum insert');
   
    result=await surveyDb
       .schema('business')
