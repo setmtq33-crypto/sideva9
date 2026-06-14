@@ -19,190 +19,233 @@
 <link rel="stylesheet" href="../css/app.css">
  
 <style>
-body{background:#f5f6fa}
-.card{border:none; border-radius: 12px;}
+body { background: #f5f6fa; display: flex; margin: 0; padding: 0; }
+/* Integrasi Sidebar Mandiri Khas SIDEVA9 */
+.local-sidebar { width: 260px; background: #fff; border-right: 1px solid #e0e0e0; min-height: 100vh; padding: 20px 0; position: fixed; left: 0; top: 0; }
+.local-sidebar h4 { padding: 0 20px; font-weight: bold; color: #333; margin-bottom: 25px; }
+.local-sidebar a { display: block; padding: 12px 20px; color: #555; text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+.local-sidebar a:hover { background: #f8f9fa; color: #0d6efd; }
+.local-sidebar a.active { background: #e7f1ff; color: #0d6efd; font-weight: bold; border-left: 4px solid #0d6efd; }
+.local-sidebar hr { margin: 15px 0; border-color: #eee; }
+
+/* Konten Utama */
+.local-main-content { margin-left: 260px; width: calc(100% - 260px); padding: 30px; }
+.card { border: none; border-radius: 12px; }
 .paper-viewport { background: #6c757d; padding: 30px 15px; border-radius: 8px; min-height: 650px; display: flex; justify-content: center; }
+
+/* Aturan Cetak Kertas Kerja Pemerintah A4 */
 @media print {
     body * { visibility: hidden; }
     #document-render-area, #document-render-area * { visibility: visible; }
-    #document-render-area { position: absolute; left: 0; top: 0; width: 100%; }
+    #document-render-area { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none !important; padding: 0 !important; }
+    .local-sidebar, .local-main-content .card:first-child, #documentTab, #auto-doc-list, #btn-print-action, .col-lg-4 { display: none !important; }
+    .col-lg-8 { width: 100% !important; margin: 0 !important; }
 }
 </style>
 </head>
 <body>
 
-<div id="sidebar-container"></div>
+<div class="local-sidebar">
+    <h4>SIDEVA9</h4>
+    <a href="dashboard.html">Dashboard</a>
+    <hr>
+    <a href="packages.html">Packages</a>
+    <a href="price-surveys.html">Survey Harga</a>
+    <a href="package-documents.html" class="active">Dokumen</a>
+    <a href="hps.html">HPS</a>
+    <a href="procurement-ready.html">Ready Procurement</a>
+    <hr>
+    <a href="users.html">Users</a>
+    <a href="opds.html">OPD</a>
+</div>
 
-<div class="main-content">
-    <div id="topbar-container"></div>
+<div class="local-main-content">
+    <div class="card p-4 mb-4 shadow-sm bg-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <span class="badge bg-primary mb-1">Modul Berkas Fisik v9 (Stabil)</span>
+                <h3 class="fw-bold m-0" id="packageName">Memuat nama paket...</h3>
+                <small class="text-muted" id="packageRup">ID RUP: -</small>
+            </div>
+            <div>
+                <a href="packages.html" class="btn btn-outline-secondary btn-sm px-3 rounded-pill">
+                    <i class="bi bi-arrow-left me-1"></i> Kembali ke Paket
+                </a>
+            </div>
+        </div>
+    </div>
 
-    <div class="container-fluid p-4">
-        <div class="card p-4 mb-4 shadow-sm bg-white">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <span class="badge bg-primary mb-1">Modul Berkas Fisik v9</span>
-                    <h3 class="fw-bold m-0" id="packageName">Memuat nama paket...</h3>
-                    <small class="text-muted" id="packageRup">ID RUP: -</small>
+    <ul class="nav nav-pills mb-4" id="documentTab" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active px-4 fw-bold" id="auto-print-tab" data-bs-toggle="tab" data-bs-target="#auto-print" type="button">
+                <i class="bi bi-printer-fill me-2"></i>Cetak Dokumen Otomatis (10 Berkas)
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link px-4 fw-bold" id="manual-upload-tab" data-bs-toggle="tab" data-bs-target="#manual-upload" type="button">
+                <i class="bi bi-cloud-arrow-up-fill me-2"></i>Berkas Unggahan / Storage
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="documentTabContent">
+        <div class="tab-pane fade show active" id="auto-print">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <div class="card p-3 shadow-sm bg-white">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="fw-bold text-secondary small">DAFTAR PILIHAN BERKAS</span>
+                            <button id="btn-print-action" class="btn btn-danger btn-sm px-3" onclick="window.print()" disabled>
+                                <i class="bi bi-printer"></i> Cetak A4
+                            </button>
+                        </div>
+                        <div class="list-group" id="auto-doc-list">
+                            <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('idkb')">1. Identifikasi Kebutuhan (IDKB)</button>
+                            <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('penetapan')">2. Penetapan Cara Pengadaan</button>
+                            <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('nodis')">3. Nota Dinas Pengajuan (NODIS)</button>
+                            <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('sppbj')">4. Surat Perintah Kerja (SPPBJ)</button>
+                            <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('formdpp')">5. Dokumen Persiapan (DPP)</button>
+                            <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('formspek')">6. Spesifikasi Teknis (SPEK)</button>
+                            <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('riviu')">7. BA Kaji Ulang DPP (RIVIU)</button>
+                            <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('evhp')">8. BA Evaluasi Harga (EVHP)</button>
+                            <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('evat')">9. BA Evaluasi Admin (EVAT)</button>
+                            <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('bahpe')">10. BA Hasil Pengadaan (BAHPE)</button>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <a href="packages.html" class="btn btn-outline-secondary btn-sm px-3 rounded-pill">
-                        <i class="bi bi-arrow-left me-1"></i> Kembali ke Paket
-                    </a>
+                <div class="col-lg-8">
+                    <div class="paper-viewport">
+                        <div id="document-render-area" class="w-100">
+                            <div class="text-center text-white my-5 py-5">
+                                <i class="bi bi-file-earmark-pdf display-1 opacity-25"></i>
+                                <p class="mt-3 opacity-75">Silakan pilih jenis berkas di menu kiri untuk melihat draf cetak.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <ul class="nav nav-pills mb-4" id="documentTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active px-4 fw-bold" id="auto-print-tab" data-bs-toggle="tab" data-bs-target="#auto-print" type="button" role="tab">
-                    <i class="bi bi-printer-fill me-2"></i>Cetak Dokumen Otomatis (10 Berkas)
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link px-4 fw-bold" id="manual-upload-tab" data-bs-toggle="tab" data-bs-target="#manual-upload" type="button" role="tab">
-                    <i class="bi bi-cloud-arrow-up-fill me-2"></i>Berkas Unggahan / Storage
-                </button>
-            </li>
-        </ul>
-
-        <div class="tab-content" id="documentTabContent">
-            
-            <div class="tab-pane fade show active" id="auto-print" role="tabpanel">
-                <div class="row">
-                    <div class="col-lg-4 mb-4">
-                        <div class="card p-3 shadow-sm bg-white">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="fw-bold text-secondary small">DAFTAR PILIHAN DOKUMEN</span>
-                                <button id="btn-print-action" class="btn btn-danger btn-sm px-3" onclick="window.print()" disabled>
-                                    <i class="bi bi-printer"></i> Cetak A4
-                                </button>
-                            </div>
-                            <div class="list-group" id="auto-doc-list">
-                                <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('idkb')">1. Identifikasi Kebutuhan (IDKB)</button>
-                                <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('penetapan')">2. Penetapan Cara Pengadaan</button>
-                                <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('nodis')">3. Nota Dinas Pengajuan (NODIS)</button>
-                                <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('sppbj')">4. Surat Perintah Kerja (SPPBJ)</button>
-                                <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('formdpp')">5. Dokumen Persiapan (DPP)</button>
-                                <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('formspek')">6. Spesifikasi Teknis (SPEK)</button>
-                                <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('riviu')">7. BA Kaji Ulang DPP (RIVIU)</button>
-                                <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('evhp')">8. BA Evaluasi Harga (EVHP)</button>
-                                <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('evat')">9. BA Evaluasi Admin (EVAT)</button>
-                                <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('bahpe')">10. BA Hasil Pengadaan (BAHPE)</button>
-                            </div>
-                        </div>
+        <div class="tab-pane fade" id="manual-upload">
+            <div class="card p-4 shadow-sm bg-white">
+                <form id="uploadForm" class="row g-3 align-items-center mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label font-weight-bold">Jenis Dokumen</label>
+                        <select id="docType" class="form-select" required>
+                            <option value="IDKB">IDKB</option>
+                            <option value="PENETAPAN">PENETAPAN</option>
+                            <option value="NODIS">NODIS</option>
+                            <option value="SPPBJ">SPPBJ</option>
+                            <option value="FORM_DPP">FORM DPP</option>
+                            <option value="FORM_SPEK">FORM SPEK</option>
+                            <option value="BA_RIVIU">BA RIVIU</option>
+                            <option value="BA_EVAT">BA EVAT</option>
+                            <option value="BA_EVHP">BA EVHP</option>
+                            <option value="BAHPE">BAHPE</option>
+                        </select>
                     </div>
-                    <div class="col-lg-8">
-                        <div class="paper-viewport">
-                            <div id="document-render-area" class="w-100">
-                                <div class="text-center text-white my-5 py-5">
-                                    <i class="bi bi-file-earmark-pdf display-1 opacity-25"></i>
-                                    <p class="mt-3 opacity-75">Silakan pilih jenis berkas di menu kiri untuk melihat draf cetak.</p>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="col-md-5">
+                        <label class="form-label font-weight-bold">Pilih File Berkas</label>
+                        <input type="file" id="docFile" class="form-select" required>
                     </div>
-                </div>
-            </div>
+                    <div class="col-md-3 mt-4 text-end">
+                        <button type="submit" class="btn btn-primary w-100 mt-2">
+                            <i class="bi bi-cloud-upload me-1"></i> Unggah Berkas
+                        </button>
+                    </div>
+                </form>
 
-            <div class="tab-pane fade" id="manual-upload" role="tabpanel">
-                <div class="card p-4 shadow-sm bg-white">
-                    <form id="uploadForm" class="row g-3 align-items-center mb-4">
-                        <div class="col-md-4">
-                            <label class="form-label font-weight-bold">Jenis Dokumen</label>
-                            <select id="docType" class="form-select" required>
-                                <option value="IDKB">IDKB</option>
-                                <option value="PENETAPAN">PENETAPAN</option>
-                                <option value="NODIS">NODIS</option>
-                                <option value="SPPBJ">SPPBJ</option>
-                                <option value="FORM_DPP">FORM DPP</option>
-                                <option value="FORM_SPEK">FORM SPEK</option>
-                                <option value="BA_RIVIU">BA RIVIU</option>
-                                <option value="BA_EVAT">BA EVAT</option>
-                                <option value="BA_EVHP">BA EVHP</option>
-                                <option value="BAHPE">BAHPE</option>
-                            </select>
-                        </div>
-                        <div class="col-md-5">
-                            <label class="form-label font-weight-bold">Pilih File Berkas</label>
-                            <input type="file" id="docFile" class="form-select" required>
-                        </div>
-                        <div class="col-md-3 mt-4 text-end">
-                            <button type="submit" class="btn btn-primary w-100 mt-2">
-                                <i class="bi bi-cloud-upload me-1"></i> Unggah Berkas
-                            </button>
-                        </div>
-                    </form>
-
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Jenis Dokumen</th>
-                                    <th>Nama File</th>
-                                    <th>Ukuran</th>
-                                    <th>Tanggal Unggah</th>
-                                    <th width="180">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="documentsTable">
-                                <tr><td colspan="5" class="text-center text-muted">Memuat database storage...</td></tr>
-                            </tbody>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Jenis Dokumen</th>
+                                <th>Nama File</th>
+                                <th>Ukuran</th>
+                                <th>Tanggal Unggah</th>
+                                <th width="180">Aksi</th>
+                            </tr>
                         </table>
-                    </div>
+                        <tbody id="documentsTable">
+                            <tr><td colspan="5" class="text-center text-muted">Memuat database storage...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
 
 <script>
-// Ambil ID Paket dari URL Param bawaan SIDEVA9
+// Penyelarasan Variabel Global Supabase Kluster Keamanan V9
+const db = window.supabaseClient || window.supabase;
 const urlParams = new URLSearchParams(window.location.search);
 const packageId = urlParams.get('package_id') || urlParams.get('id');
-
 let documents = [];
 
-// Inject UI Komponen SIDEVA9
-fetch('sidebar.html').then(r=>r.text()).then(html=>{
-    document.getElementById('sidebar-container').innerHTML=html;
-    if(document.getElementById('menuDocuments')) document.getElementById('menuDocuments').classList.add('active');
-});
-fetch('topbar.html').then(r=>r.text()).then(html=>{
-    document.getElementById('topbar-container').innerHTML=html;
-});
-
-// Load Identitas Paket Utama
 async function initPackageHeader() {
     if(!packageId) {
-        Swal.fire('Error','ID Paket tidak valid di URL','error');
+        document.getElementById('packageName').innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Peringatan: Harap masuk melalui menu "Packages" lalu klik tombol dokumen agar ID paket terbaca.</span>`;
         return;
     }
-    const { data, error } = await window.supabaseClient.from('packages').select('*').eq('id', packageId).single();
+    const { data, error } = await db.from('packages').select('*').eq('id', packageId).single();
     if(!error && data) {
         document.getElementById('packageName').innerText = data.package_name;
         document.getElementById('packageRup').innerText = `ID RUP: ${data.rup_id || '-'}`;
     }
 }
 
-// Handler Pindah Tampilan Dokumen Cetak
 function switchPrintView(slug) {
     const listItems = document.querySelectorAll('#auto-doc-list .list-group-item');
     listItems.forEach(el => el.classList.remove('active'));
     event.currentTarget.classList.add('active');
-    
     document.getElementById('btn-print-action').removeAttribute('disabled');
-    
-    if(typeof window.renderSidevaDocument === 'function') {
-        window.renderSidevaDocument(slug, packageId);
-    }
+    renderSidevaDocumentInternal(slug, packageId);
 }
 
-// ─── CODING ASLI INTERNAL STORAGE BAWAAN ANDA (DIPERTAHANKAN UTUH) ───
+// ─── CORE ENGINE GENERATOR ADMINISTRASI FISIK ───
+function docFmtRp(v) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(v || 0); }
+function docFmtDate(dateStr) {
+    const d = dateStr ? new Date(dateStr) : new Date();
+    const bulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    return `${d.getDate()} ${bulan[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+async function renderSidevaDocumentInternal(slug, pId) {
+    const targetDiv = document.getElementById('document-render-area');
+    if(!pId){
+        targetDiv.innerHTML = `<div class="alert alert-warning text-dark m-3">ID Paket Kosong. Buka halaman ini dari menu Detail Paket.</div>`;
+        return;
+    }
+    targetDiv.innerHTML = `<div class="text-center text-white p-5"><div class="spinner-border text-light spinner-border-sm"></div><p class="small mt-2">Menyinkronkan data database...</p></div>`;
+    
+    try {
+        const { data: paket } = await db.from('packages').select('*').eq('id', pId).single();
+        const { data: items } = await db.from('package_items').select('*, price_surveys(*)').eq('package_id', pId);
+        const listItems = items || [];
+        const kopHtml = `<div style="text-align:center; border-bottom:3px double #000; padding-bottom:6px; margin-bottom:20px; font-family:'Times New Roman',Times,serif; color:#000;"><h4 style="margin:0; font-size:13pt; font-weight:bold;">PEMERINTAH KABUPATEN DAERAH</h4><h3 style="margin:2px 0; font-size:15pt; font-weight:bold;">DINAS PERANGKAT DAERAH</h3><p style="margin:0; font-size:9.5pt; font-style:italic;">Sistem Administrasi Verifikasi Dokumen Terintegrasi v9</p></div>`;
+        const tgl = docFmtDate(new Date());
+        let htmlOutput = "";
+
+        if(slug === 'idkb') {
+            let rows = ""; listItems.forEach((it, i) => { rows += `<tr><td style="border:1px solid #000; padding:6px; text-align:center;">${i+1}</td><td style="border:1px solid #000; padding:6px;">${it.item_name}</td><td style="border:1px solid #000; padding:6px; text-align:center;">${it.volume} ${it.unit}</td></tr>`; });
+            htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:13pt; text-decoration:underline; margin-bottom:15px;">FORMULIR IDENTIFIKASI KEBUTUHAN BARANG/JASA</div><table style="width:100%; border-collapse:collapse; margin-bottom:15px; font-size:10.5pt;"><tr><td style="width:25%; font-weight:bold; padding:4px;">Nama Paket</td><td>: ${paket.package_name}</td></tr><tr><td style="font-weight:bold; padding:4px;">Pagu Dana</td><td style="font-weight:bold; color:blue;">: ${docFmtRp(paket.budget)}</td></tr></table><table style="width:100%; border-collapse:collapse; font-size:10.5pt;"><thead style="background:#eee;"><th style="border:1px solid #000; padding:6px; text-align:center; width:10%;">No</th><th style="border:1px solid #000; padding:6px;">Komoditas Barang</th><th style="border:1px solid #000; padding:6px; text-align:center; width:25%;">Volume</th></thead><tbody>${rows || '<tr><td colspan="3" style="border:1px solid #000; text-align:center; padding:10px;">Belum ada item belanja</td></tr>'}</tbody></table><div style="margin-top:50px; float:right; width:220px;">Disahkan, ${tgl}<br><strong>Pejabat Pembuat Komitmen</strong><br><br><br><br>( ......................... )</div><div style="clear:both;"></div>`;
+        } else if(slug === 'penetapan') {
+            htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:13pt; text-decoration:underline; margin-bottom:20px;">SURAT PENETAPAN METODE PENGADAAN</div><p>Menimbang kesiapan komoditas pasar daring, Pejabat Pembuat Komitmen menetapkan paket:</p><p><strong>Nama Pekerjaan:</strong> ${paket.package_name}<br><strong>Metode Pemilihan:</strong> E-PURCHASING (KATALOG ELEKTRONIK)</p><p>Ketetapan ini dibuat untuk segera ditindaklanjuti oleh Pejabat Pengadaan.</p><div style="margin-top:60px; float:right; width:220px;">Ditetapkan, ${tgl}<br><strong>Pejabat Pembuat Komitmen</strong><br><br><br><br>( ......................... )</div><div style="clear:both;"></div>`;
+        } else {
+            // Berkas Berita Acara Rangkuman Administrasi Umum Lainnya
+            htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:12pt; text-decoration:underline; margin-bottom:15px;">BERITA ACARA ADMINISTRASI ALUR KERJA (SIDEVA-V9)</div><p>Menerangkan dengan sah bahwa dokumen pengadaan instansi untuk paket <strong>${paket.package_name}</strong> dengan alokasi HPS senilai <strong>${docFmtRp(paket.budget)}</strong> telah diperiksa melalui sistem otomasi berkas fisik.</p><p>Status Kelayakan administrasi dinyatakan: <strong style="color:green;">MEMENUHI SYARAT (VALID)</strong></p><div style="margin-top:50px; display:flex; justify-content:between;"><div style="width:200px;"><strong>PPKom</strong><br><br><br><br>(........................)</div><div style="width:200px; text-align:right;"><strong>Pejabat Pengadaan</strong><br><br><br><br>(........................)</div></div>`;
+        }
+
+        targetDiv.innerHTML = `<div class="bg-white text-dark p-5 mx-auto text-start shadow-lg" style="width:100%; max-width:760px; min-height:900px; font-family:'Times New Roman',Times,serif; font-size:11pt; line-height:1.5; color:#000;">${htmlOutput}</div>`;
+    } catch (e) { targetDiv.innerHTML = `<div class="alert alert-danger m-2 small">❌ Gagal memproses draf kertas: ${e.message}</div>`; }
+}
+
+// ─── STORAGE HANDLING BAWAAN ASLI ANDA ───
 async function loadUploadedDocuments(){
     if(!packageId) return;
-    const {data, error} = await window.supabaseClient.from('package_documents').select('*').eq('package_id',packageId).order('created_at',{ascending:false});
-    if(error){ console.error(error); return; }
+    const {data, error} = await db.from('package_documents').select('*').eq('package_id',packageId).order('created_at',{ascending:false});
+    if(error) return;
     documents = data || [];
     renderUploadedTable();
 }
@@ -214,17 +257,7 @@ function renderUploadedTable(){
         return;
     }
     documents.forEach(doc=>{
-        html += `
-        <tr>
-            <td><span class="badge bg-secondary">${doc.document_type}</span></td>
-            <td><i class="bi bi-file-earmark-text me-1"></i>${doc.file_name}</td>
-            <td>${formatBytes(doc.file_size)}</td>
-            <td>${new Date(doc.created_at).toLocaleDateString('id-ID')}</td>
-            <td>
-                <button class="btn btn-success btn-sm p-1 px-2" onclick="downloadDocument('${doc.file_path}')"><i class="bi bi-download"></i></button>
-                <button class="btn btn-danger btn-sm p-1 px-2" onclick="deleteDocument('${doc.id}','${doc.file_path}')"><i class="bi bi-trash"></i></button>
-            </td>
-        </tr>`;
+        html += `<tr><td><span class="badge bg-secondary">${doc.document_type}</span></td><td>${doc.file_name}</td><td>${formatBytes(doc.file_size)}</td><td>${new Date(doc.created_at).toLocaleDateString('id-ID')}</td><td><button class="btn btn-success btn-sm p-1 px-2 me-1" onclick="downloadDocument('${doc.file_path}')"><i class="bi bi-download"></i></button><button class="btn btn-danger btn-sm p-1 px-2" onclick="deleteDocument('${doc.id}','${doc.file_path}')"><i class="bi bi-trash"></i></button></td></tr>`;
     });
     document.getElementById('documentsTable').innerHTML=html;
 }
@@ -240,25 +273,17 @@ document.getElementById('uploadForm').addEventListener('submit', async (e)=>{
     const filePath = `${packageId}/${docType}_${Date.now()}.${fileExt}`;
     
     Swal.showLoading();
-    const { error: uploadError } = await window.supabaseClient.storage.from('package-documents').upload(filePath, file);
+    const { error: uploadError } = await db.storage.from('package-documents').upload(filePath, file);
     if(uploadError) return Swal.fire('Error', uploadError.message, 'error');
     
-    const { error: dbError } = await window.supabaseClient.from('package_documents').insert({
-        package_id: packageId,
-        document_type: docType,
-        file_name: file.name,
-        file_size: file.size,
-        file_path: filePath
-    });
-    
-    if(dbError) return Swal.fire('Error', dbError.message, 'error');
+    await db.from('package_documents').insert({ package_id: packageId, document_type: docType, file_name: file.name, file_size: file.size, file_path: filePath });
     Swal.fire('Sukses','Berhasil mengunggah berkas','success');
     fileInput.value = '';
     loadUploadedDocuments();
 });
 
 async function downloadDocument(path){
-    const {data,error} = await window.supabaseClient.storage.from('package-documents').createSignedUrl(path,60);
+    const {data,error} = await db.storage.from('package-documents').createSignedUrl(path,60);
     if(error) return Swal.fire('Error',error.message,'error');
     window.open(data.signedUrl,'_blank');
 }
@@ -266,16 +291,14 @@ async function downloadDocument(path){
 async function deleteDocument(id,path){
     const res = await Swal.fire({ title:'Hapus berkas?', text:'File akan dihapus permanen dari storage', icon:'warning', showCancelButton:true });
     if(!res.isConfirmed) return;
-    
-    await window.supabaseClient.storage.from('package-documents').remove([path]);
-    await window.supabaseClient.from('package_documents').delete().eq('id',id);
+    await db.storage.from('package-documents').remove([path]);
+    await db.from('package_documents').delete().eq('id',id);
     loadUploadedDocuments();
 }
 
 function formatBytes(bytes, decimals = 2) {
     if (!bytes) return '0 Bytes';
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
+    const k = 1024; const dm = decimals < 0 ? 0 : decimals;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
@@ -286,6 +309,5 @@ window.addEventListener('DOMContentLoaded', () => {
     loadUploadedDocuments();
 });
 </script>
-<script src="../js/dashboard-documents.js"></script>
 </body>
 </html>
