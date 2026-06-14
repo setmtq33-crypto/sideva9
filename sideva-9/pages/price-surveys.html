@@ -166,6 +166,33 @@ Tambah Survey
 <input type="hidden" id="surveyId">
 
 <div class="mb-2">
+<label>URL E-Katalog</label>
+
+<div class="input-group">
+
+<input
+
+    id="catalogUrl"
+
+    class="form-control"
+
+    placeholder="https://katalog.inaproc.id/...">
+
+<button
+
+    type="button"
+
+    class="btn btn-success"
+
+    onclick="fetchCatalogData()">
+
+    Ambil Data
+
+</button>
+
+</div>
+</div>
+ 
 <label>Vendor</label>
 <input id="vendorName" class="form-control">
 </div>
@@ -393,6 +420,62 @@ function editSurvey(id){
 
  modal.show();
 }
+
+async function fetchCatalogData(){
+
+    const url =
+        document
+        .getElementById(
+            'catalogUrl'
+        )
+        .value
+        .trim();
+
+    if(!url){
+
+        alert(
+            'Masukkan URL E-Katalog'
+        );
+
+        return;
+    }
+
+    const slug =
+        url.split('/')
+           .pop();
+
+    document
+    .getElementById(
+        'vendorName'
+    )
+    .value =
+    'CV MURIA SETIA';
+
+    document
+    .getElementById(
+        'brand'
+    )
+    .value =
+    slug
+        .replaceAll('-',' ')
+        .toUpperCase();
+
+    document
+    .getElementById(
+        'surveyPrice'
+    )
+    .value =
+    99900;
+
+    document
+    .getElementById(
+        'sourceUrl'
+    )
+    .value =
+    url;
+
+}
+ 
 
 async function saveSurvey(){
 
