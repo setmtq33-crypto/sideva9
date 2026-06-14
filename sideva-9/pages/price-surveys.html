@@ -488,83 +488,80 @@ async function fetchCatalogData(){
 
 async function saveSurvey(){
 
- const payload={
-  tenant_id:profile.tenant_id,
-  opd_id:profile.opd_id,
-  package_item_id:selectedItemId,
-  vendor_name:vendorName.value,
-  brand:brand.value,
-  survey_price:Number(surveyPrice.value||0),
-  negotiated_price:Number(negotiatedPrice.value||0),
-  source_url:sourceUrl.value,
-  survey_date:surveyDate.value,
-  notes:notes.value,
-  is_candidate:isCandidate.checked,
-  is_winner:isWinner.checked
- };
+const isEdit = !!surveyId.value;
 
- console.log('selectedItemId', selectedItemId);
- console.log('profile', profile);
+let result;
 
- let result;
+if(isEdit){
 
- if(surveyId.value){
+const updatePayload = {
+vendor_name: vendorName.value,
+brand: brand.value,
+survey_price: Number(surveyPrice.value || 0),
+negotiated_price: Number(negotiatedPrice.value || 0),
+source_url: sourceUrl.value,
+survey_date: surveyDate.value,
+notes: notes.value,
+is_candidate: isCandidate.checked,
+is_winner: isWinner.checked
+};
 
-   console.log('EDIT ID', surveyId.value);
-   console.log('PAYLOAD', payload);
+console.log(‘MODE EDIT’);
+console.log(‘EDIT ID’, surveyId.value);
+console.log(‘UPDATE PAYLOAD’, updatePayload);
 
-   result=await surveyDb
-   .from('price_surveys')
-   .update(payload)
-   .eq('id',surveyId.value);
+result = await surveyDb
+.from(‘price_surveys’)
+.update(updatePayload)
+.eq(‘id’, surveyId.value)
+.select();
 
- }else{
+console.log(‘UPDATE RESULT’, result);
 
-   console.log(payload);
-  
-   result=await surveyDb
-      .from('price_surveys')
-      .insert(payload);
- }
+}else{
 
- console.log('PAYLOAD:', payload);
- console.log('RESULT:', result);
- 
- if(result.error){
-   console.error(result.error);
+const insertPayload = {
+tenant_id: profile.tenant_id,
+opd_id: profile.opd_id,
+package_item_id: selectedItemId,
+vendor_name: vendorName.value,
+brand: brand.value,
+survey_price: Number(surveyPrice.value || 0),
+negotiated_price: Number(negotiatedPrice.value || 0),
+source_url: sourceUrl.value,
+survey_date: surveyDate.value,
+notes: notes.value,
+is_candidate: isCandidate.checked,
+is_winner: isWinner.checked
+};
 
-    alert(result.error.message);
+console.log(‘MODE INSERT’);
+console.log(‘INSERT PAYLOAD’, insertPayload);
 
-    return;
- }
+result = await surveyDb
+.from(‘price_surveys’)
+.insert(insertPayload)
+.select();
 
- modal.hide();
-
- await selectItem(selectedItemId);
- await updatePackageStatus(packageId);
+console.log(‘INSERT RESULT’, result);
 }
 
-async function deleteSurvey(id){
+if(result.error){
 
- const ok = confirm('Hapus survey ini?');
+console.error(result.error);
 
- if(!ok) return;
+alert(result.error.message);
 
- const {error} = await surveyDb
- .from('price_surveys')
- .delete()
- .eq('id',id);
+return;
+}
 
- if(error){
+modal.hide();
 
-   console.error(error);
+await selectItem(selectedItemId);
 
-   alert(error.message);
-
-   return;
- }
-
- await selectItem(selectedItemId);
+if(typeof updatePackageStatus === ‘function’){
+await updatePackageStatus(packageId);
+}
 
 }
 
