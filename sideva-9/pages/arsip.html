@@ -43,34 +43,31 @@
 
 <script>
     
-    async function initArsip() {
-        // Kita tunggu sampai window.supabaseClient benar-benar ada
-        if (typeof window.supabaseClient === 'undefined') {
-            console.warn("Menunggu supabaseClient siap...");
-            setTimeout(initArsip, 500);
-            return;
-        }
+    let initRetryCount = 0;
+const MAX_RETRIES = 50;
 
-        try {
-            // Sekarang dia PASTI sudah ada
-            const { data, error } = await window.supabaseClient
-                .from('packages')
-                .select('id, rup, package_name');
-            
-            if (error) throw error;
-
-            const list = document.getElementById('paket-list');
-            list.innerHTML = data.map(p => `
-                <div class="paket-item" onclick="selectPaket('${p.id}')" style="cursor:pointer; padding:10px; border-bottom:1px solid #ccc;">
-                    <strong>${p.rup}</strong><br>
-                    <small>${p.package_name}</small>
-                </div>
-            `).join('');
-        } catch (err) {
-            console.error("Gagal ambil data:", err);
-            document.getElementById('paket-list').innerHTML = "Gagal memuat paket: " + err.message;
-        }
+function initArsip() {
+  // Cek apakah library utama sudah siap
+  if (window.supabaseClient && typeof window.loadAppConfig === 'function') {
+    console.log("✅ Semua sistem siap. Memulai inisialisasi arsip...");
+    loadAppConfig(); // Panggil konfigurasi
+    // Jalankan logika arsip Anda di sini
+  } else {
+    initRetryCount++;
+    if (initRetryCount <= MAX_RETRIES) {
+      // Hanya log setiap 5 kali agar konsol tidak penuh
+      if (initRetryCount % 5 === 0) {
+        console.log(`⏳ Menunggu library siap (Percobaan ${initRetryCount}/${MAX_RETRIES})...`);
+      }
+      setTimeout(initArsip, 500); // Naikkan jeda ke 500ms agar tidak berat
+    } else {
+      console.error("❌ Gagal memuat library setelah 50 percobaan. Periksa koneksi atau urutan load script.");
     }
+  }
+}
+
+// Panggil pertama kali
+initArsip();
 
     // Jalankan
     initArsip();
