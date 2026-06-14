@@ -5,12 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Akun Anggaran - SIDEVA9</title>
 
+<!-- Library Eksternal Standar SIDEVA9 -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<!-- Script Konfigurasi Jalur Lokal Proyek -->
 <script src="../js/config.js"></script>
 <script src="../js/supabase.js"></script>
 <script src="../js/auth.js"></script>
@@ -27,12 +29,13 @@ body { background: #f5f6fa; }
 
 <div class="container-fluid p-4">
 
+    <!-- HEADER DASHBOARD UTAMA -->
     <div class="card p-4 mb-4 shadow-sm bg-white">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
             <div>
                 <span class="badge bg-success mb-1 fw-bold">Modul Keuangan v9 (Public Schema)</span>
                 <h3 class="fw-bold m-0 text-dark">Daftar Akun Anggaran</h3>
-                <p class="text-muted small m-0">Kelola kode rekening, pagu belanja, dan ploting anggaran instansi/OPD.</p>
+                <p class="text-muted small m-0">Kelola kode rekening dan uraian akun belanja instansi/OPD.</p>
             </div>
             <div class="d-flex flex-wrap gap-2">
                 <a href="dashboard.html" class="btn btn-outline-secondary px-3 py-2 rounded-pill shadow-sm fw-bold">
@@ -45,21 +48,17 @@ body { background: #f5f6fa; }
         </div>
     </div>
 
+    <!-- WIDGET STATISTIK RINGKAS -->
     <div class="row mb-4">
-        <div class="col-md-4 mb-3 mb-md-0">
+        <div class="col-md-4">
             <div class="card p-3 shadow-sm bg-white border-start border-primary border-4">
                 <small class="text-muted fw-bold d-block mb-1">TOTAL KODE REKENING</small>
                 <h3 class="fw-bold m-0 id-total-account text-primary">0</h3>
             </div>
         </div>
-        <div class="col-md-8">
-            <div class="card p-3 shadow-sm bg-white border-start border-success border-4">
-                <small class="text-muted fw-bold d-block mb-1">TOTAL ALOKASI PAGU DANA MURNI</small>
-                <h3 class="fw-bold m-0 id-total-budget text-success">Rp 0</h3>
-            </div>
-        </div>
     </div>
 
+    <!-- TABEL KONTEN UTAMA -->
     <div class="card shadow-sm bg-white">
         <div class="card-body p-4">
             
@@ -77,15 +76,14 @@ body { background: #f5f6fa; }
                     <thead>
                         <tr>
                             <th width="60" class="text-center">No</th>
-                            <th width="200">Kode Rekening</th>
+                            <th width="250">Kode Rekening</th>
                             <th>Nama Akun / Uraian Anggaran</th>
-                            <th width="220" class="text-end">Alokasi Pagu Dana</th>
                             <th width="140" class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="budgetAccountsTable">
                         <tr>
-                            <td colspan="5" class="text-center py-5 text-muted">
+                            <td colspan="4" class="text-center py-5 text-muted">
                                 <div class="spinner-border text-primary spinner-border-sm mb-2" role="status"></div>
                                 <p class="m-0 small">Menghubungkan ke layanan Supabase...</p>
                             </td>
@@ -98,6 +96,7 @@ body { background: #f5f6fa; }
     </div>
 </div>
 
+<!-- MODAL FORM INTERAKTIF -->
 <div class="modal fade" id="modalAccount" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
@@ -116,13 +115,6 @@ body { background: #f5f6fa; }
                         <label class="form-label fw-bold text-secondary small">URAIAN / NAMA AKUN BELANJA</label>
                         <textarea id="accountName" class="form-control" rows="3" placeholder="Masukkan nama objek belanja..." required></textarea>
                     </div>
-                    <div class="mb-2">
-                        <label class="form-label fw-bold text-secondary small">JUMLAH ALOKASI PAGU DANA (RP) <span class="text-muted fw-normal">(Opsional)</span></label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light fw-bold text-muted">Rp</span>
-                            <input type="number" id="accountBudget" class="form-control fw-bold text-success" placeholder="Boleh dikosongkan (default: 0)" min="0">
-                        </div>
-                    </div>
                 </div>
                 <div class="modal-footer bg-light border-top-0 px-4">
                     <button type="button" class="btn btn-outline-secondary px-3 rounded-pill btn-sm" data-bs-dismiss="modal" onclick="resetForm()">Batal</button>
@@ -139,8 +131,6 @@ body { background: #f5f6fa; }
 
     let profile = null;
     let rawAccountsData = [];
-
-    const formatRp = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num || 0);
 
     async function init() {
         if (typeof getProfile === 'function') {
@@ -160,15 +150,15 @@ body { background: #f5f6fa; }
 
         if (error) {
             console.error("Gagal memuat anggaran:", error.message);
-            document.getElementById('budgetAccountsTable').innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4 small"><i class="bi bi-exclamation-octagon"></i> Gagal menyinkronkan database: ${error.message}</td></tr>`;
+            document.getElementById('budgetAccountsTable').innerHTML = `<tr><td colspan="4" class="text-center text-danger py-4 small"><i class="bi bi-exclamation-octagon"></i> Gagal menyinkronkan database: ${error.message}</td></tr>`;
             return;
         }
 
         rawAccountsData = data || [];
         
         rawAccountsData.sort((a, b) => {
-            const codeA = String(a.account_code || a.code || '');
-            const codeB = String(b.account_code || b.code || '');
+            const codeA = String(a.account_code || '');
+            const codeB = String(b.account_code || '');
             return codeA.localeCompare(codeB);
         });
 
@@ -178,28 +168,22 @@ body { background: #f5f6fa; }
     function renderAccountsTable(dataset) {
         const tbody = document.getElementById('budgetAccountsTable');
         let html = '';
-        let totalBudgetSum = 0;
 
         if (dataset.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted small">Belum ada daftar akun anggaran.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-muted small">Belum ada daftar akun anggaran.</td></tr>';
             document.querySelector('.id-total-account').innerText = '0';
-            document.querySelector('.id-total-budget').innerText = 'Rp 0';
             return;
         }
 
         dataset.forEach((row, index) => {
-            const displayCode = row.account_code || row.code || '-';
-            const displayName = row.account_name || row.name || row.uraian || '-';
-            const displayBudget = row.budget !== undefined ? row.budget : (row.pagu || row.total_budget || 0);
-
-            totalBudgetSum += parseFloat(displayBudget || 0);
+            const displayCode = row.account_code || '-';
+            const displayName = row.account_name || '-';
             
             html += `
             <tr>
                 <td class="text-center text-muted small">${index + 1}</td>
                 <td><code class="text-dark fw-bold">${displayCode}</code></td>
                 <td><div class="fw-semibold text-dark text-wrap">${displayName}</div></td>
-                <td class="text-end fw-bold text-success">${formatRp(displayBudget)}</td>
                 <td class="text-center">
                     <button class="btn btn-outline-primary btn-sm py-1 px-2 me-1 border-0" onclick="openEditAccountModal('${row.id}')">
                         <i class="bi bi-pencil-square"></i>
@@ -213,7 +197,6 @@ body { background: #f5f6fa; }
 
         tbody.innerHTML = html;
         document.querySelector('.id-total-account').innerText = dataset.length;
-        document.querySelector('.id-total-budget').innerText = formatRp(totalBudgetSum);
     }
 
     window.filterAccountsTable = function() {
@@ -223,8 +206,8 @@ body { background: #f5f6fa; }
             return;
         }
         const filtered = rawAccountsData.filter(item => {
-            const code = String(item.account_code || item.code || '').toLowerCase();
-            const name = String(item.account_name || item.name || item.uraian || '').toLowerCase();
+            const code = String(item.account_code || '').toLowerCase();
+            const name = String(item.account_name || '').toLowerCase();
             return code.includes(query) || name.includes(query);
         });
         renderAccountsTable(filtered);
@@ -236,9 +219,8 @@ body { background: #f5f6fa; }
 
         document.getElementById('modalAccountTitle').innerHTML = '<i class="bi bi-pencil-square text-primary me-2"></i>Ubah Akun Anggaran';
         document.getElementById('accountId').value = record.id;
-        document.getElementById('accountCode').value = record.account_code || record.code || '';
-        document.getElementById('accountName').value = record.account_name || record.name || record.uraian || '';
-        document.getElementById('accountBudget').value = record.budget !== undefined ? record.budget : (record.pagu || record.total_budget || 0);
+        document.getElementById('accountCode').value = record.account_code || '';
+        document.getElementById('accountName').value = record.account_name || '';
 
         const myModal = new bootstrap.Modal(document.getElementById('modalAccount'));
         myModal.show();
@@ -257,22 +239,13 @@ body { background: #f5f6fa; }
         const code = document.getElementById('accountCode').value.trim();
         const name = document.getElementById('accountName').value.trim();
         
-        // JINAKKAN PAGU: Jika kosong, otomatis set jadi angka 0 biar database lolos menyimpan
-        const rawBudgetInput = document.getElementById('accountBudget').value;
-        const budgetValue = rawBudgetInput === "" ? 0 : parseFloat(rawBudgetInput);
-
         const finalTenantId = (profile && profile.tenant_id) ? profile.tenant_id : "9940ceb7-cab2-49f0-aa86-dc13ee3d2f21";
-        const finalOpdId = (profile && profile.opd_id) ? profile.opd_id : "69614a60-de05-412e-b68c-25dd57c7b716";
 
+        // DI SESUAIKAN TOTAL dengan file image_2.jpeg
         const payload = {
             account_code: code,
-            code: code,
             account_name: name,
-            name: name,
-            budget: budgetValue,
-            pagu: budgetValue,
-            tenant_id: finalTenantId,
-            opd_id: finalOpdId
+            tenant_id: finalTenantId
         };
 
         Swal.showLoading();
@@ -307,7 +280,7 @@ body { background: #f5f6fa; }
     window.deleteAccountRecord = async function(id) {
         const confirm = await Swal.fire({
             title: 'Hapus akun anggaran?',
-            text: "Pastikan akun rekening ini tidak sedang tertaut dengan item paket aktif!",
+            text: "Apakah anda yakin ingin menghapus akun anggaran ini?",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
