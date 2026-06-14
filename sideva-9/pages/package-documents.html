@@ -178,7 +178,8 @@ body { background: #f5f6fa; display: flex; margin: 0; padding: 0; }
 
 <script>
 // Penyelarasan Variabel Global Supabase Kluster Keamanan V9
-const db = window.supabaseClient || window.supabase;
+// Ganti bagian awal deklarasi database Anda menjadi seperti ini:
+const documentDb = window.supabaseClient || window.supabase || window.db; 
 const urlParams = new URLSearchParams(window.location.search);
 const packageId = urlParams.get('package_id') || urlParams.get('id');
 let documents = [];
@@ -188,7 +189,8 @@ async function initPackageHeader() {
         document.getElementById('packageName').innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Peringatan: Harap masuk melalui menu "Packages" lalu klik tombol dokumen agar ID paket terbaca.</span>`;
         return;
     }
-    const { data, error } = await db.from('packages').select('*').eq('id', packageId).single();
+    // Pastikan pemanggilan di bawah ini menggunakan variabel baru 'documentDb'
+    const { data, error } = await documentDb.from('packages').select('*').eq('id', packageId).single();
     if(!error && data) {
         document.getElementById('packageName').innerText = data.package_name;
         document.getElementById('packageRup').innerText = `ID RUP: ${data.rup_id || '-'}`;
@@ -220,8 +222,8 @@ async function renderSidevaDocumentInternal(slug, pId) {
     targetDiv.innerHTML = `<div class="text-center text-white p-5"><div class="spinner-border text-light spinner-border-sm"></div><p class="small mt-2">Menyinkronkan data database...</p></div>`;
     
     try {
-        const { data: paket } = await db.from('packages').select('*').eq('id', pId).single();
-        const { data: items } = await db.from('package_items').select('*, price_surveys(*)').eq('package_id', pId);
+        const { data: paket } = await documentDb.from('packages').select('*').eq('id', pId).single();
+        const { data: items } = await documentDb.from('package_items').select('*, price_surveys(*)').eq('package_id', pId);
         const listItems = items || [];
         const kopHtml = `<div style="text-align:center; border-bottom:3px double #000; padding-bottom:6px; margin-bottom:20px; font-family:'Times New Roman',Times,serif; color:#000;"><h4 style="margin:0; font-size:13pt; font-weight:bold;">PEMERINTAH KABUPATEN DAERAH</h4><h3 style="margin:2px 0; font-size:15pt; font-weight:bold;">DINAS PERANGKAT DAERAH</h3><p style="margin:0; font-size:9.5pt; font-style:italic;">Sistem Administrasi Verifikasi Dokumen Terintegrasi v9</p></div>`;
         const tgl = docFmtDate(new Date());
@@ -244,7 +246,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
 // ─── STORAGE HANDLING BAWAAN ASLI ANDA ───
 async function loadUploadedDocuments(){
     if(!packageId) return;
-    const {data, error} = await db.from('package_documents').select('*').eq('package_id',packageId).order('created_at',{ascending:false});
+    const {data, error} = await documentDb.from('package_documents').select('*').eq('package_id',packageId).order('created_at',{ascending:false});
     if(error) return;
     documents = data || [];
     renderUploadedTable();
@@ -273,10 +275,10 @@ document.getElementById('uploadForm').addEventListener('submit', async (e)=>{
     const filePath = `${packageId}/${docType}_${Date.now()}.${fileExt}`;
     
     Swal.showLoading();
-    const { error: uploadError } = await db.storage.from('package-documents').upload(filePath, file);
+    const { error: uploadError } = await documentDb.storage.from('package-documents').upload(filePath, file);
     if(uploadError) return Swal.fire('Error', uploadError.message, 'error');
     
-    await db.from('package_documents').insert({ package_id: packageId, document_type: docType, file_name: file.name, file_size: file.size, file_path: filePath });
+    await documentDb.from('package_documents').insert({ package_id: packageId, document_type: docType, file_name: file.name, file_size: file.size, file_path: filePath });
     Swal.fire('Sukses','Berhasil mengunggah berkas','success');
     fileInput.value = '';
     loadUploadedDocuments();
