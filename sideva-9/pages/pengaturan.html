@@ -5,14 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pengaturan Instansi - SIDEVA9</title>
 
-<!-- Library Eksternal Standar SIDEVA9 -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<!-- Script Konfigurasi Jalur Lokal Proyek -->
 <script src="../js/config.js"></script>
 <script src="../js/supabase.js"></script>
 <script src="../js/auth.js"></script>
@@ -37,7 +35,6 @@ body { background: #f5f6fa; color: #333; }
 
 <div class="container p-4" style="max-width: 900px;">
 
-    <!-- 1. INTRO BANNER DENGAN TOMBOL KEMBALI INTERAKTIF -->
     <div class="card p-4 bg-white shadow-sm">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
             <div class="d-flex align-items-center gap-3">
@@ -56,7 +53,6 @@ body { background: #f5f6fa; color: #333; }
         </div>
     </div>
 
-    <!-- KHUSUS SUPER ADMIN: SELECTOR PILIH OPD (Awalnya tersembunyi) -->
     <div class="card bg-white shadow-sm border border-warning" id="superadmin-selector-zone" style="display: none;">
         <div class="card-header bg-warning bg-opacity-10">
             <div class="card-title text-warning-emphasis"><i class="bi bi-shield-lock-fill me-2"></i> Konsol Super Admin: Pilih Ruang Kerja OPD</div>
@@ -65,7 +61,6 @@ body { background: #f5f6fa; color: #333; }
         <div class="card-body">
             <label class="form-label fw-bold">Silahkan Pilih Instansi / OPD yang ingin dikonfigurasi:</label>
             <select class="form-select form-select-lg border-warning fw-semibold text-secondary" id="global-opd-selector" onchange="switchTargetOPD(this.value)">
-                <!-- Data OPD dari Supabase akan di-render di sini -->
                 <option value="">-- Memuat Daftar OPD --</option>
             </select>
             <div class="form-hint text-warning-emphasis mt-2">Sebagai Super Admin, perubahan yang Anda lakukan di bawah akan langsung berdampak pada OPD yang dipilih di atas.</div>
@@ -74,7 +69,6 @@ body { background: #f5f6fa; color: #333; }
 
     <form id="mainConfigForm" onsubmit="saveSeluruhPengaturan(event)">
         
-        <!-- 2. IDENTITAS & FILTER ANGGARAN -->
         <div class="card bg-white">
             <div class="card-header">
                 <div class="card-title">🏛️ Identitas & Parameter Filter</div>
@@ -100,7 +94,6 @@ body { background: #f5f6fa; color: #333; }
             </div>
         </div>
 
-        <!-- 3. LOGO & KOP SURAT -->
         <div class="card bg-white">
             <div class="card-header">
                 <div class="card-title">🖼️ Logo & Kop Surat Instansi</div>
@@ -110,7 +103,6 @@ body { background: #f5f6fa; color: #333; }
                 <p class="text-muted small">File akan diunggah langsung ke cloud storage Supabase. Pratinjau otomatis diperbarui setelah proses upload berhasil.</p>
                 
                 <div class="row g-4">
-                    <!-- SEKSI LOGO -->
                     <div class="col-md-6">
                         <label class="form-label d-block mb-2">🏛️ Logo Instansi</label>
                         <div class="upload-zone" onclick="document.getElementById('logo-file-input').click()">
@@ -129,7 +121,6 @@ body { background: #f5f6fa; color: #333; }
                         </div>
                     </div>
 
-                    <!-- SEKSI KOP SURAT -->
                     <div class="col-md-6">
                         <label class="form-label d-block mb-2">📄 Gambar Kop Surat</label>
                         <div class="upload-zone" onclick="document.getElementById('kop-file-input').click()">
@@ -151,7 +142,6 @@ body { background: #f5f6fa; color: #333; }
             </div>
         </div>
 
-        <!-- 4. LIVE PREVIEW LAYOUT -->
         <div class="card bg-white">
             <div class="card-header">
                 <div class="card-title">👁️ Live Preview Layout Dokumen Cetak</div>
@@ -167,7 +157,6 @@ body { background: #f5f6fa; color: #333; }
             </div>
         </div>
 
-        <!-- 5. TOMBOL AKSI UTAMA -->
         <div class="d-flex justify-content-between align-items-center mb-5">
             <button type="button" class="btn btn-outline-secondary px-4 rounded-pill fw-bold" onclick="resetFormPerubahan()">
                 <i class="bi bi-arrow-clockwise"></i> Reset Perubahan
@@ -181,55 +170,56 @@ body { background: #f5f6fa; color: #333; }
 
 <script>
 (function() {
-    // Memastikan client Supabase terdeteksi dengan benar sesuai proyek SIDEVA
+    // Gunakan fungsi penampung yang aman saat memanggil Supabase client
     const client = window.supabaseClient || window.supabase;
     let currentOpdInternalId = null; 
     let currentLogoUrl = null;
     let currentKopUrl = null;
     let isSuperAdmin = false;
 
+    // Default Fallback ID jika profile user tidak mengikat ID spesifik (Mengambil ID BAPPERIDA milikmu)
+    let activeOpdId = "6961a60-de05-412e-b68c-25dd57c7b716"; 
+
     async function init() {
+        // Beri perlindungan jeda super singkat agar window.getProfile dari auth.js siap dibaca
+        if (typeof window.getProfile !== 'function') {
+            setTimeout(init, 100);
+            return;
+        }
+
         Swal.fire({
             title: 'Sinkronisasi Sesi...',
             allowOutsideClick: false,
             didOpen: () => Swal.showLoading()
         });
 
-        // 1. Ambil profil user aktif via auth.js milik SIDEVA
-        if (typeof window.getProfile !== 'function') {
-            Swal.fire('Sistem Berhenti', 'Fungsi getProfile() tidak ditemukan di auth.js!', 'error');
-            return;
-        }
-        
-        const profile = await window.getProfile();
-        if (!profile) {
-            Swal.fire('Sesi Habis', 'Gagal memuat profil pengguna, silahkan login kembali.', 'error');
-            return;
-        }
-
-        // Ambil role dan default OPD ID dari database user profile
-        const userRole = profile.role || 'admin';
-        const userDefaultOpdId = profile.opd_id || profile.id_opd; // Sesuaikan kolom opd_id di tabel profile Anda
-
-        // 2. Cek Role: Apakah Super Admin?
-        if (userRole === 'superadmin' || userRole === 'super_admin' || userRole === 'Super Admin') {
-            isSuperAdmin = true;
-            document.getElementById('superadmin-selector-zone').style.display = 'block';
-            await loadDaftarOPDUntukSelector(userDefaultOpdId);
-        } else {
-            // Jika Admin biasa, langsung kunci ke ID OPD miliknya tanpa selector
-            if (!userDefaultOpdId) {
-                // Fallback jika profile belum punya link opd_id (ambil baris pertama BAPPERIDA dari db kamu)
-                await loadPengaturanDariOPD("6961a60-de05-412e-b68c-25dd57c7b716");
-            } else {
-                await loadPengaturanDariOPD(userDefaultOpdId);
+        try {
+            const profile = await window.getProfile();
+            console.log("Data Profil User:", profile);
+            if (!profile) {
+                Swal.fire('Sesi Habis', 'Gagal memuat profil pengguna, silakan login kembali.', 'error');
+                return;
             }
+
+            const userRole = profile.role || 'admin';
+            const userDefaultOpdId = profile.opd_id || profile.id_opd;
+
+            if (userRole === 'superadmin' || userRole === 'super_admin' || userRole === 'Super Admin') {
+                isSuperAdmin = true;
+                document.getElementById('superadmin-selector-zone').style.display = 'block';
+                await loadDaftarOPDUntukSelector(userDefaultOpdId);
+            } else {
+                if (userDefaultOpdId) activeOpdId = userDefaultOpdId;
+                await loadPengaturanDariOPD(activeOpdId);
+            }
+        } catch (err) {
+            console.error("Initialization Error:", err);
+            Swal.fire('Eror Sistem', 'Gagal sinkronisasi data sesi profil.', 'error');
         }
 
         document.getElementById('cfg-namaInstansi').addEventListener('input', updateLiveFallbackPreview);
     }
 
-    // LOAD DROP-DOWN SELECTOR KHUSUS SUPER ADMIN (MENGGUNAKAN ID UNIK)
     async function loadDaftarOPDUntukSelector(defaultSelectedId) {
         const { data, error } = await client
             .from('opds')
@@ -239,28 +229,21 @@ body { background: #f5f6fa; color: #333; }
 
         if (error) {
             console.error("Gagal mengambil master list OPD:", error.message);
-            Swal.fire('Gagal', 'Gagal mengambil data master OPD.', 'error');
             return;
         }
 
-        if (!data || data.length === 0) {
-            Swal.fire('Kosong', 'Tidak ada data instansi di tabel opds.', 'warning');
-            return;
-        }
+        if (!data || data.length === 0) return;
 
-        // Render isi opsi dropdown menggunakan id (bukan tenant_id)
         const selectorHtml = data.map(opd => 
             `<option value="${opd.id}" ${opd.id === defaultSelectedId ? 'selected' : ''}>[${opd.code}] ${opd.name}</option>`
         ).join('');
         
         document.getElementById('global-opd-selector').innerHTML = selectorHtml;
         
-        // Tentukan target id pertama yang akan di-load format pengaturannya
         const targetId = document.getElementById('global-opd-selector').value || data[0].id;
         await loadPengaturanDariOPD(targetId);
     }
 
-    // AMBIL DATA 1 INSTANSI BERDASARKAN ID UTAMA (ANTI BENTROK MULTIPLE ROWS)
     async function loadPengaturanDariOPD(opdId) {
         if (!opdId) return;
         Swal.showLoading();
@@ -268,13 +251,12 @@ body { background: #f5f6fa; color: #333; }
         const { data, error } = await client
             .from('opds') 
             .select('*')
-            .eq('id', opdId) // Cari berdasarkan ID Unik, dijamin dapat 1 row pas!
+            .eq('id', opdId)
             .maybeSingle();
 
         Swal.close();
         if (error) {
             console.error("Gagal memuat data OPD:", error.message);
-            Swal.fire('Eror Database', error.message, 'error');
             return;
         }
 
@@ -290,17 +272,14 @@ body { background: #f5f6fa; color: #333; }
             renderMediaPreviews();
         } else {
             clearForm();
-            Swal.fire('Perhatian', 'Data detail instansi tidak ditemukan.', 'warning');
         }
     }
 
-    // TRIGER EVENT SAAT SUPER ADMIN GANTI PILIHAN DROP-DOWN
     window.switchTargetOPD = async function(opdId) {
         if (!opdId) return;
         await loadPengaturanDariOPD(opdId);
     };
 
-    // PROSES UPLOAD MEDIA KE BUCKET STORAGE SUPABASE
     window.uploadFileMedia = async function(event, jenis) {
         const file = event.target.files[0];
         if (!file) return;
@@ -310,7 +289,7 @@ body { background: #f5f6fa; color: #333; }
             return;
         }
 
-        Swal.fire({ title: 'Menyimpan gambar ke awan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        Swal.fire({ title: 'Menyimpan gambar...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
         const fileExt = file.name.split('.').pop();
         const fileName = `${jenis}_${currentOpdInternalId || 'opd'}_${Date.now()}.${fileExt}`;
@@ -387,11 +366,10 @@ body { background: #f5f6fa; color: #333; }
         renderMediaPreviews();
     }
 
-    // SIMPAN PERUBAHAN FORM KEMBALI KE SUPABASE
     window.saveSeluruhPengaturan = async function(event) {
         event.preventDefault();
         if (!currentOpdInternalId) {
-            Swal.fire('Eror', 'ID Data Instansi tidak valid atau tidak terbaca.', 'error');
+            Swal.fire('Eror', 'ID Data Instansi tidak terbaca.', 'error');
             return;
         }
 
@@ -408,7 +386,7 @@ body { background: #f5f6fa; color: #333; }
         const { error } = await client
             .from('opds')
             .update(payload)
-            .eq('id', currentOpdInternalId); // Eksekusi update dikunci pakai ID Unik
+            .eq('id', currentOpdInternalId);
 
         if (error) {
             Swal.fire('Gagal Menyimpan', error.message, 'error');
