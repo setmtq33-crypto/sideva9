@@ -407,91 +407,87 @@ async function loadSurveys(itemId){
 
 function renderSurvey(){
 
- let html='';
+    console.log('RENDER SURVEY');
+    console.log(surveys);
 
- let surveyTotal=0;
- let negoTotal=0;
- let lowest=0;
+    let html = '';
 
- surveys.forEach((s,index)=>{
+    let surveyTotal = 0;
+    let negoTotal = 0;
+    let lowest = 0;
 
- surveyTotal +=
- Number(s.survey_price||0);
+    surveys.forEach((s,index)=>{
 
- negoTotal +=
- Number(s.negotiated_price||0);
+        surveyTotal += Number(s.survey_price || 0);
+        negoTotal += Number(s.negotiated_price || 0);
 
- if(index===0){
-  lowest =
-  Number(s.survey_price||0);
- }
+        if(index === 0){
+            lowest = Number(s.survey_price || 0);
+        }
 
- if(
- Number(s.survey_price||0)
- <
- lowest
- ){
-  lowest =
-  Number(s.survey_price||0);
- }
+        if(Number(s.survey_price || 0) < lowest){
+            lowest = Number(s.survey_price || 0);
+        }
 
- html += `
- <tr>
- <td>${s.vendor_name||''}</td>
- <td>${s.brand||''}</td>
- <td>${rupiah(s.survey_price)}</td>
- <td>${rupiah(s.negotiated_price)}</td>
- <td>${s.is_candidate ? '✔' : ''}</td>
- <td>${s.is_winner ? '✔' : ''}</td>
- <td>${s.survey_date||''}</td>
- <td>
+        html += `
+        <tr>
+            <td>${s.vendor_name || ''}</td>
+            <td>${s.brand || ''}</td>
 
- <button
- class="btn btn-warning btn-sm"
- onclick="editSurvey('${s.id}')">
- Edit
- </button>
+            <td>
+                <b>${s.survey_price || 0}</b>
+            </td>
 
- <button
- class="btn btn-danger btn-sm"
- onclick="deleteSurvey('${s.id}')">
- Hapus
- </button>
+            <td>${s.negotiated_price || 0}</td>
 
- </td>
- </tr>
- `;
+            <td>
+                ${s.is_candidate ? '✔' : ''}
+            </td>
 
- });
+            <td>
+                ${s.is_winner ? '✔' : ''}
+            </td>
 
- surveyTable.innerHTML = html;
+            <td>${s.survey_date || ''}</td>
 
- const count =
- surveys.length;
+            <td>
 
- surveyCount.innerText =
- count;
+                <button
+                    class="btn btn-warning btn-sm"
+                    onclick="editSurvey('${s.id}')">
+                    Edit
+                </button>
 
- avgSurvey.innerText =
- rupiah(
- count
- ?
- surveyTotal/count
- :
- 0
- );
+                <button
+                    class="btn btn-danger btn-sm"
+                    onclick="deleteSurvey('${s.id}')">
+                    Hapus
+                </button>
 
- avgNegotiated.innerText =
- rupiah(
- count
- ?
- negoTotal/count
- :
- 0
- );
+            </td>
+        </tr>
+        `;
+    });
 
- lowestPrice.innerText =
- rupiah(lowest);
+    document.getElementById('surveyTable').innerHTML = html;
+
+    const count = surveys.length;
+
+    document.getElementById('surveyCount').innerText = count;
+
+    document.getElementById('avgSurvey').innerText =
+        rupiah(count ? surveyTotal / count : 0);
+
+    document.getElementById('avgNegotiated').innerText =
+        rupiah(count ? negoTotal / count : 0);
+
+    document.getElementById('lowestPrice').innerText =
+        rupiah(lowest);
+
+    console.log('HTML TABEL');
+    console.log(html);
+
+    console.log('RENDER SELESAI');
 }
 
 function openAddModal(){
