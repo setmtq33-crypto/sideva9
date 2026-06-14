@@ -32,7 +32,7 @@ body { background: #f5f6fa; }
             <div>
                 <span class="badge bg-info text-dark mb-1 fw-bold">Modul Struktur OPD v9</span>
                 <h3 class="fw-bold m-0 text-dark">Manajemen Data Bidang</h3>
-                <p class="text-muted small m-0">Kelola daftar bidang, divisi, atau seksi sub-organisasi perangkat daerah.</p>
+                <p class="text-muted small m-0">Kelola daftar bidang beserta informasi pejabat kepala seksi terkait.</p>
             </div>
             <div class="d-flex flex-wrap gap-2">
                 <a href="dashboard.html" class="btn btn-outline-secondary px-3 py-2 rounded-pill shadow-sm fw-bold">
@@ -61,11 +61,8 @@ body { background: #f5f6fa; }
                 <div class="col-md-4">
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                        <input type="text" id="searchBidang" class="form-control border-start-0 ps-0" placeholder="Cari nama bidang..." onkeyup="filterBidangsTable()">
+                        <input type="text" id="searchBidang" class="form-control border-start-0 ps-0" placeholder="Cari nama bidang atau kepala..." onkeyup="filterBidangsTable()">
                     </div>
-                </div>
-                <div class="col-md-auto text-muted small">
-                    *Menggunakan Public Schema bawaan database SIDEVA
                 </div>
             </div>
 
@@ -73,14 +70,17 @@ body { background: #f5f6fa; }
                 <table class="table table-hover align-middle border-top">
                     <thead>
                         <tr>
-                            <th width="70" class="text-center">No</th>
+                            <th width="60" class="text-center">No</th>
                             <th>Nama Bidang / Sub Bagian</th>
-                            <th width="150" class="text-center">Aksi</th>
+                            <th>Kepala Bidang</th>
+                            <th>NIP Jabatan</th>
+                            <th width="120" class="text-center">Status</th>
+                            <th width="140" class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="bidangsTable">
                         <tr>
-                            <td colspan="3" class="text-center py-5 text-muted">
+                            <td colspan="6" class="text-center py-5 text-muted">
                                 <div class="spinner-border text-info spinner-border-sm mb-2" role="status"></div>
                                 <p class="m-0 small">Menghubungkan ke basis data Supabase...</p>
                             </td>
@@ -103,9 +103,21 @@ body { background: #f5f6fa; }
             <form id="bidangForm" onsubmit="saveBidangForm(event)">
                 <input type="hidden" id="bidangId">
                 <div class="modal-body p-4">
-                    <div class="mb-2">
+                    <div class="mb-3">
                         <label class="form-label fw-bold text-secondary small">NAMA BIDANG / SEKSI</label>
-                        <input type="text" id="bidangName" class="form-control" placeholder="Contoh: Bidang Cipta Karya / Sekre" required>
+                        <input type="text" id="bidangName" class="form-control" placeholder="Contoh: Perencanaan / Cipta Karya" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary small">NAMA KEPALA BIDANG / PEJABAT</label>
+                        <input type="text" id="headName" class="form-control" placeholder="Contoh: Ahmad Subarjo, S.T.">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary small">NIP KEPALA BIDANG</label>
+                        <input type="text" id="headNip" class="form-control" placeholder="Contoh: 19820311XXXXXXXXXX">
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label fw-bold text-secondary small">NAMA JABATAN / NOMENKLATUR</label>
+                        <input type="text" id="positionName" class="form-control" placeholder="Contoh: Kepala Bidang Perencanaan">
                     </div>
                 </div>
                 <div class="modal-footer bg-light border-top-0 px-4">
@@ -119,7 +131,6 @@ body { background: #f5f6fa; }
 
 <script>
 (function() {
-    // Memanggil jaminan objek instansi Supabase murni tanpa tabrakan di Chrome
     const client = window.supabaseClient || window.supabase;
 
     let profile = null;
@@ -133,20 +144,19 @@ body { background: #f5f6fa; }
     }
 
     async function loadBidangs() {
-        // AMAN: Mengarah langsung ke default public schema proyek Anda
         const { data, error } = await client
             .from('bidangs')
             .select('*')
-            .order('name', { ascending: true });
+            .order('bidang_name', { ascending: true });
 
         if (error) {
             console.error("Gagal memuat bidang:", error.message);
-            document.getElementById('bidangsTable').innerHTML = `<tr><td colspan="3" class="text-center text-danger py-4 small"><i class="bi bi-exclamation-octagon"></i> Gagal sinkronisasi data: ${error.message}</td></tr>`;
+            document.getElementById('bidangsTable').innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4 small"><i class="bi bi-exclamation-octagon"></i> Gagal sinkronisasi data: ${error.message}</td></tr>`;
             return;
         }
 
         rawBidangsData = data || [];
-        renderBidangsTable(rawAccountsData = rawBidangsData);
+        renderBidangsTable(rawBidangsData);
     }
 
     function renderBidangsTable(dataset) {
@@ -154,21 +164,28 @@ body { background: #f5f6fa; }
         let html = '';
 
         if (dataset.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-muted small">Belum ada daftar bidang yang direkam.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted small">Belum ada daftar bidang yang direkam.</td></tr>';
             document.querySelector('.id-total-bidang').innerText = '0';
             return;
         }
 
         dataset.forEach((row, index) => {
+            const statusBadge = row.is_active 
+                ? '<span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill small">Aktif</span>' 
+                : '<span class="badge bg-secondary-subtle text-secondary px-2 py-1 rounded-pill small">Non-Aktif</span>';
+
             html += `
             <tr>
                 <td class="text-center text-muted small">${index + 1}</td>
-                <td><div class="fw-bold text-dark">${row.name || '-'}</div></td>
+                <td><div class="fw-bold text-dark">${row.bidang_name || '-'}</div><small class="text-muted">${row.position_name || ''}</small></td>
+                <td><div class="fw-semibold text-secondary">${row.head_name || '-'}</div></td>
+                <td><code class="text-dark small">${row.head_nip || '-'}</code></td>
+                <td class="text-center">${statusBadge}</td>
                 <td class="text-center">
-                    <button class="btn btn-outline-primary btn-sm py-1 px-2 me-1 border-0" onclick="openEditBidangModal('${row.id}')" title="Ubah Nama">
+                    <button class="btn btn-outline-primary btn-sm py-1 px-2 me-1 border-0" onclick="openEditBidangModal('${row.id}')">
                         <i class="bi bi-pencil-square"></i>
                     </button>
-                    <button class="btn btn-outline-danger btn-sm py-1 px-2 border-0" onclick="deleteBidangRecord('${row.id}')" title="Hapus Data">
+                    <button class="btn btn-outline-danger btn-sm py-1 px-2 border-0" onclick="deleteBidangRecord('${row.id}')">
                         <i class="bi bi-trash-fill"></i>
                     </button>
                 </td>
@@ -186,7 +203,8 @@ body { background: #f5f6fa; }
             return;
         }
         const filtered = rawBidangsData.filter(item => 
-            item.name && item.name.toLowerCase().includes(query)
+            (item.bidang_name && item.bidang_name.toLowerCase().includes(query)) ||
+            (item.head_name && item.head_name.toLowerCase().includes(query))
         );
         renderBidangsTable(filtered);
     };
@@ -197,7 +215,10 @@ body { background: #f5f6fa; }
 
         document.getElementById('modalBidangTitle').innerHTML = '<i class="bi bi-pencil-square text-info me-2"></i>Ubah Data Bidang';
         document.getElementById('bidangId').value = record.id;
-        document.getElementById('bidangName').value = record.name;
+        document.getElementById('bidangName').value = record.bidang_name;
+        document.getElementById('headName').value = record.head_name || '';
+        document.getElementById('headNip').value = record.head_nip || '';
+        document.getElementById('positionName').value = record.position_name || '';
 
         const myModal = new bootstrap.Modal(document.getElementById('modalBidang'));
         myModal.show();
@@ -213,10 +234,13 @@ body { background: #f5f6fa; }
         event.preventDefault();
         
         const id = document.getElementById('bidangId').value;
-        const nameValue = document.getElementById('bidangName').value.trim();
-
+        
+        // Membaca seluruh data input dari form
         const payload = {
-            name: nameValue,
+            bidang_name: document.getElementById('bidangName').value.trim(),
+            head_name: document.getElementById('headName').value.trim() || null,
+            head_nip: document.getElementById('headNip').value.trim() || null,
+            position_name: document.getElementById('positionName').value.trim() || null,
             tenant_id: profile ? profile.tenant_id : null,
             opd_id: profile ? profile.opd_id : null
         };
@@ -230,6 +254,8 @@ body { background: #f5f6fa; }
                 .update(payload)
                 .eq('id', id);
         } else {
+            // Jika data baru, otomatis set default is_active = true seperti di gambar
+            payload.is_active = true;
             response = await client
                 .from('bidangs')
                 .insert([payload]);
