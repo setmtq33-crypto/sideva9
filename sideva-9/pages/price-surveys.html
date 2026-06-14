@@ -582,17 +582,14 @@ async function fetchCatalogData(){
         };
 
         // 3. Gunakan CORS Proxy agar tidak di-block oleh browser
-        const targetUrl = 'https://katalog.inaproc.id/api/graphql';
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent('https://katalog.inaproc.id/api/graphql')}`;
 
-        // PERBAIKAN DI SINI: Memperbaiki format objek fetch request
         const response = await fetch(proxyUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                url: targetUrl,
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(graphqlQuery)
@@ -602,23 +599,21 @@ async function fetchCatalogData(){
         if (!response.ok) throw new Error('Gagal terhubung ke proxy server');
 
         const proxyData = await response.json();
-        
-        // AllOrigins mengembalikan data berupa string di properti 'contents'
-        if (!proxyData.contents) throw new Error('Proxy tidak mengembalikan data');
+        // AllOrigins mengembalikan data dalam bentuk string di properti 'contents'
         const resBody = JSON.parse(proxyData.contents); 
 
         if (resBody.errors) {
             throw new Error(resBody.errors[0].message);
         }
 
-        const product = resBody.data ? resBody.data._v0_getProductBySlug : null;
+        const product = resBody.data._v0_getProductBySlug;
 
         if (!product) {
             alert('Produk tidak ditemukan di E-Katalog. Pastikan URL benar dan publik.');
             return;
         }
 
-        // 4. Masukkan data asli dari database E-Katalog ke Form Anda
+        // 4. Masukkan data asli dari database E-Katalog ke Form Anda secara otomatis!
         vendorName.value = product.username ? product.username.toUpperCase().replaceAll('-', ' ') : 'TIDAK DIKETAHUI';
         brand.value = product.brand ? product.brand.toUpperCase() : (slug.replaceAll('-', ' ').toUpperCase());
         sourceUrl.value = url;
@@ -626,7 +621,7 @@ async function fetchCatalogData(){
         // Ambil harga dari varian pertama produk
         if (product.variants && product.variants.length > 0) {
             surveyPrice.value = product.variants[0].priceWithTax || 0;
-            negotiatedPrice.value = product.variants[0].priceWithTax || 0; 
+            negotiatedPrice.value = product.variants[0].priceWithTax || 0; // Default disamakan sebelum nego manual
         }
 
         alert('Data produk E-Katalog berhasil ditarik secara riil!');
