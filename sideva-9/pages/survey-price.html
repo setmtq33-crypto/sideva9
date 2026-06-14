@@ -13,7 +13,19 @@
 
 <div class="container-fluid py-4">
 
-    <h3>Survey Harga E-Katalog</h3>
+    <div class="d-flex justify-content-between mb-3">
+
+        <h3>Survey Harga E-Katalog</h3>
+    
+        <a
+            href="dashboard.html"
+            class="btn btn-secondary">
+    
+            Kembali
+    
+        </a>
+    
+    </div>
 
     <div class="card mb-4">
 
@@ -81,9 +93,18 @@
             <button
                 id="saveBtn"
                 class="btn btn-primary mt-3">
-
+            
                 Simpan Survey
-
+            
+            </button>
+            
+            <button
+                id="cancelEditBtn"
+                class="btn btn-secondary mt-3 ms-2"
+                style="display:none;">
+            
+                Batal Edit
+            
             </button>
 
         </div>
@@ -111,6 +132,7 @@
                     <th>Harga</th>
                     <th>Penyedia</th>
                     <th>URL</th>
+                    <th>Aksi</th>
 
                 </tr>
 
@@ -139,83 +161,209 @@ from '../assets/js/auth.js';
 const db =
     window.supabaseClient;
 
+let editingId = null;
 let profile;
 
 async function saveSurvey(){
 
     const productName =
-        document
-        .getElementById(
+        document.getElementById(
             'productName'
         ).value;
 
     const price =
         Number(
-            document
-            .getElementById(
+            document.getElementById(
                 'price'
             ).value
         );
 
     const unit =
-        document
-        .getElementById(
+        document.getElementById(
             'unit'
         ).value;
 
     const supplier =
-        document
-        .getElementById(
+        document.getElementById(
             'supplier'
         ).value;
 
     const productUrl =
-        document
-        .getElementById(
+        document.getElementById(
             'productUrl'
         ).value;
 
-    const { error } =
+    let error;
+
+    if(editingId){
+
+        ({ error } =
+        await db
+        .from('catalog_products')
+        .update({
+
+            product_name:
+                productName,
+
+            supplier_name:
+                supplier,
+
+            unit:
+                unit,
+
+            price:
+                price,
+
+            product_url:
+                productUrl
+
+        })
+        .eq(
+            'id',
+            editingId
+        ));
+
+    }else{
+
+        ({ error } =
+        await db
+        .from('catalog_products')
+        .insert({
+
+            tenant_id:
+                profile.tenant_id,
+
+            product_name:
+                productName,
+
+            supplier_name:
+                supplier,
+
+            unit:
+                unit,
+
+            price:
+                price,
+
+            product_url:
+                productUrl
+
+        }));
+
+    }
+
+    if(error){
+
+        alert(error.message);
+
+        return;
+
+    }
+
+    resetForm();
+
+    await loadData();
+
+}
+
+async function editSurvey(id){
+
+    const {
+        data
+    } =
+    await db
+    .from('catalog_products')
+    .select('*')
+    .eq('id',id)
+    .single();
+
+    if(!data) return;
+
+    editingId =
+        data.id;
+
+    document.getElementById(
+        'productName'
+    ).value =
+    data.product_name || '';
+
+    document.getElementById(
+        'price'
+    ).value =
+    data.price || '';
+
+    document.getElementById(
+        'unit'
+    ).value =
+    data.unit || '';
+
+    document.getElementById(
+        'supplier'
+    ).value =
+    data.supplier_name || '';
+
+    document.getElementById(
+        'productUrl'
+    ).value =
+    data.product_url || '';
+
+    document.getElementById(
+        'cancelEditBtn'
+    ).style.display =
+    'inline-block';
+
+}
+
+async function deleteSurvey(id){
+
+    const ok =
+    confirm(
+        'Hapus data survey?'
+    );
+
+    if(!ok) return;
+
     await db
     .from(
         'catalog_products'
     )
-    .insert({
-
-        tenant_id:
-            profile.tenant_id,
-
-        product_name:
-            productName,
-
-        supplier_name:
-            supplier,
-
-        unit:
-            unit,
-
-        price:
-            price,
-
-        product_url:
-            productUrl
-
-    });
-
-    if(error){
-
-        alert(
-            error.message
-        );
-
-        return;
-    }
+    .delete()
+    .eq(
+        'id',
+        id
+    );
 
     await loadData();
 
-    alert(
-        'Survey tersimpan'
-    );
+}
+
+function resetForm(){
+
+    editingId = null;
+
+    document.getElementById(
+        'productName'
+    ).value='';
+
+    document.getElementById(
+        'price'
+    ).value='';
+
+    document.getElementById(
+        'unit'
+    ).value='';
+
+    document.getElementById(
+        'supplier'
+    ).value='';
+
+    document.getElementById(
+        'productUrl'
+    ).value='';
+
+    document.getElementById(
+        'cancelEditBtn'
+    ).style.display='none';
 
 }
 
@@ -251,31 +399,35 @@ async function loadData(){
         <tr>
 
             <td>
-                ${row.product_name}
-            </td>
-
-            <td>
-                ${Number(
-                    row.price
-                ).toLocaleString(
-                    'id-ID'
-                )}
-            </td>
-
-            <td>
-                ${row.supplier_name||''}
-            </td>
-
-            <td>
 
                 <a
-                href="${row.product_url}"
-                target="_blank">
-
-                Link
-
+                    href="${row.product_url}"
+                    target="_blank">
+            
+                    Link
+            
                 </a>
-
+            
+            </td>
+            
+            <td>
+            
+                <button
+                    class="btn btn-warning btn-sm"
+                    onclick="editSurvey('${row.id}')">
+            
+                    Edit
+            
+                </button>
+            
+                <button
+                    class="btn btn-danger btn-sm ms-1"
+                    onclick="deleteSurvey('${row.id}')">
+            
+                    Hapus
+            
+                </button>
+            
             </td>
 
         </tr>
@@ -300,7 +452,20 @@ async function init(){
 
     await loadData();
 
+    document
+    .getElementById(
+        'cancelEditBtn'
+    )
+    .onclick =
+    resetForm;
+
 }
+
+window.editSurvey =
+    editSurvey;
+
+window.deleteSurvey =
+    deleteSurvey;
 
 init();
 
