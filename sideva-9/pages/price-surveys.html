@@ -279,7 +279,6 @@ async function loadPackage(){
   console.log('LOAD PACKAGE V2 BUSINESS');
 
  const {data} = await surveyDb
- .schema('business')
  .from('packages')
  .select('*')
  .eq('id',packageId)
@@ -293,7 +292,6 @@ async function loadPackage(){
 async function loadItems(){
 
  const {data,error} = await surveyDb
- .schema('business')
  .from('package_items')
  .select('*')
  .eq('package_id',packageId)
@@ -340,7 +338,6 @@ async function selectItem(id){
  document.getElementById('selectedItemName').innerText=item.item_name;
 
  const {data,error} = await surveyDb
- .schema('business')
  .from('price_surveys')
  .select('*')
  .eq('package_item_id',id)
@@ -514,7 +511,6 @@ async function saveSurvey(){
  if(surveyId.value){
 
    result=await surveyDb
-   .schema('business')
    .from('price_surveys')
    .update(payload)
    .eq('id',surveyId.value);
@@ -524,7 +520,6 @@ async function saveSurvey(){
    console.log(payload);
   
    result=await surveyDb
-      .schema('business')
       .from('price_surveys')
       .insert(payload);
  }
@@ -553,7 +548,6 @@ async function deleteSurvey(id){
  if(!ok) return;
 
  const {error} = await surveyDb
- .schema('business')
  .from('price_surveys')
  .delete()
  .eq('id',id);
