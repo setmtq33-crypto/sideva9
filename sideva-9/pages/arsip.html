@@ -1,17 +1,22 @@
-<!-- Di dalam file arsip.html -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Arsip Dokumen - SI-DEVA v9</title>
+    </head>
+<body>
+
 <div class="header-arsip">
-    <!-- Tombol Kembali -->
     <button onclick="window.location.href='dashboard-v9.html'">← Kembali ke Dashboard</button>
     <h2>Arsip Paket</h2>
 </div>
 
 <div class="arsip-layout">
     <div class="sidebar-list" id="paket-list">
-        <!-- Daftar paket dari Supabase akan muncul di sini -->
+        Memuat daftar paket...
     </div>
 
     <div class="doc-area">
-        <!-- Navigasi 10 Dokumen (Awalnya tersembunyi) -->
         <div id="nav-dokumen-v8" style="display:none; margin-bottom: 20px;">
             <button onclick="renderDokumenV8('evat', selectedPackageId)">EVAT</button>
             <button onclick="renderDokumenV8('evhp', selectedPackageId)">EVHP</button>
@@ -31,15 +36,20 @@
     </div>
 </div>
 
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../js/supabase-config.js"></script> ```
+<script src="../js/supabase-config.js"></script>
 <script src="../js/dashboard-documentsv8.js"></script>
 <script src="../js/v9-legacy-bridge.js"></script>
 
 <script>
-    // Inisialisasi daftar paket saat halaman dibuka
     async function initArsip() {
+        // Cek apakah supabaseClient sudah ada
+        if (!window.supabaseClient) {
+            console.warn("Supabase belum siap, mencoba lagi dalam 500ms...");
+            setTimeout(initArsip, 500);
+            return;
+        }
+
         try {
             const { data, error } = await window.supabaseClient
                 .from('packages')
@@ -49,26 +59,20 @@
 
             const list = document.getElementById('paket-list');
             list.innerHTML = data.map(p => `
-                <div class="paket-item" onclick="selectPaket('${p.id}')">
+                <div class="paket-item" onclick="selectPaket('${p.id}')" style="cursor:pointer; padding:10px; border-bottom:1px solid #ccc;">
                     <strong>${p.rup}</strong><br>
                     <small>${p.package_name}</small>
                 </div>
             `).join('');
         } catch (err) {
             console.error("Gagal ambil data:", err);
+            document.getElementById('paket-list').innerHTML = "Gagal memuat paket. Cek koneksi.";
         }
     }
 
-    // Panggil saat halaman pertama kali load
-    window.onload = initArsip;
+    // Tunggu semua file dimuat baru jalankan
+    window.addEventListener('load', initArsip);
 </script>
 
-
-
-
-<body>
-<html>
-
-
-
-
+</body>
+</html>
