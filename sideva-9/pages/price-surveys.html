@@ -283,7 +283,7 @@ async function loadPackage(){
  .from('packages')
  .select('*')
  .eq('id',packageId)
- .single();
+ 
 
  if(data){
    document.getElementById('packageName').innerText=data.package_name;
@@ -292,12 +292,15 @@ async function loadPackage(){
 
 async function loadItems(){
 
- const {data} = await surveyDb
+ const {data,error} = await surveyDb
  .schema('business')
  .from('package_items')
  .select('*')
  .eq('package_id',packageId)
  .order('item_name');
+
+ console.log('ITEM ERROR', error);
+ console.log('ITEM DATA', data);
 
  items=data||[];
 
