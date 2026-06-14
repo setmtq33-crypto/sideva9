@@ -21,8 +21,6 @@
 
 <link rel="stylesheet" href="../css/app.css">
 
-</head>
- 
 <style>
 body{background:#f5f6fa}
 .item-active{background:#0d6efd;color:white}
@@ -171,28 +169,21 @@ Tambah Survey
 <div class="input-group">
 
 <input
-
     id="catalogUrl"
-
     class="form-control"
-
     placeholder="https://katalog.inaproc.id/...">
 
 <button
-
     type="button"
-
     class="btn btn-success"
-
     onclick="fetchCatalogData()">
-
     Ambil Data
-
 </button>
 
 </div>
 </div>
  
+<div class="mb-2">
 <label>Vendor</label>
 <input id="vendorName" class="form-control">
 </div>
@@ -261,10 +252,7 @@ let currentSurveyId = null;
 let items = [];
 let surveys = [];
 
-const modal =
-new bootstrap.Modal(
-document.getElementById('surveyModal')
-);
+const modal = new bootstrap.Modal(document.getElementById('surveyModal'));
 
 function rupiah(v){
  return new Intl.NumberFormat(
@@ -277,21 +265,15 @@ function rupiah(v){
 }
 
 async function init(){
-
  profile = await getProfile();
-
- packageId =
- new URLSearchParams(location.search)
- .get('id');
+ packageId = new URLSearchParams(location.search).get('id');
 
  await loadPackage();
  await loadItems();
 }
 
 async function loadPackage(){
-
- const {data,error} =
- await surveyDb
+ const {data,error} = await surveyDb
  .from('packages')
  .select('id,package_name')
  .eq('id',packageId)
@@ -302,14 +284,11 @@ async function loadPackage(){
    return;
  }
 
- packageName.innerText =
- data.package_name;
+ packageName.innerText = data.package_name;
 }
 
 async function loadItems(){
-
- const {data,error} =
- await surveyDb
+ const {data,error} = await surveyDb
  .from('package_items')
  .select('*')
  .eq('package_id',packageId)
@@ -321,16 +300,13 @@ async function loadItems(){
  }
 
  items = data || [];
-
  renderItems();
 }
 
 function renderItems(){
-
  let html='';
 
  items.forEach(item=>{
-
  html += `
  <button
  class="list-group-item list-group-item-action"
@@ -338,7 +314,6 @@ function renderItems(){
  ${item.item_name}
  </button>
  `;
-
  });
 
  itemList.innerHTML = html;
@@ -349,16 +324,12 @@ function renderItems(){
 }
 
 async function selectItem(id){
-
     selectedItemId = id;
-
     console.log('SELECT ITEM DIPANGGIL', id);
 
     const item = items.find(x => x.id === id);
-
     if(item){
-        document.getElementById('selectedItemName').innerText =
-            item.item_name;
+        document.getElementById('selectedItemName').innerText = item.item_name;
     }
 
     const { data, error } = await surveyDb
@@ -376,7 +347,6 @@ async function selectItem(id){
     }
 
     surveys = data || [];
-
     renderSurvey();
 
     console.log('RENDER SELESAI');
@@ -384,16 +354,11 @@ async function selectItem(id){
 }
 
 async function loadSurveys(itemId){
-
- const {data,error} =
- await surveyDb
+ const {data,error} = await surveyDb
  .from('price_surveys')
  .select('*')
  .eq('package_item_id',itemId)
- .order('survey_date',
- {
-  ascending:false
- });
+ .order('survey_date', { ascending:false });
 
  if(error){
    console.error(error);
@@ -401,27 +366,25 @@ async function loadSurveys(itemId){
  }
 
  surveys = data || [];
-
  renderSurvey();
 }
 
 function renderSurvey(){
-
     console.log('RENDER SURVEY');
     console.log(surveys);
 
     let html = '';
-
     let surveyTotal = 0;
     let negoTotal = 0;
-    let lowest = surveys.length > 0 ? Number(surveys[0].survey_price || 0) : 0; // Perbaikan di sini
+    
+    // PERBAIKAN 1: Inisialisasi awal nilai modal lowest dengan data pertama jika ada
+    let lowest = surveys.length > 0 ? Number(surveys[0].survey_price || 0) : 0;
 
-    surveys.forEach((s, index)=>{
-
+    surveys.forEach((s)=>{
         surveyTotal += Number(s.survey_price || 0);
         negoTotal += Number(s.negotiated_price || 0);
 
-        // Perbaikan logika perbandingan harga terendah
+        // PERBAIKAN 2: Evaluasi harga terendah lebih bersih dan efisien tanpa if(index === 0)
         if(Number(s.survey_price || 0) < lowest){
             lowest = Number(s.survey_price || 0);
         }
@@ -430,7 +393,9 @@ function renderSurvey(){
         <tr>
             <td>${s.vendor_name || ''}</td>
             <td>${s.brand || ''}</td>
-            <td><b>${rupiah(s.survey_price)}</b></td> <td>${rupiah(s.negotiated_price)}</td>   <td>${s.is_candidate ? '✔' : ''}</td>
+            <td><b>${rupiah(s.survey_price)}</b></td>
+            <td>${rupiah(s.negotiated_price)}</td>
+            <td>${s.is_candidate ? '✔' : ''}</td>
             <td>${s.is_winner ? '✔' : ''}</td>
             <td>${s.survey_date || ''}</td>
             <td>
@@ -445,17 +410,19 @@ function renderSurvey(){
 
     const count = surveys.length;
     document.getElementById('surveyCount').innerText = count;
+
     document.getElementById('avgSurvey').innerText = rupiah(count ? surveyTotal / count : 0);
     document.getElementById('avgNegotiated').innerText = rupiah(count ? negoTotal / count : 0);
     document.getElementById('lowestPrice').innerText = rupiah(lowest);
+
+    console.log('HTML TABEL');
+    console.log(html);
+    console.log('RENDER SELESAI');
 }
 
 function openAddModal(){
-
  currentSurveyId = null;
-
  surveyId.value='';
-
  vendorName.value='';
  brand.value='';
  surveyPrice.value='';
@@ -463,10 +430,7 @@ function openAddModal(){
  sourceUrl.value='';
  notes.value='';
 
- surveyDate.value =
- new Date()
- .toISOString()
- .split('T')[0];
+ surveyDate.value = new Date().toISOString().split('T')[0];
 
  isCandidate.checked=false;
  isWinner.checked=false;
@@ -475,9 +439,7 @@ function openAddModal(){
 }
 
 async function editSurvey(id){
-
- const {data,error} =
- await surveyDb
+ const {data,error} = await surveyDb
  .from('price_surveys')
  .select('*')
  .eq('id',id)
@@ -489,189 +451,119 @@ async function editSurvey(id){
  }
 
  currentSurveyId = id;
-
  surveyId.value=id;
+ 
+ // PERBAIKAN 3: Amankan value item ID yang sedang aktif agar data sync bekerja lancar
+ selectedItemId = data.package_item_id; 
 
- vendorName.value =
- data.vendor_name || '';
-
- brand.value =
- data.brand || '';
-
- surveyPrice.value =
- data.survey_price || 0;
-
- negotiatedPrice.value =
- data.negotiated_price || 0;
-
- sourceUrl.value =
- data.source_url || '';
-
- surveyDate.value =
- data.survey_date || '';
-
- notes.value =
- data.notes || '';
-
- isCandidate.checked =
- data.is_candidate;
-
- isWinner.checked =
- data.is_winner;
+ vendorName.value = data.vendor_name || '';
+ brand.value = data.brand || '';
+ surveyPrice.value = data.survey_price || 0;
+ negotiatedPrice.value = data.negotiated_price || 0;
+ sourceUrl.value = data.source_url || '';
+ surveyDate.value = data.survey_date || '';
+ notes.value = data.notes || '';
+ isCandidate.checked = data.is_candidate;
+ isWinner.checked = data.is_winner;
 
  modal.show();
 }
 
 async function saveSurvey(){
-
 alert('1 MASUK SAVE');
 
 const payload = {
-
-vendor_name: vendorName.value,
-brand: brand.value,
-survey_price: Number(surveyPrice.value || 0),
-negotiated_price: Number(negotiatedPrice.value || 0),
-source_url: sourceUrl.value,
-survey_date: surveyDate.value,
-notes: notes.value,
-is_candidate: isCandidate.checked,
-is_winner: isWinner.checked
-
+    vendor_name: vendorName.value,
+    brand: brand.value,
+    survey_price: Number(surveyPrice.value || 0),
+    negotiated_price: Number(negotiatedPrice.value || 0),
+    source_url: sourceUrl.value,
+    survey_date: surveyDate.value,
+    notes: notes.value,
+    is_candidate: isCandidate.checked,
+    is_winner: isWinner.checked
 };
 
 alert('2 PAYLOAD JADI');
-
 let result;
 
 if(currentSurveyId){
-
-alert('3 MODE EDIT');
-
-result =
-await surveyDb
-.from('price_surveys')
-.update(payload)
-.eq('id',currentSurveyId);
-
-alert('4 UPDATE SELESAI');
-
+    alert('3 MODE EDIT');
+    result = await surveyDb
+    .from('price_surveys')
+    .update(payload)
+    .eq('id',currentSurveyId);
+    alert('4 UPDATE SELESAI');
 }else{
-
-alert('3 MODE INSERT');
-
-result =
-await surveyDb
-.from('price_surveys')
-.insert({
-...payload,
-tenant_id: profile.tenant_id,
-opd_id: profile.opd_id,
-package_item_id: selectedItemId
-});
-
-alert('4 INSERT SELESAI');
+    alert('3 MODE INSERT');
+    result = await surveyDb
+    .from('price_surveys')
+    .insert({
+        ...payload,
+        tenant_id: profile.tenant_id,
+        opd_id: profile.opd_id,
+        package_item_id: selectedItemId
+    });
+    alert('4 INSERT SELESAI');
 }
 
 alert('5 SEBELUM CEK ERROR');
-
 console.log(result);
 
 if(result.error){
-
-alert(result.error.message);
-
-return;
+    alert(result.error.message);
+    return;
 }
 
 alert('6 SUKSES');
-
 modal.hide();
 
-await selectedItemId(selectedItemId);
+// PERBAIKAN 4: Ganti loadSurveys ke selectItem agar state data ter-refresh sempurna di layar
+await selectItem(selectedItemId);
 }
 
 async function deleteSurvey(id){
-
- if(
- !confirm(
- 'Hapus survey ini?'
- )
- ){
+ if(!confirm('Hapus survey ini?')){
   return;
  }
 
- const {error} =
- await surveyDb
+ const {error} = await surveyDb
  .from('price_surveys')
  .delete()
  .eq('id',id);
 
  if(error){
-
   console.error(error);
-
-  alert(
-  error.message
-  );
-
+  alert(error.message);
   return;
  }
 
- await loadSurveys(
- selectedItemId
- );
+ // PERBAIKAN 5: Ganti loadSurveys ke selectItem agar tabel langsung bersih pasca-hapus
+ await selectItem(selectedItemId);
 }
 
 async function fetchCatalogData(){
-
- const url =
- catalogUrl.value.trim();
+ const url = catalogUrl.value.trim();
 
  if(!url){
-
- alert(
- 'Masukkan URL E-Katalog'
- );
-
- return;
+     alert('Masukkan URL E-Katalog');
+     return;
  }
 
- const slug =
- url.split('/').pop();
+ const slug = url.split('/').pop();
 
- vendorName.value =
- 'CV MURIA SETIA';
-
- brand.value =
- slug
- .replaceAll('-',' ')
- .toUpperCase();
-
- surveyPrice.value =
- 99900;
-
- sourceUrl.value =
- url;
+ vendorName.value = 'CV MURIA SETIA';
+ brand.value = slug.replaceAll('-',' ').toUpperCase();
+ surveyPrice.value = 99900;
+ sourceUrl.value = url;
 }
 
-window.openAddModal =
-openAddModal;
-
-window.editSurvey =
-editSurvey;
-
-window.deleteSurvey =
-deleteSurvey;
-
-window.saveSurvey =
-saveSurvey;
-
-window.selectItem =
-selectItem;
-
-window.fetchCatalogData =
-fetchCatalogData;
+window.openAddModal = openAddModal;
+window.editSurvey = editSurvey;
+window.deleteSurvey = deleteSurvey;
+window.saveSurvey = saveSurvey;
+window.selectItem = selectItem;
+window.fetchCatalogData = fetchCatalogData;
 
 init();
 
