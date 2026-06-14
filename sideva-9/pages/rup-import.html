@@ -308,6 +308,9 @@ const rupDb =
 let profile =
     null;
 
+let editingRupId =
+    null;
+
 async function init(){
 
     await loadLayout();
@@ -624,7 +627,7 @@ async function saveRup(){
     
     );
 
-    let editingRupId = null;
+    
     clearForm();
     
     await loadRupImports();
@@ -788,7 +791,7 @@ async function importToPackage(
     );
 }
 
-let editingRupId = null;
+
 
 async function editRup(id){
 
