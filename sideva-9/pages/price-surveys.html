@@ -510,6 +510,9 @@ async function saveSurvey(){
 
  if(surveyId.value){
 
+   console.log('EDIT ID', surveyId.value);
+   console.log('PAYLOAD', payload);
+
    result=await surveyDb
    .from('price_surveys')
    .update(payload)
