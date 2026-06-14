@@ -1,55 +1,32 @@
-<nav class="sidebar border-end bg-white" style="width: 250px; min-height: 100vh;">
-    <div class="p-3 border-bottom text-center">
+<nav class="sidebar border-end bg-white" style="width: 260px; min-height: 100vh;">
+    <div class="p-4 border-bottom text-center">
         <h5 class="fw-bold text-primary">SIDEVA9</h5>
     </div>
     
     <ul class="nav flex-column p-2">
-        <li class="nav-item">
-            <a href="dashboard.html" class="nav-link text-dark d-flex align-items-center gap-3">
-                <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a href="pengaturan.html" class="nav-link text-dark d-flex align-items-center gap-3">
-                <i class="bi bi-building-gear"></i> <span>Pengaturan Instansi</span>
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a href="anggaran.html" class="nav-link text-dark d-flex align-items-center gap-3">
-                <i class="bi bi-wallet2"></i> <span>Data Anggaran</span>
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a href="laporan.html" class="nav-link text-dark d-flex align-items-center gap-3">
-                <i class="bi bi-file-earmark-bar-graph"></i> <span>Laporan</span>
-            </a>
-        </li>
-
-        <li class="nav-item mt-4">
-            <hr class="dropdown-divider">
-            <a href="#" onclick="logout()" class="nav-link text-danger d-flex align-items-center gap-3">
-                <i class="bi bi-box-arrow-left"></i> <span>Keluar</span>
-            </a>
-        </li>
+        <li class="nav-item"><a href="/pages/dashboard.html" class="nav-link text-dark d-flex align-items-center gap-3"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+        <li class="nav-item"><a href="/pages/packages.html" class="nav-link text-dark d-flex align-items-center gap-3"><i class="bi bi-box-seam"></i> Packages</a></li>
+        <li class="nav-item"><a href="/pages/price-surveys.html" class="nav-link text-dark d-flex align-items-center gap-3"><i class="bi bi-search"></i> Survey Harga</a></li>
+        <li class="nav-item"><a href="/pages/package-documents.html" class="nav-link text-dark d-flex align-items-center gap-3"><i class="bi bi-file-earmark-text"></i> Dokumen</a></li>
+        <li class="nav-item"><a href="/pages/hps.html" class="nav-link text-dark d-flex align-items-center gap-3"><i class="bi bi-calculator"></i> HPS</a></li>
+        
+        <hr class="my-2">
+        
+        <!-- Menu Pengaturan & Admin -->
+        <li class="nav-item"><a href="/pages/pengaturan.html" class="nav-link text-dark d-flex align-items-center gap-3"><i class="bi bi-gear"></i> Pengaturan</a></li>
+        <li class="nav-item"><a href="/pages/opds.html" class="nav-link text-dark d-flex align-items-center gap-3"><i class="bi bi-building"></i> OPDs</a></li>
+        <li class="nav-item"><a href="/pages/bidangs.html" class="nav-link text-dark d-flex align-items-center gap-3"><i class="bi bi-diagram-3"></i> Bidang</a></li>
+        <li class="nav-item"><a href="/pages/budget-accounts.html" class="nav-link text-dark d-flex align-items-center gap-3"><i class="bi bi-bank"></i> Rekening</a></li>
+        <li class="nav-item"><a href="/pages/users.html" class="nav-link text-dark d-flex align-items-center gap-3"><i class="bi bi-people"></i> Users</a></li>
+        
+        <hr class="my-2">
+        
+        <li class="nav-item"><a href="#" onclick="logout()" class="nav-link text-danger d-flex align-items-center gap-3"><i class="bi bi-box-arrow-left"></i> Keluar</a></li>
     </ul>
 </nav>
 
 <style>
-    .nav-link {
-        padding: 12px 16px;
-        transition: all 0.2s;
-        border-radius: 8px;
-    }
-    .nav-link:hover {
-        background-color: #f0f4ff;
-        color: #4f6ef7 !important;
-    }
-    .nav-link i {
-        font-size: 1.2rem;
-        width: 20px; /* Biar ikonnya sejajar rapi */
-        text-align: center;
-    }
+    .nav-link { padding: 10px 16px; transition: 0.2s; border-radius: 8px; }
+    .nav-link:hover { background-color: #f1f5f9; color: #1e293b !important; }
+    .nav-link i { font-size: 1.1rem; width: 24px; text-align: center; }
 </style>
