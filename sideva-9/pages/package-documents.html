@@ -276,13 +276,111 @@ async function renderSidevaDocumentInternal(slug, pId) {
             htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:13pt; text-decoration:underline;">DOKUMEN PENETAPAN</div>`;
             
         } else if (slug === 'spek') {
-            let rows = '';
+            let itemRows = "";
             listItems.forEach((it, i) => {
-                rows += `<tr><td style="border:1px solid #000;padding:6px;text-align:center;">${i+1}</td><td style="border:1px solid #000;padding:6px;">${it.item_name}</td><td style="border:1px solid #000;padding:6px;">${it.specification || '-'}</td><td style="border:1px solid #000;padding:6px;text-align:center;">${it.quantity}</td><td style="border:1px solid #000;padding:6px;text-align:center;">${it.unit}</td></tr>`;
+                const hargaSatuan = it.price_surveys?.[0]?.price || 0;
+                itemRows += `
+                <tr>
+                    <td style="border:1px solid #000; padding:6px; text-align:left;">
+                        ${it.item_name}<br>
+                        <span style="font-size:9.5pt; color:#333;">Spesifikasi: ${it.specification || '-'}</span>
+                    </td>
+                    <td style="border:1px solid #000; padding:6px; text-align:center;">${it.quantity}</td>
+                    <td style="border:1px solid #000; padding:6px; text-align:center;">${it.unit}</td>
+                    <td style="border:1px solid #000; padding:6px; text-align:right;">${docFmtRp(hargaSatuan)}</td>
+                </tr>`;
             });
-             
-            htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:16pt; text-decoration:underline; margin-bottom:20px;">SPESIFIKASI TEKNIS</div><table style="width:100%; font-size:11pt; margin-bottom:20px;"><tr><td width="220"><strong>Nama Paket Pengadaan</strong></td><td>: ${paket.package_name}</td></tr><tr><td><strong>Nomor RUP</strong></td><td>: ${paket.rup_number || '-'}</td></tr><tr><td><strong>Program</strong></td><td>: ${paket.program || '-'}</td></tr><tr><td><strong>Kegiatan</strong></td><td>: ${paket.kegiatan || '-'}</td></tr><tr><td><strong>Sub Kegiatan</strong></td><td>: ${paket.sub_kegiatan || '-'}</td></tr><tr><td><strong>Mata Anggaran</strong></td><td>: ${akun ? `${akun.account_code} - ${akun.account_name}` : '-'}</td></tr><tr><td><strong>Pagu Anggaran</strong></td><td>: ${docFmtRp(paket.budget_ceiling)}</td></tr></table><table style="width:100%; border-collapse:collapse; font-size:10pt;"><thead><tr><th style="border:1px solid #000;padding:6px;">No</th><th style="border:1px solid #000;padding:6px;">Nama Barang</th><th style="border:1px solid #000;padding:6px;">Spesifikasi Teknis</th><th style="border:1px solid #000;padding:6px;">Volume</th><th style="border:1px solid #000;padding:6px;">Satuan</th></tr></thead><tbody>${rows}</tbody></table><br><br><table style="width:100%;"><tr><td style="width:50%;text-align:center;">Menyetujui,<br>${ppk?.position || 'PA/KPA/PPK'}<br><br><br><br><br><strong>${ppk?.full_name || '-'}</strong><br>NIP. ${ppk?.nip || '-'}</td><td style="width:50%;text-align:center;">Disusun Oleh,<br>${bidang?.position_name || 'Kepala Bidang'}<br>${bidang?.bidang_name || ''}<br><br><br><br><br><strong>${bidang?.head_name || '-'}</strong><br>NIP. ${bidang?.head_nip || '-'}</td></tr></table>`;
 
+            htmlOutput = `
+            ${kopHtml}
+            
+            <div style="text-align:center; font-size:14pt; font-weight:bold; text-decoration:underline; margin-bottom:5px;">SPESIFIKASI TEKNIS PAKET E-PURCHASING</div>
+            <div style="text-align:center; font-size:11pt; margin-bottom:20px;">Nomor: SPEK/${paket.rup_number || '........'}/DEMO/2026</div>
+
+            <table style="width:100%; font-size:10.5pt; margin-bottom:25px; border-collapse:collapse;">
+                <tr><td width="220" style="padding:3px;"><strong>Perangkat Daerah</strong></td><td style="padding:3px;">: ${opd?.opd_name || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Program</strong></td><td style="padding:3px;">: ${paket.program || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Kegiatan</strong></td><td style="padding:3px;">: ${paket.kegiatan || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Sub Kegiatan</strong></td><td style="padding:3px;">: ${paket.sub_kegiatan || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>RUP</strong></td><td style="padding:3px;">: ${paket.rup_number || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Nama Paket Pengadaan</strong></td><td style="padding:3px;">: ${paket.package_name}</td></tr>
+                <tr><td style="padding:3px;"><strong>Pagu</strong></td><td style="padding:3px;">: ${docFmtRp(paket.budget_ceiling)}</td></tr>
+                <tr><td style="padding:3px;"><strong>Mata Anggaran Belanja</strong></td><td style="padding:3px;">: ${akun ? `${akun.account_code} - ${akun.account_name}` : '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Sumber Dana</strong></td><td style="padding:3px;">: APBD Kabupaten Kapuas Hulu</td></tr>
+            </table>
+
+            <table style="width:100%; border-collapse:collapse; font-size:10pt; margin-bottom:20px;">
+                <thead style="background:#eee;">
+                    <tr>
+                        <th style="border:1px solid #000; padding:8px; text-align:center; width:5%;">No</th>
+                        <th style="border:1px solid #000; padding:8px; text-align:left; width:25%;">Elemen Spesifikasi</th>
+                        <th style="border:1px solid #000; padding:8px; text-align:left;">Uraian Spesifikasi</th>
+                        <th style="border:1px solid #000; padding:8px; text-align:center; width:10%;">Ket</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;">1.</td>
+                        <td style="border:1px solid #000; padding:8px; vertical-align:top;"><strong>Jenis, Spesifikasi, Kuantitas, Satuan dan Harga</strong></td>
+                        <td style="border:1px solid #000; padding:0; vertical-align:top;">
+                            <table style="width:100%; border-collapse:collapse; font-size:9.5pt; border:none;">
+                                <tr style="background:#f9f9f9;">
+                                    <th style="border-bottom:1px solid #000; border-right:1px solid #000; padding:5px; text-align:left;">Nama Barang dan Spesifikasi</th>
+                                    <th style="border-bottom:1px solid #000; border-right:1px solid #000; padding:5px; text-align:center; width:12%;">Qty</th>
+                                    <th style="border-bottom:1px solid #000; border-right:1px solid #000; padding:5px; text-align:center; width:15%;">Satuan</th>
+                                    <th style="border-bottom:1px solid #000; padding:5px; text-align:right; width:25%;">Harga Satuan</th>
+                                </tr>
+                                ${itemRows || `<tr><td colspan="4" style="padding:10px; text-align:center;">Belum ada item belanja</td></tr>`}
+                            </table>
+                        </td>
+                        <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;"></td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;">2.</td>
+                        <td style="border:1px solid #000; padding:8px; vertical-align:top;"><strong>Tempat</strong></td>
+                        <td style="border:1px solid #000; padding:8px; vertical-align:top; text-align:justify;">Pengiriman sampai ke lokasi yaitu Kantor ${opd?.opd_name || 'Perangkat Daerah'}, Sepanjang Jalan Kenangan. Lokasi pengantaran: Langsung ke tempat/lokasi tujuan.</td>
+                        <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;"></td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;">3.</td>
+                        <td style="border:1px solid #000; padding:8px; vertical-align:top;"><strong>Waktu</strong></td>
+                        <td style="border:1px solid #000; padding:8px; vertical-align:top;">1 Hari Kalender (atau disesuaikan sejak diterbitkannya Surat Pesanan)</td>
+                        <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;"></td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;">4.</td>
+                        <td style="border:1px solid #000; padding:8px; vertical-align:top;"><strong>Tingkat Layanan</strong></td>
+                        <td style="border:1px solid #000; padding:8px; vertical-align:top; text-align:justify;">
+                            Penyedia wajib memenuhi tingkat layanan meliputi ketepatan waktu, kesesuaian spesifikasi, kualitas hasil, ketepatan jumlah, responsivitas, pengemasan dan pengiriman, jaminan/garansi, fleksibilitas layanan, kepatuhan administratif, serta standar keamanan dan kepatuhan. <br><br>
+                            Penyedia juga wajib menindaklanjuti setiap ketidaksesuaian melalui perbaikan atau penggantian tanpa biaya tambahan sesuai ketentuan yang disepakati serta bertanggung jawab penuh atas pengadaan.
+                        </td>
+                        <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p style="font-size:10pt; margin-bottom:30px;">
+                <strong>Link E-Catalog:</strong><br>
+                <a href="https://katalog.inaproc.id" target="_blank" style="color:#0000EE; text-decoration:underline; word-break:break-all;">https://katalog.inaproc.id/search?keyword=nasi&page=1&regionNames=Kab.+Kapuas+Hulu&regionCode=61.06&labels=%2CVerified&sellerTypes=%2CUMKK</a><br>
+                <span style="font-style:italic; font-size:9pt; color:#555;">Diakses tanggal: ${tgl}</span>
+            </p>
+
+            <table style="width:100%; font-size:10.5pt;">
+                <tr>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        &nbsp;
+                    </td>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        Putussibau, ${tgl}<br>
+                        Ditetapkan oleh:<br>
+                        <strong>${ppk?.position || 'Pejabat Pembuat Komitmen (PPKom)'}</strong>
+                        <br><br><br><br><br>
+                        <strong><u>${ppk?.full_name || '-'}</u></strong><br>
+                        NIP. ${ppk?.nip || '-'}
+                    </td>
+                </tr>
+            </table>`;
+         
         } else if (slug === 'dpp') {
             let rows = "";
             listItems.forEach((it, i) => {
