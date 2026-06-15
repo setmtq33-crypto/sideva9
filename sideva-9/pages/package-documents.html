@@ -227,8 +227,9 @@ async function renderSidevaDocumentInternal(slug, pId) {
         const { data: items, error: itemsError } = await documentDb.from('package_items').select('*,price_surveys(*)').eq('package_id', pId); if(itemsError){throw itemsError;} console.log("ITEMS :", items);
         const { data: ppk } = await documentDb.from('ppkoms').select('*').eq('opd_id', paket.opd_id).single(); console.log("PPK :", ppk);
         const { data: bidang } = await documentDb.from('bidangs').select('*').eq('id', paket.bidang_id).single(); console.log("BIDANG :", bidang);
+        const { data: opd } = await documentDb.from('opds').select('*').eq('id', paket.opd_id).single(); console.log("OPD :", opd);
         const listItems = items || [];
-        const kopHtml = `<div style="text-align:center; border-bottom:3px double #000; padding-bottom:6px; margin-bottom:20px; font-family:'Times New Roman',Times,serif; color:#000;"><h4 style="margin:0; font-size:13pt; font-weight:bold;">PEMERINTAH KABUPATEN DAERAH</h4><h3 style="margin:2px 0; font-size:15pt; font-weight:bold;">DINAS PERANGKAT DAERAH</h3><p style="margin:0; font-size:9.5pt; font-style:italic;">Sistem Administrasi Verifikasi Dokumen Terintegrasi v9</p></div>`;
+        const kopHtml = `<div style="text-align:center; margin-bottom:20px;"><img src="${opd?.kop_url || ''}"style="width:100%;max-width:900px;height:auto;"></div>`;
         const tgl = docFmtDate(new Date());
         let htmlOutput = "";
 
