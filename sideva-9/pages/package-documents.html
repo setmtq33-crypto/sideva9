@@ -231,7 +231,110 @@ async function renderSidevaDocumentInternal(slug, pId) {
 
         if(slug === 'idkb') {
             let rows = ""; listItems.forEach((it, i) => { rows += `<tr><td style="border:1px solid #000; padding:6px; text-align:center;">${i+1}</td><td style="border:1px solid #000; padding:6px;">${it.item_name}</td><td style="border:1px solid #000; padding:6px; text-align:center;">${it.quantity} ${it.unit}</td></tr>`; });
-            htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:13pt; text-decoration:underline; margin-bottom:15px;">FORMULIR IDENTIFIKASI KEBUTUHAN BARANG/JASA</div><table style="width:100%; border-collapse:collapse; margin-bottom:15px; font-size:10.5pt;"><tr><td style="width:25%; font-weight:bold; padding:4px;">Nama Paket</td><td>: ${paket.package_name}</td></tr><tr><td style="font-weight:bold; padding:4px;">Pagu Dana</td><td style="font-weight:bold; color:blue;">: ${docFmtRp(paket.budget_ceiling)}</td></tr></table><table style="width:100%; border-collapse:collapse; font-size:10.5pt;"><thead style="background:#eee;"><th style="border:1px solid #000; padding:6px; text-align:center; width:10%;">No</th><th style="border:1px solid #000; padding:6px;">Komoditas Barang</th><th style="border:1px solid #000; padding:6px; text-align:center; width:25%;">Volume</th></thead><tbody>${rows || '<tr><td colspan="3" style="border:1px solid #000; text-align:center; padding:10px;">Belum ada item belanja</td></tr>'}</tbody></table><div style="margin-top:50px; float:right; width:220px;">Disahkan, ${tgl}<br><strong>Pejabat Pembuat Komitmen</strong><br><br><br><br>( ......................... )</div><div style="clear:both;"></div>`;
+            htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:13pt; text-decoration:underline; margin-bottom:15px;">FORMULIR IDENTIFIKASI KEBUTUHAN BARANG/JASA</div><table style="width:100%; border-collapse:collapse; margin-bottom:15px; font-size:10.5pt;"><tr><td style="width:25%; font-weight:bold; padding:4px;">Nama Paket</td><td>
+                        : ${paket.package_name}</td></tr><tr><td style="font-weight:bold; padding:4px;">
+                        Nomor RUP</td><td>: ${paket.rup_number || '-'}</td></tr>
+            
+                <tr>
+                    <td style="font-weight:bold; padding:4px;">
+                        Program
+                    </td>
+                    <td>
+                        : ${paket.program || '-'}
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td style="font-weight:bold; padding:4px;">
+                        Kegiatan
+                    </td>
+                    <td>
+                        : ${paket.kegiatan || '-'}
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td style="font-weight:bold; padding:4px;">
+                        Sub Kegiatan
+                    </td>
+                    <td>
+                        : ${paket.sub_kegiatan || '-'}
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td style="font-weight:bold; padding:4px;">
+                        Output
+                    </td>
+                    <td>
+                        : ${paket.output || '-'}
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td style="font-weight:bold; padding:4px;">
+                        Metode Pengadaan
+                    </td>
+                    <td>
+                        : ${paket.procurement_method || '-'}
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td style="font-weight:bold; padding:4px;">
+                        Pagu Dana
+                    </td>
+                    <td style="font-weight:bold; color:blue;">
+                        : ${docFmtRp(paket.budget_ceiling)}
+                    </td>
+                </tr>
+            
+            </table>
+            
+            <table style="width:100%; border-collapse:collapse; font-size:10.5pt;">
+            
+                <thead style="background:#eee;">
+                    <tr>
+                        <th style="border:1px solid #000; padding:6px; text-align:center; width:10%;">
+                            No
+                        </th>
+            
+                        <th style="border:1px solid #000; padding:6px;">
+                            Komoditas Barang
+                        </th>
+            
+                        <th style="border:1px solid #000; padding:6px; text-align:center; width:25%;">
+                            Volume
+                        </th>
+                    </tr>
+                </thead>
+            
+                <tbody>
+                    ${
+                        rows ||
+                        `<tr>
+                            <td colspan="3"
+                                style="border:1px solid #000; text-align:center; padding:10px;">
+                                Belum ada item belanja
+                            </td>
+                        </tr>`
+                    }
+                </tbody>
+            
+            </table>
+            
+            <div style="margin-top:50px; float:right; width:220px;">
+                Disahkan, ${tgl}
+                <br>
+                <strong>Pejabat Pembuat Komitmen</strong>
+            
+                <br><br><br><br>
+            
+                ( ................................ )
+            </div>
+            
+            <div style="clear:both;"></div>
+            `;
         } else if(slug === 'penetapan') {
             htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:13pt; text-decoration:underline; margin-bottom:20px;">SURAT PENETAPAN METODE PENGADAAN</div><p>Menimbang kesiapan komoditas pasar daring, Pejabat Pembuat Komitmen menetapkan paket:</p><p><strong>Nama Pekerjaan:</strong> ${paket.package_name}<br><strong>Metode Pemilihan:</strong> E-PURCHASING (KATALOG ELEKTRONIK)</p><p>Ketetapan ini dibuat untuk segera ditindaklanjuti oleh Pejabat Pengadaan.</p><div style="margin-top:60px; float:right; width:220px;">Ditetapkan, ${tgl}<br><strong>Pejabat Pembuat Komitmen</strong><br><br><br><br>( ......................... )</div><div style="clear:both;"></div>`;
         } else {
