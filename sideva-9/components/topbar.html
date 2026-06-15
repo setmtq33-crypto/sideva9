@@ -13,7 +13,7 @@
     <div class="d-flex align-items-center gap-2 gap-md-3">
         
         <div id="superAdminOpdSelectorContainer" class="d-none">
-            <select id="globalOpdSelector" class="form-select form-select-sm border-secondary-subtle bg-body-tertiary fw-semibold" style="min-width: 220px; border-radius: 8px; font-size: 0.8rem; height: 36px; cursor: pointer;">
+            <select id="globalOpdSelector" class="form-select form-select-sm border-secondary-subtle bg-body-tertiary fw-semibold text-body" style="min-width: 220px; border-radius: 8px; font-size: 0.8rem; height: 36px; cursor: pointer;">
                 <option value="ALL">-- Semua OPD (Konsolidasi) --</option>
             </select>
         </div>
@@ -60,9 +60,6 @@
         justify-content: center;
         transition: all 0.2s;
     }
-    .btn-icon-theme:hover {
-        background: var(--bs-secondary-bg);
-    }
     
     .profile-avatar-circle {
         width: 38px;
@@ -90,95 +87,3 @@
         color: #ffffff;
     }
 </style>
-
-<script>
-    // 1. UTALITAS PENGATURAN TEMA TAMPILAN
-    function applySavedTheme() {
-        const cachedTheme = localStorage.getItem('theme-mode') || 'light';
-        document.documentElement.setAttribute('data-bs-theme', cachedTheme);
-        const icon = document.getElementById('theme-icon-indicator');
-        if (icon) {
-            icon.className = cachedTheme === 'dark' ? 'bi bi-moon-stars-fill text-warning' : 'bi bi-sun-fill text-primary';
-        }
-    }
-
-    function toggleAppTheme() {
-        const activeTheme = document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
-        localStorage.setItem('theme-mode', activeTheme);
-        document.documentElement.setAttribute('data-bs-theme', activeTheme);
-        const icon = document.getElementById('theme-icon-indicator');
-        if (icon) {
-            icon.className = activeTheme === 'dark' ? 'bi bi-moon-stars-fill text-warning' : 'bi bi-sun-fill text-primary';
-        }
-    }
-
-    // 2. LOGIKA UTAMA: EVALUASI ROLE DAN PENGISIAN DROPDOWN OPD
-    async function verifyAndRenderOpdSelector() {
-        // Gunakan interval untuk menunggu sampai fungsi getProfile() & objek database Supabase siap di window
-        const integrityCheck = setInterval(async () => {
-            const hasAuthScript = typeof window.getProfile === 'function';
-            const hasSupabase = typeof window.supabaseClient !== 'undefined';
-            const hasContainer = document.getElementById('superAdminOpdSelectorContainer') !== null;
-
-            if (hasAuthScript && hasSupabase && hasContainer) {
-                clearInterval(integrityCheck); // Hentikan loop pencarian karena semua resource siap
-                
-                try {
-                    const profile = await window.getProfile();
-                    
-                    if (profile && profile.role) {
-                        // Mengonversi role menjadi huruf kecil semua agar lolos validasi 'super_admin' atau 'superadmin'
-                        const normalizedRole = profile.role.toLowerCase().replace(/[^a-z0-9]/g, '');
-                        
-                        if (normalizedRole === 'superadmin') {
-                            const container = document.getElementById('superAdminOpdSelectorContainer');
-                            const selector = document.getElementById('globalOpdSelector');
-                            
-                            // Tarik data langsung dari tabel database 'opds' Anda
-                            const { data: opds, error } = await window.supabaseClient
-                                .from('opds')
-                                .select('id, opd_name')
-                                .order('opd_name', { ascending: true });
-                            
-                            if (!error && opds) {
-                                // Bersihkan isi dropdown agar tidak duplikat saat berpindah halaman
-                                selector.innerHTML = '<option value="ALL">-- Semua OPD (Konsolidasi) --</option>';
-                                
-                                opds.forEach(opd => {
-                                    const opt = document.createElement('option');
-                                    opt.value = opd.id;
-                                    opt.innerText = opd.opd_name;
-                                    selector.appendChild(opt);
-                                });
-                                
-                                // Kunci kembali posisi pilihan OPD terakhir yang disimpan di komputer admin
-                                const savedOpd = localStorage.getItem('selected-opd-id') || 'ALL';
-                                selector.value = savedOpd;
-                                
-                                // Pasang detektor perubahan pilihan
-                                selector.addEventListener('change', (e) => {
-                                    localStorage.setItem('selected-opd-id', e.target.value);
-                                    window.location.reload();
-                                });
-                                
-                                // Tampilkan container dropdown secara instan ke hadapan Super Admin
-                                container.classList.remove('d-none');
-                            } else {
-                                console.error("Supabase Error saat membaca tabel opds:", error);
-                            }
-                        }
-                    }
-                } catch (err) {
-                    console.error("Gagal memproses validasi hak akses akun:", err);
-                }
-            }
-        }, 100);
-
-        // Batasi pencarian maksimal selama 6 detik untuk mencegah konsumsi memori tak terbatas jika ada script error eksternal
-        setTimeout(() => clearInterval(integrityCheck), 6000);
-    }
-
-    // Jalankan eksekusi terstruktur
-    applySavedTheme();
-    verifyAndRenderOpdSelector();
-</script>
