@@ -396,31 +396,35 @@ async function renderSidevaDocumentInternal(slug, pId) {
             font-size:10pt;
             ">
             
-            ${listItems.flatMap(item =>
-            (item.price_surveys || []).map((ps,idx)=>`
+            ${[
+                ...new Map(
+                    listItems
+                        .flatMap(item => item.price_surveys || [])
+                        .map(ps => [ps.vendor_name, ps])
+                ).values()
+            ]
+            .map((ps,index)=>`
             <tr>
-            <td
-            style="
-            border:1px solid #000;
-            padding:6px;
-            width:40px;
-            vertical-align:top;
-            ">
-            ${idx+1}
-            </td>
+                <td
+                    style="
+                        border:1px solid #000;
+                        padding:6px;
+                        width:40px;
+                        text-align:center;
+                    ">
+                    ${index + 1}
+                </td>
             
-            <td
-            style="
-            border:1px solid #000;
-            padding:6px;
-            ">
-            <strong>${ps.vendor_name}</strong>
-            <br>
-            ${ps.source_url || '-'}
-            </td>
+                <td
+                    style="
+                        border:1px solid #000;
+                        padding:6px;
+                    ">
+                    ${ps.vendor_name}
+                </td>
             </tr>
             `)
-            ).join('')}
+            .join('')}
             
             </table>
             
