@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dashboard SIDEVA v9</title>
 
+<script>
+    document.documentElement.setAttribute('data-bs-theme', localStorage.getItem('theme-mode') || 'light');
+</script>
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -21,7 +25,6 @@
 <link rel="stylesheet" href="../css/app.css">
 
 <style>
-/* UTALITAS PRESIFI LAYOUT & ADAPTIVE MULTI-THEME ENGINE */
 body {
     background-color: var(--bs-body-bg);
     color: var(--bs-body-color);
@@ -30,16 +33,14 @@ body {
     overflow-x: hidden;
 }
 
-/* Kerangka Kerja Pemisah Sidebar untuk Laptop vs HP */
 .main-content {
-    margin-left: 260px; /* Lebar sidebar bawaan */
+    margin-left: 260px;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Modern & Premium Glassmorphism Card System */
 .card {
     border: 1px solid var(--bs-border-color-translucent) !important;
     border-radius: 16px !important;
@@ -49,7 +50,7 @@ body {
 }
 
 [data-bs-theme="dark"] .card {
-    background-color: #1e293b !important; /* Latar kartu mode gelap premium */
+    background-color: #1e293b !important;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
@@ -70,14 +71,12 @@ body {
     gap: 8px;
 }
 
-/* Banner Selamat Datang Gradasi */
 .banner-gradient {
     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
     color: #ffffff !important;
     border: none !important;
 }
 
-/* Metric Display KPI */
 .kpi-card {
     position: relative;
     overflow: hidden;
@@ -103,7 +102,6 @@ body {
     margin-top: 4px;
 }
 
-/* Grid Menu Aksi Cepat Adaptif */
 .action-grid-item {
     display: flex;
     align-items: center;
@@ -138,7 +136,6 @@ body {
     box-shadow: 0 2px 6px rgba(0,0,0,0.02);
 }
 
-/* Penyesuaian Baris Tabel */
 .table th {
     background-color: var(--bs-tertiary-bg) !important;
     color: var(--bs-secondary-color);
@@ -164,11 +161,8 @@ body {
     display: inline-block;
 }
 
-/* MEDIA QUERIES BREAKPOINT UNTUK PRESERVED HP & TABLET PRECISION */
 @media (max-width: 991.98px) {
-    .main-content {
-        margin-left: 0 !important; /* Di HP, konten melebar penuh menutupi celah sidebar */
-    }
+    .main-content { margin-left: 0 !important; }
 }
 </style>
 </head>
@@ -348,15 +342,33 @@ async function init(){
  document.getElementById('welcomeText').innerHTML =
  `Sistem mendeteksi identifikasi masuk sebagai: <b>${profile.full_name}</b> dengan level status akses <b>(${profile.role})</b>`;
 
+ // Sinkronisasi Nama Pengguna ke elemen Topbar agar tidak kosong saat dipasang asinkronus
+ setTimeout(() => {
+     const topbarUserEl = document.getElementById('userName');
+     if (topbarUserEl) topbarUserEl.innerText = profile.full_name;
+ }, 300);
+
  await loadKPI();
  await loadStatus();
  await loadOpdSummary();
  await loadRecentPackages();
 }
 
+// INTEGRASI SELECTOR OPD GLOBAL PADA QUERY KPI
 async function loadKPI(){
- const {data:packages} = await dashboardDb.from('packages').select('*');
- const {data:hps} = await dashboardDb.from('package_hps').select('*');
+ const selectedOpd = localStorage.getItem('selected-opd-id') || 'ALL';
+ 
+ let packageQuery = dashboardDb.from('packages').select('*');
+ let hpsQuery = dashboardDb.from('package_hps').select('*');
+ 
+ // Jika super admin menargetkan OPD spesifik, paksa penyaringan data
+ if (selectedOpd !== 'ALL') {
+     packageQuery = packageQuery.eq('opd_id', selectedOpd);
+     hpsQuery = hpsQuery.eq('opd_id', selectedOpd);
+ }
+
+ const {data:packages} = await packageQuery;
+ const {data:hps} = await hpsQuery;
 
  const totalPackages = (packages||[]).length;
  const readyProcurement = (packages||[]).filter(x => x.package_status === 'READY_PROCUREMENT').length;
@@ -371,20 +383,17 @@ async function loadKPI(){
  document.getElementById('readyProcurement').innerText = readyProcurement;
 }
 
+// INTEGRASI SELECTOR OPD GLOBAL PADA TABEL STATUS ALUR KERJA
 async function loadStatus(){
- const statuses=[
- 'DRAFT',
- 'DPP_COMPLETE',
- 'ITEMS_COMPLETE',
- 'SURVEY_COMPLETE',
- 'DOCUMENT_COMPLETE',
- 'HPS_COMPLETE',
- 'BAHPE_DRAFT',
- 'BAHPE_COMPLETE',
- 'READY_PROCUREMENT',
- ];
+ const statuses=['DRAFT','DPP_COMPLETE','ITEMS_COMPLETE','SURVEY_COMPLETE','DOCUMENT_COMPLETE','HPS_COMPLETE','BAHPE_DRAFT','BAHPE_COMPLETE','READY_PROCUREMENT'];
+ const selectedOpd = localStorage.getItem('selected-opd-id') || 'ALL';
 
- const {data} = await dashboardDb.from('packages').select('package_status');
+ let statusQuery = dashboardDb.from('packages').select('package_status');
+ if (selectedOpd !== 'ALL') {
+     statusQuery = statusQuery.eq('opd_id', selectedOpd);
+ }
+
+ const {data} = await statusQuery;
  let html='';
 
  statuses.forEach(status=>{
@@ -421,8 +430,16 @@ async function loadOpdSummary(){
  document.getElementById('opdSummaryTable').innerHTML = html;
 }
 
+// INTEGRASI SELECTOR OPD GLOBAL PADA MONITORING ANTRIAN LOG PAKET TERBARU
 async function loadRecentPackages(){
- const {data} = await dashboardDb.from('packages').select('*').order('created_at',{ascending:false}).limit(10);
+ const selectedOpd = localStorage.getItem('selected-opd-id') || 'ALL';
+ 
+ let recentQuery = dashboardDb.from('packages').select('*').order('created_at',{ascending:false}).limit(10);
+ if (selectedOpd !== 'ALL') {
+     recentQuery = recentQuery.eq('opd_id', selectedOpd);
+ }
+
+ const {data} = await recentQuery;
  let html='';
 
  (data||[]).forEach(pkg=>{
@@ -446,14 +463,12 @@ init();
 
 <script src="../js/layout.js"></script>
 <script>
-// Load layouts dynamically
-loadLayout();
-
-// Sinkronisasi pendeteksi tema instan agar tidak terjadi kelap-kelip putih saat reload halaman
-(function() {
-    const savedTheme = localStorage.getItem('theme-mode') || 'light';
-    document.documentElement.setAttribute('data-bs-theme', savedTheme);
-})();
+// Memuat layout secara aman terproteksi
+try {
+    loadLayout();
+} catch (error) {
+    console.error("Layout Safari Engine Fallback Active: ", error);
+}
 </script>
  
 </body>
