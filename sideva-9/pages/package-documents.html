@@ -198,10 +198,21 @@ async function initPackageHeader() {
 }
 
 function switchPrintView(slug) {
-    const listItems = document.querySelectorAll('#auto-doc-list .list-group-item');
-    listItems.forEach(el => el.classList.remove('active'));
+
+    console.log("SLUG DIPILIH =", slug);
+
+    const listItems =
+        document.querySelectorAll('#auto-doc-list .list-group-item');
+
+    listItems.forEach(el =>
+        el.classList.remove('active'));
+
     event.currentTarget.classList.add('active');
-    document.getElementById('btn-print-action').removeAttribute('disabled');
+
+    document
+        .getElementById('btn-print-action')
+        .removeAttribute('disabled');
+
     renderSidevaDocumentInternal(slug, packageId);
 }
 
