@@ -47,5 +47,13 @@ async function loadLayout() {
         }
     }
 }
-
 window.loadLayout = loadLayout;
+
+function toggleAppTheme() {
+    const body = document.body;
+    body.classList.toggle('dark-mode');
+    const isDark = body.classList.contains('dark-mode');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+}
+window.toggleAppTheme = toggleAppTheme;
+
