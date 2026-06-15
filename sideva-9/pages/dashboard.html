@@ -13,12 +13,6 @@
 
 <link rel="stylesheet" href="../css/app.css">
 
-<script src="../js/config.js" defer></script>
-<script src="../js/supabase.js" defer></script>
-<script src="../js/auth.js" defer></script>
-<script src="../js/workflow.js" defer></script>
-<script src="../js/camera.js" defer></script>
-
 <link rel="manifest" href="../manifest.json">
 <meta name="theme-color" content="#0d6efd">
 
@@ -31,6 +25,12 @@
     });
   }
 </script>
+
+<script src="../js/config.js"></script>
+<script src="../js/supabase.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/workflow.js"></script>
+<script src="../js/camera.js"></script>
 </head>
 <body>
 
@@ -41,7 +41,7 @@
         <div id="topbar-container" class="topbar"></div>
          
         <div class="content-body">
-            <div class="container-fluid p-4">
+            <div class="container-fluid">
 
                 <div class="row mb-4">
                     <div class="col-md-12">
@@ -191,6 +191,7 @@
 </div>
 
 <script>
+// Menjamin inisialisasi client database terikat aman saat halaman diproses
 const dashboardDb = window.supabaseClient;
 let barChartInstance = null;
 let pieChartInstance = null;
@@ -203,13 +204,26 @@ function rupiah(v){
  }).format(v||0);
 }
 
-// Responsivitas Sidebar Mobile Toggle Action
 function toggleMobileSidebar() {
     document.getElementById('sidebar-container').classList.toggle('active');
     document.getElementById('main-content-area').classList.toggle('shifted');
 }
 
-// Pemuat Komponen Modular HTML
+async function init(){
+    await loadComponent('sidebar-container', 'sidebar.html');
+    await loadComponent('topbar-container', 'topbar.html');
+    await loadComponent('footbar-container', 'footbar.html');
+
+    const profile = await getProfile();
+    document.getElementById('welcomeText').innerHTML =
+    `Selamat datang kembali, <b>${profile.full_name}</b> Hak akses: <span class="badge bg-primary">${profile.role}</span>`;
+
+    await loadKPI();
+    await loadStatus();
+    await loadOpdSummary();
+    await loadRecentPackages();
+}
+
 async function loadComponent(containerId, url) {
     try {
         const response = await fetch(url);
@@ -217,27 +231,6 @@ async function loadComponent(containerId, url) {
             document.getElementById(containerId).innerHTML = await response.text();
         }
     } catch (e) { console.error("Gagal load komponen: " + url); }
-}
-
-// Fungsi Inisialisasi Aliran Data Utama
-async function init(){
-    // 1. Memuat komponen tata letak terlebih dahulu agar kontainer siap di DOM
-    await loadComponent('sidebar-container', 'sidebar.html');
-    await loadComponent('topbar-container', 'topbar.html');
-    await loadComponent('footbar-container', 'footbar.html');
-
-    // 2. Mengambil data akun profil pengguna dari auth.js kamu
-    const profile = await getProfile();
-    if(profile) {
-        document.getElementById('welcomeText').innerHTML =
-        `Selamat datang kembali, <b>${profile.full_name}</b> Hak akses: <span class="badge bg-primary">${profile.role}</span>`;
-    }
-
-    // 3. Mengambil dan memetakan statistik database Supabase ke widget/grafik
-    await loadKPI();
-    await loadStatus();
-    await loadOpdSummary();
-    await loadRecentPackages();
 }
 
 async function loadKPI(){
@@ -255,7 +248,6 @@ async function loadKPI(){
  document.getElementById('efficiency').innerText = rupiah(totalBudget-totalHps);
  document.getElementById('readyProcurement').innerText = readyProcurement;
 
- // Render Diagram Batang Interaktif
  renderBarChart(totalBudget, totalHps);
 }
 
@@ -278,7 +270,6 @@ async function loadStatus(){
  });
 
  document.getElementById('statusTable').innerHTML=html;
- // Render Diagram Lingkaran Status
  renderPieChart(chartLabels, chartData);
 }
 
@@ -308,7 +299,6 @@ async function loadRecentPackages(){
  document.getElementById('recentPackages').innerHTML=html;
 }
 
-// Inisialisasi Grafik Interaktif Chart.js
 function renderBarChart(budget, hps) {
     const ctx = document.getElementById('chartPaguHps').getContext('2d');
     if(barChartInstance) barChartInstance.destroy();
@@ -343,7 +333,6 @@ function renderPieChart(labels, dataValues) {
     });
 }
 
-// Jalankan sistem
 init();
 </script>
 
