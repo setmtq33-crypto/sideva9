@@ -3,191 +3,288 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dashboard SIDEVA9</title>
-
+<title>Dashboard SIDEVA9 — Meta AI Edition</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <link rel="stylesheet" href="../css/app.css">
 <script src="../js/config.js"></script>
 <script src="../js/supabase.js"></script>
 <script src="../js/auth.js"></script>
 <script src="../js/workflow.js"></script>
 <script src="../js/camera.js"></script>
-
 <link rel="manifest" href="../manifest.json">
 <meta name="theme-color" content="#0d6efd">
+<style>
+:root{
+  --bg:#f5f7fb; --card:#fff; --text:#0f172a; --muted:#64748b;
+  --primary:#0d6efd; --success:#16a34a; --info:#0891b2; --warning:#d97706; --danger:#dc2626;
+  --ring:0 0 0 4px rgba(13,110,253,.12); --shadow:0 12px 32px rgba(2,6,23,.08);
+}
+[data-theme="dark"]{
+  --bg:#070b15; --card:#0f172a; --text:#e2e8f0; --muted:#94a3b8;
+  --shadow:0 12px 32px rgba(0,0,0,.5); color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);transition:background .35s,color .35s}
+.card{background:var(--card);border:0;border-radius:20px;box-shadow:var(--shadow);transition:transform .18s ease, box-shadow .18s}
+.card:hover{transform:translateY(-3px)}
+.kpi{font-size:1.9rem;font-weight:800;letter-spacing:.2px}
+.kpi-wrap{display:flex;gap:1rem;align-items:center}
+.kpi-icon{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font-size:1.4rem;
+  background:radial-gradient(120% 120% at 30% 20%, rgba(13,110,253,.18), rgba(13,202,240,.10));color:var(--primary)}
+.kpi-icon.success{background:radial-gradient(120% 120% at 30% 20%, rgba(22,163,74,.22), rgba(8,145,178,.12));color:var(--success)}
+.kpi-icon.info{background:radial-gradient(120% 120% at 30% 20%, rgba(8,145,178,.22), rgba(13,110,253,.12));color:var(--info)}
+.kpi-icon.warn{background:radial-gradient(120% 120% at 30% 20%, rgba(217,119,6,.22), rgba(217,119,6,.08));color:var(--warning)}
+.kpi-icon.danger{background:radial-gradient(120% 120% at 30% 20%, rgba(220,38,38,.22), rgba(220,38,38,.08));color:var(--danger)}
 
+.header-card .card-body{padding:1.1rem 1.3rem}
+.live-clock{font-variant-numeric:tabular-nums;font-weight:600}
+.badge-soft{background:rgba(13,110,253,.1);color:var(--primary);border:1px solid rgba(13,110,253,.15)}
+.search-box{position:relative}
+.search-box input{padding-left:2.1rem;border-radius:12px;background:transparent;color:var(--text);border-color:rgba(100,116,139,.25)}
+.search-box i{position:absolute;left:.7rem;top:50%;transform:translateY(-50%);color:var(--muted)}
+.table thead th{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:1px solid rgba(148,163,184,.2)}
+.table tbody td{border-bottom:1px dashed rgba(148,163,184,.15)}
+.quick{border-radius:14px;padding:.8rem 1rem;display:flex;align-items:center;gap:.6rem;border:1px solid rgba(148,163,184,.18);background:transparent;transition:.15s}
+.quick:hover{background:rgba(13,110,253,.06);transform:translateY(-1px)}
+.chart-wrap{position:relative;height:300px}
+.skeleton{height:1.1rem;border-radius:8px;background:linear-gradient(90deg,rgba(148,163,184,.15),rgba(148,163,184,.3),rgba(148,163,184,.15));background-size:200% 100%;animation:sh 1.1s linear infinite}
+@keyframes sh{to{background-position:-200% 0}}
+.toast-meta{backdrop-filter:blur(8px);border-radius:14px}
+.info-dot{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:rgba(148,163,184,.15);color:var(--muted);cursor:pointer}
+.info-dot:hover{box-shadow:var(--ring)}
+.pill{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .55rem;border-radius:999px;font-size:.72rem;font-weight:700;letter-spacing:.02em}
+.pill-ready{background:rgba(22,163,74,.14);color:#15803d;border:1px solid rgba(22,163,74,.2)}
+.pill-draft{background:rgba(100,116,139,.14);color:#475569;border:1px solid rgba(100,116,139,.2)}
+.pill-progress{background:rgba(13,110,253,.12);color:#1d4ed8;border:1px solid rgba(13,110,253,.18)}
+.last-update{font-size:.8rem;color:var(--muted)}
+[data-theme="dark"] .quick{border-color:rgba(148,163,184,.25)}
+</style>
 <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      // Jalur file service worker disesuaikan keluar folder pages
-      navigator.serviceWorker.register('../sw.js')
-        .then(reg => console.log('PWA SIDEVA9 Berhasil Terdaftar!', reg.scope))
-        .catch(err => console.log('PWA Gagal Terdaftar:', err));
-    });
+// PWA register — tetap seperti aslinya
+window.addEventListener('load', () => {
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('../sw.js')
+      .then(reg => console.log('PWA SIDEVA9 Terdaftar', reg.scope))
+      .catch(err => console.log('PWA Gagal', err));
   }
+});
 </script>
 </head>
 <body>
-
 <div class="wrapper">
-    <nav id="sidebar-container" class="sidebar"></nav>
+  <div class="main-content" id="main-content-area">
+    <div id="topbar-container" class="topbar"></div>
+    <div class="content-body">
+      <div class="container-fluid p-3 p-lg-4">
 
-    <div class="main-content" id="main-content-area">
-        <div id="topbar-container" class="topbar"></div>
-         
-        <div class="content-body">
-            <div class="container-fluid p-4">
-
-                <div class="row mb-4">
-                    <div class="col-md-12">
-                        <div class="card p-2">
-                            <div class="card-body">
-                                <h4 class="fw-bold">Dashboard SIDEVA9</h4>
-                                <div id="welcomeText" class="text-muted">Mengambil data profil...</div>
-                            </div>
-                        </div>
-                    </div>
+        <!-- HEADER -->
+        <div class="row mb-3">
+          <div class="col-12">
+            <div class="card header-card">
+              <div class="card-body d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div>
+                  <div class="d-flex align-items-center gap-2">
+                    <h4 class="fw-bold mb-0">Dashboard SIDEVA9</h4>
+                    <span class="badge badge-soft">Meta AI Edition</span>
+                  </div>
+                  <div id="welcomeText" class="text-muted mt-1">Mengambil data profil...</div>
+                  <div class="last-update mt-1" id="lastUpdate">—</div>
                 </div>
-
-                <div class="row mb-4 g-3">
-                    <div class="col-xl-2 col-md-4 col-6">
-                        <div class="card h-100"><div class="card-body">
-                            <small class="text-muted text-uppercase fw-semibold d-block mb-1" style="font-size:0.75rem;">Jumlah Paket</small>
-                            <div id="totalPackages" class="kpi">0</div>
-                        </div></div>
-                    </div>
-                    <div class="col-xl-3 col-md-4 col-6">
-                        <div class="card h-100"><div class="card-body">
-                            <small class="text-muted text-uppercase fw-semibold d-block mb-1" style="font-size:0.75rem;">Total Pagu</small>
-                            <div id="totalBudget" class="kpi text-truncate">Rp0</div>
-                        </div></div>
-                    </div>
-                    <div class="col-xl-3 col-md-4 col-6">
-                        <div class="card h-100"><div class="card-body">
-                            <small class="text-muted text-uppercase fw-semibold d-block mb-1" style="font-size:0.75rem;">Total HPS</small>
-                            <div id="totalHps" class="kpi text-truncate">Rp0</div>
-                        </div></div>
-                    </div>
-                    <div class="col-xl-2 col-md-6 col-6">
-                        <div class="card h-100"><div class="card-body">
-                            <small class="text-muted text-uppercase fw-semibold d-block mb-1" style="font-size:0.75rem;">Efisiensi</small>
-                            <div id="efficiency" class="kpi text-success text-truncate">Rp0</div>
-                        </div></div>
-                    </div>
-                    <div class="col-xl-2 col-md-6 col-12">
-                        <div class="card h-100"><div class="card-body">
-                            <small class="text-muted text-uppercase fw-semibold d-block mb-1" style="font-size:0.75rem;">Ready Procure</small>
-                            <div id="readyProcurement" class="kpi text-info">0</div>
-                        </div></div>
-                    </div>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="text-end me-1">
+                    <div class="small text-muted">Pontianak (WIB)</div>
+                    <div id="liveClock" class="live-clock"></div>
+                  </div>
+                  <button id="btnInstall" class="btn btn-outline-primary d-none" title="Install Aplikasi"><i class="bi bi-download"></i></button>
+                  <button id="themeToggle" class="btn btn-outline-secondary" aria-label="Ganti tema"><i class="bi bi-moon-stars"></i></button>
+                  <button class="btn btn-primary" onclick="location.reload()"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</button>
                 </div>
-
-                <div class="row mb-4">
-                    <div class="col-lg-8">
-                        <div class="card h-100">
-                            <div class="card-header">Grafik Perbandingan Pagu vs HPS</div>
-                            <div class="card-body" style="position: relative; height:300px;">
-                                <canvas id="chartPaguHps"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="card h-100">
-                            <div class="card-header">Distribusi Status Alur Kerja</div>
-                            <div class="card-body" style="position: relative; height:300px;">
-                                <canvas id="chartStatusPie"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <div class="card h-100">
-                            <div class="card-header">Tabel Status Alur Kerja</div>
-                            <div class="card-body p-0" style="max-height: 350px; overflow-y:auto;">
-                                <table class="table table-hover align-middle mb-0">
-                                    <tbody id="statusTable"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="card h-100">
-                            <div class="card-header">Aksi Cepat Menu</div>
-                            <div class="card-body" style="max-height: 350px; overflow-y:auto;">
-                                <div class="row g-2">
-                                    <div class="col-6"><a href="packages.html" class="btn btn-outline-primary w-100 text-start py-2"><i class="bi bi-box-seam me-2"></i> Packages</a></div>
-                                    <div class="col-6"><a href="package-items.html" class="btn btn-outline-secondary w-100 text-start py-2"><i class="bi bi-list-stars me-2"></i> Items</a></div>
-                                    <div class="col-6"><a href="price-surveys.html" class="btn btn-outline-secondary w-100 text-start py-2"><i class="bi bi-search"></i> Surveys</a></div>
-                                    <div class="col-6"><a href="package-documents.html" class="btn btn-outline-secondary w-100 text-start py-2"><i class="bi bi-file-earmark-text"></i> Documents</a></div>
-                                    <div class="col-6"><a href="hps.html" class="btn btn-outline-secondary w-100 text-start py-2"><i class="bi bi-calculator"></i> HPS Engine</a></div>
-                                    <div class="col-6"><a href="procurement-ready.html" class="btn btn-success w-100 text-start py-2"><i class="bi bi-check-circle"></i> Ready Proc</a></div>
-                                    <div class="col-6"><a href="audit-logs.html" class="btn btn-dark w-100 text-start py-2"><i class="bi bi-journal-text"></i> Audit Logs</a></div>
-                                    <div class="col-6"><a href="users.html" class="btn btn-dark w-100 text-start py-2"><i class="bi bi-people"></i> Users</a></div>
-                                    <div class="col-6"><a href="opds.html" class="btn btn-outline-primary w-100 text-start py-2"><i class="bi bi-building"></i> OPD</a></div>
-                                    <div class="col-6"><a href="rup-import.html" class="btn btn-warning w-100 text-start py-2"><i class="bi bi-cloud-upload"></i> Import RUP</a></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row mb-4">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-header">Ringkasan Anggaran per OPD</div>
-                            <div class="card-body p-0">
-                                <div class="table-responsive">
-                                    <table class="table table-hover align-middle mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th>Nama Organisasi Perangkat Daerah (OPD)</th>
-                                                <th>Jumlah Paket</th>
-                                                <th>Total Pagu Anggaran</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="opdSummaryTable"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-header">Daftar Paket Pengadaan Terbaru</div>
-                            <div class="card-body p-0">
-                                <div class="table-responsive">
-                                    <table class="table table-hover align-middle mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th>Nama Paket Kontrak</th>
-                                                <th>Pagu Anggaran</th>
-                                                <th>Status Berjalan</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="recentPackages"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+              </div>
             </div>
+          </div>
         </div>
 
-        <div id="footbar-container"></div>
+        <!-- KPI -->
+        <div class="row g-3 mb-3">
+          <div class="col-xl-2 col-md-4 col-6">
+            <div class="card h-100"><div class="card-body">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="kpi-wrap">
+                  <div class="kpi-icon"><i class="bi bi-box-seam"></i></div>
+                  <div>
+                    <small class="text-uppercase fw-semibold d-block" style="color:var(--muted);font-size:.72rem">Jumlah Paket</small>
+                    <div id="totalPackages" class="kpi"><span class="skeleton" style="width:70px;display:inline-block"></span></div>
+                  </div>
+                </div>
+                <span class="info-dot" data-bs-toggle="tooltip" title="Total paket kontrak yang tercatat di sistem"><i class="bi bi-info"></i></span>
+              </div>
+            </div></div>
+          </div>
+          <div class="col-xl-3 col-md-4 col-6">
+            <div class="card h-100"><div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div class="kpi-wrap">
+                  <div class="kpi-icon warn"><i class="bi bi-cash-stack"></i></div>
+                  <div>
+                    <small class="text-uppercase fw-semibold d-block" style="color:var(--muted);font-size:.72rem">Total Pagu</small>
+                    <div id="totalBudget" class="kpi">Rp0</div>
+                  </div>
+                </div>
+                <span class="info-dot" data-bs-toggle="tooltip" title="Akumulasi pagu anggaran dari semua paket"><i class="bi bi-info"></i></span>
+              </div>
+            </div></div>
+          </div>
+          <div class="col-xl-3 col-md-4 col-6">
+            <div class="card h-100"><div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div class="kpi-wrap">
+                  <div class="kpi-icon danger"><i class="bi bi-calculator"></i></div>
+                  <div>
+                    <small class="text-uppercase fw-semibold d-block" style="color:var(--muted);font-size:.72rem">Total HPS</small>
+                    <div id="totalHps" class="kpi">Rp0</div>
+                  </div>
+                </div>
+                <span class="info-dot" data-bs-toggle="tooltip" title="Total Harga Perkiraan Sendiri"><i class="bi bi-info"></i></span>
+              </div>
+            </div></div>
+          </div>
+          <div class="col-xl-2 col-md-6 col-6">
+            <div class="card h-100"><div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div class="kpi-wrap">
+                  <div class="kpi-icon success"><i class="bi bi-graph-down-arrow"></i></div>
+                  <div>
+                    <small class="text-uppercase fw-semibold d-block" style="color:var(--muted);font-size:.72rem">Efisiensi</small>
+                    <div id="efficiency" class="kpi">Rp0</div>
+                    <div id="efficiencyPct" class="small" style="color:var(--success);font-weight:600"></div>
+                  </div>
+                </div>
+                <span class="info-dot" data-bs-toggle="tooltip" title="Selisih Pagu - HPS (potensi efisiensi)"><i class="bi bi-info"></i></span>
+              </div>
+            </div></div>
+          </div>
+          <div class="col-xl-2 col-md-6 col-12">
+            <div class="card h-100"><div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div class="kpi-wrap">
+                  <div class="kpi-icon info"><i class="bi bi-check2-circle"></i></div>
+                  <div>
+                    <small class="text-uppercase fw-semibold d-block" style="color:var(--muted);font-size:.72rem">Ready Procure</small>
+                    <div id="readyProcurement" class="kpi">0</div>
+                  </div>
+                </div>
+                <span class="info-dot" data-bs-toggle="tooltip" title="Paket dengan status READY_PROCUREMENT"><i class="bi bi-info"></i></span>
+              </div>
+            </div></div>
+          </div>
+        </div>
+
+        <!-- CHARTS -->
+        <div class="row g-3 mb-3">
+          <div class="col-lg-8">
+            <div class="card h-100"><div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-bold mb-0"><i class="bi bi-bar-chart-line me-2"></i>Pagu vs HPS</h6>
+                <span class="text-muted small">Top 5 paket terbesar</span>
+              </div>
+              <div class="chart-wrap"><canvas id="chartPaguHps"></canvas></div>
+            </div></div>
+          </div>
+          <div class="col-lg-4">
+            <div class="card h-100"><div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-bold mb-0"><i class="bi bi-pie-chart me-2"></i>Distribusi Status</h6>
+              </div>
+              <div class="chart-wrap"><canvas id="chartStatusPie"></canvas></div>
+            </div></div>
+          </div>
+        </div>
+
+        <!-- STATUS & QUICK -->
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <div class="card h-100"><div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-bold mb-0"><i class="bi bi-list-check me-2"></i>Status Paket</h6>
+                <div class="search-box"><i class="bi bi-search"></i><input id="filterStatus" class="form-control form-control-sm" placeholder="Cari status..."></div>
+              </div>
+              <div style="max-height:310px;overflow:auto">
+                <table class="table align-middle mb-0">
+                  <thead><tr><th>Status</th><th class="text-end">Jumlah</th></tr></thead>
+                  <tbody id="statusTable"></tbody>
+                </table>
+              </div>
+            </div></div>
+          </div>
+          <div class="col-md-6">
+            <div class="card h-100"><div class="card-body">
+              <h6 class="fw-bold mb-2"><i class="bi bi-lightning-charge me-2"></i>Akses Cepat</h6>
+              <div class="row g-2">
+                <div class="col-6"><a href="packages.html" class="quick w-100"><i class="bi bi-box-seam"></i> Packages</a></div>
+                <div class="col-6"><a href="package-items.html" class="quick w-100"><i class="bi bi-list-stars"></i> Items</a></div>
+                <div class="col-6"><a href="price-surveys.html" class="quick w-100"><i class="bi bi-search"></i> Surveys</a></div>
+                <div class="col-6"><a href="package-documents.html" class="quick w-100"><i class="bi bi-file-earmark-text"></i> Documents</a></div>
+                <div class="col-6"><a href="hps.html" class="quick w-100"><i class="bi bi-calculator"></i> HPS Engine</a></div>
+                <div class="col-6"><a href="procurement-ready.html" class="quick w-100"><i class="bi bi-check-circle"></i> Ready Proc</a></div>
+                <div class="col-6"><a href="audit-logs.html" class="quick w-100"><i class="bi bi-journal-text"></i> Audit Logs</a></div>
+                <div class="col-6"><a href="users.html" class="quick w-100"><i class="bi bi-people"></i> Users</a></div>
+                <div class="col-6"><a href="opds.html" class="quick w-100"><i class="bi bi-building"></i> OPD</a></div>
+                <div class="col-6"><a href="rup-import.html" class="quick w-100"><i class="bi bi-cloud-upload"></i> Import RUP</a></div>
+              </div>
+            </div></div>
+          </div>
+        </div>
+
+        <!-- OPD & RECENT -->
+        <div class="row g-3">
+          <div class="col-12">
+            <div class="card"><div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-bold mb-0"><i class="bi bi-building me-2"></i>Ringkasan per OPD</h6>
+                <div class="search-box"><i class="bi bi-search"></i><input id="filterOpd" class="form-control form-control-sm" placeholder="Cari OPD..."></div>
+              </div>
+              <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                  <thead><tr><th>OPD</th><th>Jumlah Paket</th><th>Total Pagu</th></tr></thead>
+                  <tbody id="opdSummaryTable"></tbody>
+                </table>
+              </div>
+            </div></div>
+          </div>
+          <div class="col-12">
+            <div class="card"><div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-bold mb-0"><i class="bi bi-clock-history me-2"></i>Paket Terbaru</h6>
+                <div class="search-box"><i class="bi bi-search"></i><input id="filterRecent" class="form-control form-control-sm" placeholder="Cari paket..."></div>
+              </div>
+              <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                  <thead><tr><th>Nama Paket</th><th>Pagu</th><th>Status</th></tr></thead>
+                  <tbody id="recentPackages"></tbody>
+                </table>
+              </div>
+            </div></div>
+          </div>
+        </div>
+
+      </div>
     </div>
+    <div id="footbar-container"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index:1080">
+  <div id="metaToast" class="toast toast-meta align-items-center text-bg-dark border-0" role="alert">
+    <div class="d-flex">
+      <div class="toast-body"><i class="bi bi-stars me-2"></i>Dashboard siap. Mode <span id="toastTheme"></span> aktif.</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
 </div>
 
 <script>
