@@ -1,0 +1,24 @@
+{
+  "name": "SIDEVA v9 Procurement",
+  "short_name": "SIDEVA9",
+  "description": "Sistem Informasi Digital Evaluasi Verifikasi Adminitrasi E - Purchasing",
+  "start_url": "/pages/dashboard.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#1e293b",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/WhatsApp Image 2026-06-15 at 19.42.46.jpeg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/WhatsApp Image 2026-06-15 at 19.42.46.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
