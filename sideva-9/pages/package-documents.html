@@ -286,7 +286,6 @@ async function renderSidevaDocumentInternal(slug, pId) {
         } else if (slug === 'dpp') {
             let rows = "";
             listItems.forEach((it, i) => {
-                // Mengambil harga survei/satuan pertama jika ada, jika tidak ada default ke 0
                 const hargaSatuan = it.price_surveys?.[0]?.price || 0;
                 rows += `
                 <tr>
@@ -305,10 +304,12 @@ async function renderSidevaDocumentInternal(slug, pId) {
             ${kopHtml}
             
             <div style="text-align:center; font-size:14pt; font-weight:bold; text-decoration:underline; margin-bottom:5px;">DOKUMEN PERSIAPAN PENGADAAN (DPP) E - PURCHASING</div>
-            <div style="text-align:center; font-size:11pt; margin-bottom:20px;">Tanggal: ${tgl}</div>
+            <div style="text-align:center; font-size:11pt; margin-bottom:5px;">Nomor: DPP/${paket.rup_number || '........'}/DEMO/2026</div>
+            <br>
 
             <table style="width:100%; font-size:10.5pt; margin-bottom:20px; border-collapse:collapse;">
-                <tr><td width="220" style="padding:3px;"><strong>Perangkat Daerah</strong></td><td style="padding:3px;">: ${opd?.opd_name || '-'}</td></tr>
+                <tr><td width="220" style="padding:3px;"><strong>Tanggal</strong></td><td style="padding:3px;">: ${tgl}</td></tr>
+                <tr><td style="padding:3px;"><strong>Perangkat Daerah</strong></td><td style="padding:3px;">: ${opd?.opd_name || '-'}</td></tr>
                 <tr><td style="padding:3px;"><strong>Program</strong></td><td style="padding:3px;">: ${paket.program || '-'}</td></tr>
                 <tr><td style="padding:3px;"><strong>Kegiatan</strong></td><td style="padding:3px;">: ${paket.kegiatan || '-'}</td></tr>
                 <tr><td style="padding:3px;"><strong>Sub Kegiatan</strong></td><td style="padding:3px;">: ${paket.sub_kegiatan || '-'}</td></tr>
