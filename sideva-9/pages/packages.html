@@ -240,7 +240,8 @@ async function initPage(){
     profile = await getProfile();
     if(!profile) return;
 
-    if(!await canCreatePackage()){
+    // ATURAN MAIN: Jika user beralih ke SUPER_ADMIN, paksa hak akses bernilai TRUE tanpa batasan permissions.js
+    if(profile.role !== "SUPER_ADMIN" && !await canCreatePackage()){
         document.getElementById('saveBtn').style.display = 'none';
     }
 
@@ -300,7 +301,8 @@ async function loadMak(){
 }
 
 async function savePackage(){
-    if(!await canCreatePackage()){
+    // ATURAN MAIN: SUPER_ADMIN bypass verifikasi canCreatePackage()
+    if(profile.role !== "SUPER_ADMIN" && !await canCreatePackage()){
         alert('Anda tidak memiliki hak membuat paket');
         return;
     }
@@ -345,7 +347,6 @@ async function savePackage(){
 async function loadPackages() {
     let query = db.from("packages").select("*").order("created_at", { ascending: false });
     
-    // PERBAIKAN UTAMA: Jika role SUPER_ADMIN dan belum memilih OPD spesifik di select, tampilkan SEMUA paket sistem.
     const opdId = profile.role === "SUPER_ADMIN" ? currentOpdId : profile.opd_id;
     if (opdId) {
         query = query.eq("opd_id", opdId);
@@ -413,7 +414,7 @@ async function loadPackages() {
                         <i class="fa-solid fa-folder"></i> Dokumen
                     </button>
                     
-                    ${canSeeHps(profile.role) ? `
+                    ${(profile.role === 'SUPER_ADMIN' || canSeeHps(profile.role)) ? `
                         <button class="btn btn-sm btn-success" onclick="openHps('${pkg.id}')"><i class="fa-solid fa-calculator"></i> HPS</button>
                         <button class="btn btn-sm btn-outline-success" onclick="openBahpe('${pkg.id}')"><i class="fa-solid fa-file-contract"></i> BAHPE</button>
                     ` : ""}
