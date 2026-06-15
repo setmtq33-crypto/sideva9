@@ -24,7 +24,7 @@
             --sidebar-width: 260px;
             --topbar-height: 70px;
             --primary-gradient: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            --dark-blue: #1e3c72;
+            --dark-blue: #111e38;
             --light-bg: #f4f6f9;
         }
 
@@ -41,7 +41,7 @@
             position: fixed;
             top: 0;
             left: 0;
-            background: #111e38;
+            background: var(--dark-blue);
             color: #94a3b8;
             z-index: 1030;
             transition: all 0.3s ease;
@@ -140,7 +140,7 @@
             transition: all 0.3s ease;
         }
 
-        /* ENTERPRISE CARD DASHBOARD COMPONENTS */
+        /* METRIC DISPLAY CARDS */
         .stat-card {
             border: none;
             border-radius: 12px;
@@ -166,6 +166,60 @@
             font-size: 1.3rem;
         }
 
+        /* QUICK ACTION SHORCUTS */
+        .action-card {
+            border: none;
+            border-radius: 12px;
+            background: #ffffff;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            color: #2c3e50;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            border-left: 4px solid #cbd5e1;
+            transition: all 0.25s ease;
+        }
+
+        .action-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+            border-left-color: #2a5298;
+            color: #2a5298;
+        }
+
+        .action-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .card-form-custom {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            background: #ffffff;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #1e3c72;
+            border-left: 4px solid #2a5298;
+            padding-left: 10px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         /* FOOTBAR STYLE SYSTEM */
         .footer-wrapper {
             position: absolute;
@@ -182,26 +236,6 @@
             font-size: 0.85rem;
             color: #64748b;
             transition: all 0.3s ease;
-        }
-
-        .card-form-custom {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-            background: #ffffff;
-            padding: 24px;
-            margin-bottom: 30px;
-        }
-
-        .section-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #1e3c72;
-            border-left: 4px solid #2a5298;
-            padding-left: 10px;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         @media (max-width: 992px) {
@@ -222,15 +256,13 @@
             </h4>
         </div>
         <div class="sidebar-menu">
-            <div id="generalSection">
-                <div class="menu-category">Menu Navigasi</div>
-                <a href="dashboard.html" class="nav-menu-item active">
-                    <i class="fa-solid fa-chart-pie"></i> Ringkasan Utama
-                </a>
-                <a href="packages.html" class="nav-menu-item">
-                    <i class="fa-solid fa-cubes"></i> Paket Pengadaan
-                </a>
-            </div>
+            <div class="menu-category">Menu Navigasi</div>
+            <a href="dashboard.html" class="nav-menu-item active">
+                <i class="fa-solid fa-chart-pie"></i> Ringkasan Utama
+            </a>
+            <a href="packages.html" class="nav-menu-item">
+                <i class="fa-solid fa-cubes"></i> Paket Pengadaan
+            </a>
 
             <div id="adminSection" style="display: none;">
                 <div class="menu-category">Pengaturan Aplikasi</div>
@@ -251,21 +283,21 @@
             </button>
             <div class="d-none d-md-flex align-items-center gap-2 text-muted fw-medium small">
                 <i class="fa-regular fa-calendar-check text-primary"></i>
-                <span id="currentDateStr">Memuat Waktu...</span>
+                <span id="currentDateStr">Memuat Kalender...</span>
             </div>
         </div>
 
         <div class="dropdown">
-            <div class="d-flex align-items-center gap-3 cursor-pointer" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
+            <div class="d-flex align-items-center gap-3" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
                 <div class="text-end d-none d-sm-block">
                     <h6 class="mb-0 text-dark fw-bold small" id="topbarUserName">Nama User</h6>
-                    <span class="text-muted" style="font-size: 0.75rem;" id="topbarUserRole">Memuat Jabatan...</span>
+                    <span class="text-muted" style="font-size: 0.75rem;" id="topbarUserRole">Memuat Akses...</span>
                 </div>
                 <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" id="avatarBox" style="width: 40px; height: 40px; font-size: 0.95rem;">
                     U
                 </div>
             </div>
-            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 rounded-3" style="width: 220px;">
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 rounded-3" style="width: 240px;">
                 <li class="p-3 border-bottom">
                     <h6 class="mb-0 fw-bold" id="dropName">User Akun</h6>
                     <small class="text-muted" id="dropOpdName">Nama Instansi</small>
@@ -285,6 +317,45 @@
             </div>
         </div>
 
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-sm-6 col-md-3">
+                <a href="packages.html" class="action-card">
+                    <div class="action-icon text-primary bg-primary-subtle"><i class="fa-solid fa-folder-plus"></i></div>
+                    <div>
+                        <h6 class="mb-0 fw-bold small">Paket Baru</h6>
+                        <small class="text-muted" style="font-size:0.75rem;">Buat pengadaan</small>
+                    </div>
+                </a>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3" id="quickActionUser" style="display: none;">
+                <a href="users.html" class="action-card">
+                    <div class="action-icon text-warning bg-warning-subtle"><i class="fa-solid fa-users-gear"></i></div>
+                    <div>
+                        <h6 class="mb-0 fw-bold small">Kelola User</h6>
+                        <small class="text-muted" style="font-size:0.75rem;">Hak akses profil</small>
+                    </div>
+                </a>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3" id="quickActionOpd" style="display: none;">
+                <a href="opd-config.html" class="action-card">
+                    <div class="action-icon text-info bg-info-subtle"><i class="fa-solid fa-landmark"></i></div>
+                    <div>
+                        <h6 class="mb-0 fw-bold small">Set Instansi</h6>
+                        <small class="text-muted" style="font-size:0.75rem;">Konfigurasi OPD</small>
+                    </div>
+                </a>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <a href="#" onclick="location.reload(); return false;" class="action-card">
+                    <div class="action-icon text-success bg-success-subtle"><i class="fa-solid fa-arrows-rotate"></i></div>
+                    <div>
+                        <h6 class="mb-0 fw-bold small">Refresh Feed</h6>
+                        <small class="text-muted" style="font-size:0.75rem;">Perbarui data</small>
+                    </div>
+                </a>
+            </div>
+        </div>
+
         <div class="row g-4 mb-4">
             <div class="col-md-4">
                 <div class="stat-card d-flex align-items-center justify-content-between">
@@ -301,7 +372,7 @@
                 <div class="stat-card d-flex align-items-center justify-content-between">
                     <div>
                         <span class="text-muted small text-uppercase fw-bold">Pagu Anggaran Dikelola</span>
-                        <h2 class="fw-bold text-dark mt-1 mb-0" style="font-size: 1.5rem;" id="countTotalBudget">Rp 0</h2>
+                        <h2 class="fw-bold text-dark mt-1 mb-0" style="font-size: 1.45rem;" id="countTotalBudget">Rp 0</h2>
                     </div>
                     <div class="stat-icon-box bg-success-subtle text-success">
                         <i class="fa-solid fa-wallet"></i>
@@ -341,12 +412,14 @@ let activeProfile = null;
 document.addEventListener("DOMContentLoaded", initDashboard);
 
 async function initDashboard() {
+    // Render Waktu Topbar
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     document.getElementById("currentDateStr").innerText = new Date().toLocaleDateString('id-ID', options);
 
     activeProfile = await getProfile();
     if (!activeProfile) return;
 
+    // Set Teks Identitas User
     document.getElementById("topbarUserName").innerText = activeProfile.full_name || "Nama Pengguna";
     document.getElementById("topbarUserRole").innerText = activeProfile.role || "Akses";
     document.getElementById("dropName").innerText = activeProfile.full_name || "User";
@@ -356,9 +429,11 @@ async function initDashboard() {
         document.getElementById("avatarBox").innerText = activeProfile.full_name.charAt(0).toUpperCase();
     }
 
-    // ATURAN MAIN: JIKA ROLE ADALAH SUPER_ADMIN, BYPASS TAMPILAN MENU KONTROL AKSES
+    // ATURAN MAIN: JIKA SUPER_ADMIN, LOLOS BYPASS MENU KONTROL & TOMBOL AKSI CEPAT PRIVILEGE TINGGI
     if (activeProfile.role === "SUPER_ADMIN") {
         document.getElementById("adminSection").style.display = "block";
+        document.getElementById("quickActionUser").style.display = "block";
+        document.getElementById("quickActionOpd").style.display = "block";
     }
 
     await runMetricCounters();
@@ -368,7 +443,7 @@ async function runMetricCounters() {
     try {
         let pkgQuery = coreDb.from("packages").select("budget_ceiling, opd_id");
         
-        // Aturan main Super Admin: Lewati sensor filter OPD id jika perannya Super Admin
+        // Aturan pembatasan OPD dilewati penuh khusus bagi SUPER_ADMIN
         if (activeProfile.role !== "SUPER_ADMIN" && activeProfile.opd_id) {
             pkgQuery = pkgQuery.eq("opd_id", activeProfile.opd_id);
         }
