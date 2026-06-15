@@ -280,6 +280,15 @@ async function renderSidevaDocumentInternal(slug, pId) {
                         : ${paket.procurement_method || '-'}
                     </td>
                 </tr>
+
+                <tr>
+                   <td style="font-weight:bold; padding:4px;">
+                       Mata Anggaran
+                   </td>
+                   <td>
+                       : ${akun ? `${akun.account_code} - ${akun.account_name}` : '-'}
+                   </td>
+               </tr>
             
                 <tr>
                     <td style="font-weight:bold; padding:4px;">
