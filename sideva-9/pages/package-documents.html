@@ -284,31 +284,103 @@ async function renderSidevaDocumentInternal(slug, pId) {
             htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:16pt; text-decoration:underline; margin-bottom:20px;">SPESIFIKASI TEKNIS</div><table style="width:100%; font-size:11pt; margin-bottom:20px;"><tr><td width="220"><strong>Nama Paket Pengadaan</strong></td><td>: ${paket.package_name}</td></tr><tr><td><strong>Nomor RUP</strong></td><td>: ${paket.rup_number || '-'}</td></tr><tr><td><strong>Program</strong></td><td>: ${paket.program || '-'}</td></tr><tr><td><strong>Kegiatan</strong></td><td>: ${paket.kegiatan || '-'}</td></tr><tr><td><strong>Sub Kegiatan</strong></td><td>: ${paket.sub_kegiatan || '-'}</td></tr><tr><td><strong>Mata Anggaran</strong></td><td>: ${akun ? `${akun.account_code} - ${akun.account_name}` : '-'}</td></tr><tr><td><strong>Pagu Anggaran</strong></td><td>: ${docFmtRp(paket.budget_ceiling)}</td></tr></table><table style="width:100%; border-collapse:collapse; font-size:10pt;"><thead><tr><th style="border:1px solid #000;padding:6px;">No</th><th style="border:1px solid #000;padding:6px;">Nama Barang</th><th style="border:1px solid #000;padding:6px;">Spesifikasi Teknis</th><th style="border:1px solid #000;padding:6px;">Volume</th><th style="border:1px solid #000;padding:6px;">Satuan</th></tr></thead><tbody>${rows}</tbody></table><br><br><table style="width:100%;"><tr><td style="width:50%;text-align:center;">Menyetujui,<br>${ppk?.position || 'PA/KPA/PPK'}<br><br><br><br><br><strong>${ppk?.full_name || '-'}</strong><br>NIP. ${ppk?.nip || '-'}</td><td style="width:50%;text-align:center;">Disusun Oleh,<br>${bidang?.position_name || 'Kepala Bidang'}<br>${bidang?.bidang_name || ''}<br><br><br><br><br><strong>${bidang?.head_name || '-'}</strong><br>NIP. ${bidang?.head_nip || '-'}</td></tr></table>`;
 
         } else if (slug === 'dpp') {
+            let rows = "";
+            listItems.forEach((it, i) => {
+                // Mengambil harga survei/satuan pertama jika ada, jika tidak ada default ke 0
+                const hargaSatuan = it.price_surveys?.[0]?.price || 0;
+                rows += `
+                <tr>
+                    <td style="border:1px solid #000; padding:6px; text-align:center;">${i+1}.</td>
+                    <td style="border:1px solid #000; padding:6px;">
+                        <strong>${it.item_name}</strong><br>
+                        <span style="font-size:9.5pt; color:#333;">Spesifikasi: ${it.specification || '-'}</span>
+                    </td>
+                    <td style="border:1px solid #000; padding:6px; text-align:center;">${it.quantity}</td>
+                    <td style="border:1px solid #000; padding:6px; text-align:center;">${it.unit}</td>
+                    <td style="border:1px solid #000; padding:6px; text-align:right;">${docFmtRp(hargaSatuan)}</td>
+                </tr>`;
+            });
+
             htmlOutput = `
             ${kopHtml}
-            <div style="text-align:center; font-size:16pt; font-weight:bold; text-decoration:underline; margin-bottom:20px;">DOKUMEN PERSIAPAN PENGADAAN</div>
-            <table style="width:100%; font-size:11pt; margin-bottom:20px;">
-                <tr><td width="220"><strong>Nama Paket</strong></td><td>: ${paket.package_name}</td></tr>
-                <tr><td><strong>Nomor RUP</strong></td><td>: ${paket.rup_number || '-'}</td></tr>
-                <tr><td><strong>Program</strong></td><td>: ${paket.program || '-'}</td></tr>
-                <tr><td><strong>Kegiatan</strong></td><td>: ${paket.kegiatan || '-'}</td></tr>
-                <tr><td><strong>Sub Kegiatan</strong></td><td>: ${paket.sub_kegiatan || '-'}</td></tr>
+            
+            <div style="text-align:center; font-size:14pt; font-weight:bold; text-decoration:underline; margin-bottom:5px;">DOKUMEN PERSIAPAN PENGADAAN (DPP) E - PURCHASING</div>
+            <div style="text-align:center; font-size:11pt; margin-bottom:20px;">Tanggal: ${tgl}</div>
+
+            <table style="width:100%; font-size:10.5pt; margin-bottom:20px; border-collapse:collapse;">
+                <tr><td width="220" style="padding:3px;"><strong>Perangkat Daerah</strong></td><td style="padding:3px;">: ${opd?.opd_name || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Program</strong></td><td style="padding:3px;">: ${paket.program || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Kegiatan</strong></td><td style="padding:3px;">: ${paket.kegiatan || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Sub Kegiatan</strong></td><td style="padding:3px;">: ${paket.sub_kegiatan || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>RUP</strong></td><td style="padding:3px;">: ${paket.rup_number || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Nama Paket Pengadaan</strong></td><td style="padding:3px;">: ${paket.package_name}</td></tr>
+                <tr><td style="padding:3px;"><strong>Pagu Dana</strong></td><td style="padding:3px;">: ${docFmtRp(paket.budget_ceiling)}</td></tr>
+                <tr><td style="padding:3px;"><strong>Mata Anggaran Belanja</strong></td><td style="padding:3px;">: ${akun ? `${akun.account_code} - ${akun.account_name}` : '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Sumber Dana</strong></td><td style="padding:3px;">: APBD Kabupaten Kapuas Hulu</td></tr>
             </table>
-            <p><strong>1. LATAR BELAKANG</strong></p>
-            <p>Pengadaan dilakukan untuk mendukung pelaksanaan kegiatan perangkat daerah sesuai dokumen perencanaan dan kebutuhan operasional.</p>
-            <p><strong>2. MAKSUD DAN TUJUAN</strong></p>
-            <p>${paket.output || '-'}</p>
-            <p><strong>3. METODE PENGADAAN</strong></p>
-            <p>${paket.procurement_method || '-'}</p>
-            <p><strong>4. PAGU ANGGARAN</strong></p>
-            <p>${docFmtRp(paket.budget_ceiling)}</p>
-            <p><strong>5. MATA ANGGARAN</strong></p>
-            <p>${akun ? `${akun.account_code} - ${akun.account_name}` : '-'}</p>
-            <br><br>
-            <table style="width:100%;">
+
+            <div style="font-weight:bold; margin-top:15px; margin-bottom:5px;">I. Spesifikasi Teknis</div>
+            <p style="margin:0 0 10px 0; text-align:justify;">Penyusunan spesifikasi teknis telah menguraikan hal-hal antara lain: kesesuaian dengan kebutuhan, karakteristik barang (ukuran, dimensi, komposisi), kinerja, standar yang digunakan (SNI/ISO), pengepakan/pengiriman, aspek layanan (waktu, responsivitas), serta higienitas dan keamanan untuk pengadaan makan minum.</p>
+            
+            <div style="font-weight:bold; font-size:10pt; margin-bottom:5px;">a. Spesifikasi Jenis, Mutu Barang/Bahan/Material, Jumlah, Satuan dan Harga</div>
+            <table style="width:100%; border-collapse:collapse; font-size:10pt; margin-bottom:15px;">
+                <thead style="background:#eee;">
+                    <tr>
+                        <th style="border:1px solid #000; padding:6px; text-align:center; width:5%;">No</th>
+                        <th style="border:1px solid #000; padding:6px; text-align:left;">Nama/Jenis Barang Spesifikasi Mutu/Bahan/Material</th>
+                        <th style="border:1px solid #000; padding:6px; text-align:center; width:8%;">Qty</th>
+                        <th style="border:1px solid #000; padding:6px; text-align:center; width:12%;">Satuan</th>
+                        <th style="border:1px solid #000; padding:6px; text-align:right; width:18%;">Harga Satuan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rows || `<tr><td colspan="5" style="border:1px solid #000; text-align:center; padding:10px;">Belum ada item belanja</td></tr>`}
+                </tbody>
+            </table>
+
+            <div style="font-weight:bold; font-size:10pt; margin-bottom:3px;">b. Justifikasi Teknis Dalam Penggunaan Merek</div>
+            <p style="margin:0 0 10px 20px;">Tidak menggunakan merek tertentu / Menyesuaikan ketersediaan e-Katalog.</p>
+
+            <div style="font-weight:bold; font-size:10pt; margin-bottom:3px;">c. Spesifikasi Waktu</div>
+            <p style="margin:0 0 10px 20px;">Pelaksanaan pekerjaan mulai dari diterbitkannya Surat Pesanan (SP) sampai dengan jadwal penyelesaian yang disepakati.</p>
+
+            <div style="font-weight:bold; font-size:10pt; margin-bottom:3px;">d. Spesifikasi Tempat</div>
+            <p style="margin:0 0 10px 20px;">Pengiriman langsung ke tempat/lokasi tujuan yang ditentukan oleh Perangkat Daerah. Jarak dan akses lokasi diperhitungkan oleh penyedia tanpa biaya tambahan di luar harga satuan e-Katalog.</p>
+
+            <div style="font-weight:bold; font-size:10pt; margin-bottom:3px;">e. Spesifikasi Layanan</div>
+            <p style="margin:0 0 15px 20px; text-align:justify;">Penyedia wajib memenuhi tingkat layanan meliputi ketepatan waktu, kesesuaian spesifikasi, kualitas hasil, ketepatan jumlah, responsivitas, pengemasan, serta menindaklanjuti setiap ketidaksesuaian melalui perbaikan atau penggantian tanpa biaya tambahan.</p>
+
+            <div style="font-weight:bold; margin-top:15px; margin-bottom:5px;">II. Prioritas Penggunaan Produk Dalam Negeri</div>
+            <p style="margin:0 0 15px 0; text-align:justify;">Berdasarkan Peraturan Presiden Nomor 46 Tahun 2025 tentang Perubahan Kedua Atas Peraturan Presiden Nomor 16 Tahun 2018 Tentang Pengadaan Barang/Jasa Pemerintah, PPK memilih barang/jasa pada Katalog Elektronik dengan memprioritaskan Produk Dalam Negeri (PDN) yang memiliki nilai TKDN sesuai dengan ketentuan peraturan perundang-undangan.</p>
+
+            <div style="font-weight:bold; margin-top:15px; margin-bottom:5px;">III. Prioritas Penggunaan Produk dari Penyedia dengan Kualifikasi Usaha Kecil serta Koperasi</div>
+            <p style="margin:0 0 15px 0; text-align:justify;">Berdasarkan Pasal 65 Peraturan Presiden Nomor 46 Tahun 2025, untuk nilai paket pengadaan barang/jasa dengan nilai pagu anggaran sampai dengan Rp15.000.000.000,00 (lima belas miliar rupiah), PPK memilih Penyedia dengan Kualifikasi Usaha Kecil atau Koperasi pada aplikasi Katalog Elektronik.</p>
+
+            <div style="font-weight:bold; margin-top:15px; margin-bottom:5px;">IV. Pengumpulan Referensi Harga</div>
+            <p style="margin:0 0 15px 0; text-align:justify;">PPK/PP mempersiapkan referensi harga yang bersumber dari Katalog Elektronik maupun harga pembanding produk sejenis di luar sistem sebagai dasar acuan untuk melakukan Negosiasi Harga (kecuali untuk produk yang bersifat <i>fixed price</i>).</p>
+
+            <div style="font-weight:bold; margin-top:15px; margin-bottom:5px;">V. Rancangan Kontrak</div>
+            <p style="margin:0 0 15px 0;">Rancangan Kontrak menggunakan Surat Pesanan (SP) sesuai yang tertuang pada aplikasi E-Purchasing.</p>
+
+            <div style="font-weight:bold; margin-top:15px; margin-bottom:5px;">VI. Rencana Metode Pemilihan Penyedia</div>
+            <p style="margin:0 0 15px 0;">Rencana metode pemilihan penyedia Katalog Elektronik menggunakan metode: <strong>Negosiasi Harga</strong>.</p>
+
+            <div style="font-weight:bold; margin-top:15px; margin-bottom:5px;">VII. Penutup</div>
+            <p style="margin:0 0 35px 0; text-align:justify;">Demikian Dokumen Persiapan e-Purchasing ini dibuat untuk dapat diketahui bersama sebagai acuan bagi pelaksanaan proses pengadaan barang/jasa bagi pihak terkait.</p>
+
+            <table style="width:100%; font-size:10.5pt;">
                 <tr>
-                    <td style="width:50%;text-align:center;">Menyetujui<br>${ppk?.position || 'PA/KPA/PPK'}<br><br><br><br><br><strong>${ppk?.full_name || '-'}</strong><br>NIP. ${ppk?.nip || '-'}</td>
-                    <td style="width:50%;text-align:center;">Disusun Oleh<br>${bidang?.position_name || 'Kepala Bidang'}<br>${bidang?.bidang_name || ''}<br><br><br><br><br><strong>${bidang?.head_name || '-'}</strong><br>NIP. ${bidang?.head_nip || '-'}</td>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        &nbsp;
+                    </td>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        Putussibau, ${tgl}<br>
+                        Ditetapkan oleh:<br>
+                        <strong>${ppk?.position || 'Pejabat Pembuat Komitmen (PPKom)'}</strong>
+                        <br><br><br><br><br>
+                        <strong><u>${ppk?.full_name || '-'}</u></strong><br>
+                        NIP. ${ppk?.nip || '-'}
+                    </td>
                 </tr>
             </table>`;
          
