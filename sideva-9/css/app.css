@@ -1,40 +1,21 @@
-/* Reset Dasar */
+/* RESET TOTAL */
 body { margin: 0; font-family: sans-serif; }
+.wrapper { display: flex; min-height: 100vh; }
 
-/* Menggunakan variabel agar mudah dikelola */
-:root { --sidebar-width: 270px; }
-
-/* Menghilangkan CSS sidebar lama agar tidak konflik */
-.sidebar {
-    background: transparent !important;
-    padding: 0 !important;
-    position: static !important;
+/* PASTIKAN SIDEBAR TIDAK TERTIMPA */
+#sidebar-container { 
+    width: 270px; 
+    flex-shrink: 0; 
 }
 
-/* Mengatur tata letak utama */
-.wrapper {
-    display: flex;
-    min-height: 100vh;
+/* PASTIKAN KONTEN UTAMA FLEKSIBEL */
+.main-content { 
+    flex-grow: 1; 
+    width: 100%; 
+    transition: margin-left 0.3s; 
 }
 
-.main-content {
-    flex-grow: 1;
-    margin-left: 0; /* Sidebar baru sudah memiliki posisi fixed sendiri */
-    width: 100%;
-    transition: margin-left 0.3s;
-}
-
-/* Mengatasi tumpang tindih pada layar desktop */
-@media (min-width: 992px) {
-    .main-content {
-        margin-left: var(--sidebar-width);
-    }
-}
-
-.topbar {
-    background: white;
-    padding: 15px;
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 1px solid #dee2e6;
+/* HAPUS LOGO SISA DARI LAYOUT LAMA */
+.brand-logo-container, .old-logo-class, .banner-gradient {
+    display: none !important; 
 }
