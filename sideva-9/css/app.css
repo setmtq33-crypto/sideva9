@@ -1,47 +1,146 @@
-body{
-    margin:0;
+:root {
+    /* Day Mode (Teduh & Profesional) */
+    --bg-primary: #f8fafc;
+    --bg-card: #ffffff;
+    --sidebar-bg: #1e293b;
+    --sidebar-text: #f1f5f9;
+    --sidebar-hover: #334155;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --primary-accent: #3b82f6;
 }
 
-.sidebar{
-
-    position:fixed;
-
-    width:240px;
-
-    left:0;
-    top:0;
-    bottom:0;
-
-    background:#0d6efd;
-
-    padding:20px;
-
-    color:white;
+[data-theme="dark"] {
+    /* Night Mode (Deep Dark yang Nyaman di Mata) */
+    --bg-primary: #0f172a;
+    --bg-card: #1e293b;
+    --sidebar-bg: #0f172a;
+    --sidebar-text: #cbd5e1;
+    --sidebar-hover: #1e293b;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-color: #334155;
+    --primary-accent: #60a5fa;
 }
 
-.sidebar a{
-
-    display:block;
-
-    color:white;
-
-    text-decoration:none;
-
-    margin-bottom:10px;
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-main);
+    transition: background-color 0.3s, color 0.3s;
 }
 
-.main-content{
-
-    margin-left:240px;
+/* Layout Responsif */
+.wrapper {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
 }
 
-.topbar{
+.sidebar {
+    position: fixed;
+    width: 260px;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    background-color: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    border-right: 1px solid var(--border-color);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
 
-    background:white;
+.main-content {
+    margin-left: 260px;
+    flex-grow: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    transition: all 0.3s ease;
+}
 
-    padding:15px;
+.topbar {
+    background-color: var(--bg-card);
+    padding: 15px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
 
-    display:flex;
+.content-body {
+    padding: 24px;
+    flex-grow: 1;
+}
 
-    justify-content:space-between;
+/* Desain Komponen */
+.card {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 12px !important;
+    color: var(--text-main) !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+}
+
+.card-header {
+    background-color: transparent !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.table {
+    color: var(--text-main) !important;
+}
+
+.table th {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-muted) !important;
+    border-color: var(--border-color) !important;
+}
+
+.table td {
+    border-color: var(--border-color) !important;
+}
+
+.kpi {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary-accent);
+}
+
+/* Footer modern */
+.footer {
+    background-color: var(--bg-card);
+    border-top: 1px solid var(--border-color);
+    padding: 15px 24px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: auto;
+}
+
+/* Responsivitas untuk Handphone & Tablet (iOS / Android) */
+@media (max-width: 991.98px) {
+    .sidebar {
+        left: -260px;
+    }
+    .sidebar.active {
+        left: 0;
+    }
+    .main-content {
+        margin-left: 0;
+    }
+    .main-content.shifted {
+        margin-left: 260px;
+    }
 }
