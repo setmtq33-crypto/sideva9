@@ -24,11 +24,17 @@
 
         <div class="text-end d-none d-md-block">
             <h6 class="mb-0 fw-bold header-profile-name" id="userName" style="font-size: 0.85rem;">Memuat Akun...</h6>
-            <small class="text-muted fw-semibold opacity-75" style="font-size: 0.7rem;">Supabase Auth Platform</small>
+            <small class="text-muted fw-semibold opacity-75" style="font-size: 0.7rem;">Supabase Active Auth</small>
+        </div>
+        
+        <div class="profile-avatar-circle d-flex align-items-center justify-content-center fw-bold">
+            <i class="bi bi-person-fill"></i>
         </div>
 
-        <button onclick="logout()" class="btn-logout-action" title="Keluar dari Aplikasi">
-            <i class="bi bi-power fs-5"></i>
+        <div class="vr d-none d-sm-block mx-1" style="height: 24px; opacity: 0.2;"></div>
+
+        <button onclick="logout()" class="btn btn-logout-action" title="Logout dari sistem">
+            <i class="bi bi-power"></i>
         </button>
     </div>
 </div>
@@ -40,24 +46,32 @@
         border-bottom: 1px solid var(--bs-border-color);
         width: 100%;
     }
-    .secure-badge {
-        font-size: 0.75rem;
-        letter-spacing: 0.5px;
-    }
+    .secure-badge { font-size: 0.72rem; }
+    
     .btn-icon-theme {
         width: 36px;
         height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         border-radius: 10px;
         border: 1px solid var(--bs-border-color);
         background: var(--bs-tertiary-bg);
         color: var(--bs-body-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
         transition: all 0.2s;
     }
     .btn-icon-theme:hover {
         background: var(--bs-secondary-bg);
+    }
+    
+    .profile-avatar-circle {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: var(--bs-primary-subtle);
+        color: var(--bs-primary);
+        font-size: 0.9rem;
+        border: 1px solid var(--bs-border-color-translucent);
     }
     .btn-logout-action {
         width: 36px;
@@ -78,7 +92,7 @@
 </style>
 
 <script>
-    // 1. FUNGSI MANAGEMENT MANAGEMENT TEMA
+    // 1. UTALITAS PENGATURAN TEMA TAMPILAN
     function applySavedTheme() {
         const cachedTheme = localStorage.getItem('theme-mode') || 'light';
         document.documentElement.setAttribute('data-bs-theme', cachedTheme);
@@ -98,76 +112,73 @@
         }
     }
 
-    // 2. LOGIKA UTAMA: VALIDASI AMAN SELECTOR OPD GLOBAL
-    async function initGlobalOpdSelector() {
-        // Mekanisme Interval Tunggu: Menghindari balapan pemuatan skrip auth.js / supabase.js
-        const checkAuthReady = setInterval(async () => {
-            try {
-                // Pastikan client Supabase dan fungsi getProfile bawaan framework Anda sudah terdefinisi di window
-                if (typeof window.supabaseClient !== 'undefined' && typeof window.getProfile === 'function') {
+    // 2. LOGIKA UTAMA: EVALUASI ROLE DAN PENGISIAN DROPDOWN OPD
+    async function verifyAndRenderOpdSelector() {
+        // Gunakan interval untuk menunggu sampai fungsi getProfile() & objek database Supabase siap di window
+        const integrityCheck = setInterval(async () => {
+            const hasAuthScript = typeof window.getProfile === 'function';
+            const hasSupabase = typeof window.supabaseClient !== 'undefined';
+            const hasContainer = document.getElementById('superAdminOpdSelectorContainer') !== null;
+
+            if (hasAuthScript && hasSupabase && hasContainer) {
+                clearInterval(integrityCheck); // Hentikan loop pencarian karena semua resource siap
+                
+                try {
+                    const profile = await window.getProfile();
                     
-                    // Hentikan loop pencarian karena core script sudah siap
-                    clearInterval(checkAuthReady);
-                    
-                    // Ambil profil pengguna aktif
-                    const userProfile = await window.getProfile(); 
-                    
-                    if (userProfile) {
-                        const userRole = (userProfile.role || '').toLowerCase();
+                    if (profile && profile.role) {
+                        // Mengonversi role menjadi huruf kecil semua agar lolos validasi 'super_admin' atau 'superadmin'
+                        const normalizedRole = profile.role.toLowerCase().replace(/[^a-z0-9]/g, '');
                         
-                        // Cek presisi apakah level akun adalah super_admin
-                        if (userRole === 'super_admin' || userRole === 'superadmin') {
+                        if (normalizedRole === 'superadmin') {
                             const container = document.getElementById('superAdminOpdSelectorContainer');
                             const selector = document.getElementById('globalOpdSelector');
                             
-                            if (container && selector) {
-                                // Ambil data list OPD langsung menggunakan objek database global window.supabaseClient
-                                const { data: opds, error } = await window.supabaseClient
-                                    .from('opds')
-                                    .select('id, opd_name')
-                                    .order('opd_name', { ascending: true });
+                            // Tarik data langsung dari tabel database 'opds' Anda
+                            const { data: opds, error } = await window.supabaseClient
+                                .from('opds')
+                                .select('id, opd_name')
+                                .order('opd_name', { ascending: true });
+                            
+                            if (!error && opds) {
+                                // Bersihkan isi dropdown agar tidak duplikat saat berpindah halaman
+                                selector.innerHTML = '<option value="ALL">-- Semua OPD (Konsolidasi) --</option>';
                                 
-                                if (!error && opds) {
-                                    // Bersihkan sisa render duplikasi sebelum mengisi dropdown
-                                    selector.innerHTML = '<option value="ALL">-- Semua OPD (Konsolidasi) --</option>';
-                                    
-                                    opds.forEach(opd => {
-                                        const opt = document.createElement('option');
-                                        opt.value = opd.id;
-                                        opt.innerText = opd.opd_name;
-                                        selector.appendChild(opt);
-                                    });
-                                    
-                                    // Ambil opsi terakhir yang disimpan di memori browser
-                                    const savedOpdId = localStorage.getItem('selected-opd-id') || 'ALL';
-                                    selector.value = savedOpdId;
-                                    
-                                    // Pasang event penangkap perubahan data
-                                    selector.addEventListener('change', (e) => {
-                                        localStorage.setItem('selected-opd-id', e.target.value);
-                                        window.location.reload();
-                                    });
-                                    
-                                    // TAMPILKAN SEKARANG: Menghapus kelas d-none secara paksa setelah data siap
-                                    container.classList.remove('d-none');
-                                } else {
-                                    console.error("Gagal menarik data tabel opds dari Supabase:", error);
-                                }
+                                opds.forEach(opd => {
+                                    const opt = document.createElement('option');
+                                    opt.value = opd.id;
+                                    opt.innerText = opd.opd_name;
+                                    selector.appendChild(opt);
+                                });
+                                
+                                // Kunci kembali posisi pilihan OPD terakhir yang disimpan di komputer admin
+                                const savedOpd = localStorage.getItem('selected-opd-id') || 'ALL';
+                                selector.value = savedOpd;
+                                
+                                // Pasang detektor perubahan pilihan
+                                selector.addEventListener('change', (e) => {
+                                    localStorage.setItem('selected-opd-id', e.target.value);
+                                    window.location.reload();
+                                });
+                                
+                                // Tampilkan container dropdown secara instan ke hadapan Super Admin
+                                container.classList.remove('d-none');
+                            } else {
+                                console.error("Supabase Error saat membaca tabel opds:", error);
                             }
                         }
                     }
+                } catch (err) {
+                    console.error("Gagal memproses validasi hak akses akun:", err);
                 }
-            } catch (err) {
-                clearInterval(checkAuthReady);
-                console.error("Sistem menghentikan pemuatan otomatis Selector akibat kendala teknis:", err);
             }
-        }, 100); // Periksa ulang setiap 100 milidetik secara asinkronus
+        }, 100);
 
-        // Pembatasan keamanan (Timeout): Jika dalam 6 detik fungsi tidak ketemu, hentikan interval agar tidak membebani memori browser
-        setTimeout(() => clearInterval(checkAuthReady), 6000);
+        // Batasi pencarian maksimal selama 6 detik untuk mencegah konsumsi memori tak terbatas jika ada script error eksternal
+        setTimeout(() => clearInterval(integrityCheck), 6000);
     }
 
-    // Inisialisasi awal saat topbar ditempelkan oleh layout.js
+    // Jalankan eksekusi terstruktur
     applySavedTheme();
-    initGlobalOpdSelector();
+    verifyAndRenderOpdSelector();
 </script>
