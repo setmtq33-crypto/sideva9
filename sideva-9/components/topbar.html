@@ -1,21 +1,60 @@
-<div class="topbar">
-
-    <div>
-        SIDEVA9
-    </div>
-
-    <div>
-
-        <span id="userName"></span>
-
-        <button
-            onclick="logout()"
-            class="btn btn-danger btn-sm">
-
-            Logout
-
+<div class="d-flex justify-content-between align-items-center w-100">
+    <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-outline-secondary d-lg-none" onclick="toggleMobileSidebar()">
+            <i class="bi bi-list"></i>
         </button>
-
+        <div class="d-none d-sm-block text-muted small">
+            <i class="bi bi-calendar3 me-1"></i> <span id="currentDate">Senin, 15 Juni 2026</span>
+            <span class="mx-2">|</span>
+            <i class="bi bi-clock me-1"></i> <span id="currentTime">22:27:55</span> WIB
+        </div>
     </div>
 
+    <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-link text-secondary p-1" onclick="toggleThemeMode()" title="Ganti Mode Tema">
+            <i id="themeIcon" class="bi bi-moon-fill fs-5"></i>
+        </button>
+        
+        <div class="vr"></div>
+        
+        <span id="userName" class="fw-semibold"></span>
+        <button onclick="logout()" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+            <i class="bi bi-box-arrow-right me-1"></i> Keluar
+        </button>
+    </div>
 </div>
+
+<script>
+// Logic Realtime Clock & Date
+function updateClock() {
+    const now = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('currentDate').innerText = now.toLocaleDateString('id-ID', options);
+    document.getElementById('currentTime').innerText = now.toLocaleTimeString('id-ID', { hour12: false });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Theme Switching Feature
+function toggleThemeMode() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('sideva-theme', newTheme);
+    
+    const icon = document.getElementById('themeIcon');
+    if(newTheme === 'dark') {
+        icon.className = 'bi bi-sun-fill text-warning fs-5';
+    } else {
+        icon.className = 'bi bi-moon-fill text-secondary fs-5';
+    }
+}
+
+// Inisialisasi tema tersimpan saat load
+const savedTheme = localStorage.getItem('sideva-theme') || 'light';
+document.documentElement.setAttribute('data-theme', savedTheme);
+setTimeout(() => {
+    const icon = document.getElementById('themeIcon');
+    if(icon) icon.className = savedTheme === 'dark' ? 'bi bi-sun-fill text-warning fs-5' : 'bi bi-moon-fill text-secondary fs-5';
+}, 200);
+</script>
