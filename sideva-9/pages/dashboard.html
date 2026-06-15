@@ -336,54 +336,62 @@ function rupiah(v){
  }).format(v||0);
 }
 
-// GANTI FUNGSI init() LAMA ANDA DENGAN YANG INI:
+// ====== GANTI FUNGSI init() LAMA ANDA DENGAN INI ======
 async function init(){
-  const profile = await getProfile();
+  try {
+    const profile = await getProfile();
 
-  document.getElementById('welcomeText').innerHTML =
-  `Sistem mendeteksi identifikasi masuk sebagai: <b>${profile.full_name}</b> dengan level status akses <b>(${profile.role})</b>`;
+    document.getElementById('welcomeText').innerHTML =
+    `Sistem mendeteksi identifikasi masuk sebagai: <b>${profile.full_name}</b> dengan level status akses <b>(${profile.role})</b>`;
 
-  // Sinkronisasi Nama Pengguna ke elemen Topbar
-  setTimeout(() => {
-      const topbarUserEl = document.getElementById('userName');
-      if (topbarUserEl) topbarUserEl.innerText = profile.full_name;
-  }, 300);
+    // Sinkronisasi sinkron teks nama profil ke komponen topbar setelah jeda layout rendering
+    setTimeout(() => {
+        const topbarUserEl = document.getElementById('userName');
+        if (topbarUserEl) topbarUserEl.innerText = profile.full_name;
+    }, 500);
 
-  // SEGERA JALANKAN INJEKSI DROP DOWN OPD SEKARANG
-  await injectSuperAdminSelector(profile);
+    // EKSEKUSI PEMANTAUAN ELEMEN DROPDOWN SECARA REKURSIF
+    injectSuperAdminSelector(profile);
 
-  // Jalankan query data bawaan dashboard Anda
-  await loadKPI();
-  await loadStatus();
-  await loadOpdSummary();
-  await loadRecentPackages();
+    // Jalankan pemuatan data bawaan dashboard Anda
+    await loadKPI();
+    await loadStatus();
+    await loadOpdSummary();
+    await loadRecentPackages();
+  } catch (error) {
+    console.error("Gagal memuat inisialisasi awal dashboard:", error);
+  }
 }
 
-// TAMBAHKAN FUNGSI BARU INI TEPAT DI BAWAH FUNGSI init():
-async function injectSuperAdminSelector(profile) {
+// ====== TAMBAHKAN FUNGSI ANTIGAGAL INI TEPAT DI BAWAH FUNGSI init() ======
+function injectSuperAdminSelector(profile) {
     if (!profile || !profile.role) return;
     
-    // Normalisasi string huruf besar/kecil (Menghandle SUPER_ADMIN dari data Anda)
+    // Normalisasi teks string role (Mengamankan format 'SUPER_ADMIN' atau 'super_admin')
     const normalizedRole = profile.role.toLowerCase().replace(/[^a-z0-9]/g, '');
     
     if (normalizedRole === 'superadmin') {
-        // Gunakan interval kecil untuk memastikan topbar.html selesai ditempel ke DOM oleh layout.js
-        const checkTopbarReady = setInterval(async () => {
+        let attempts = 0;
+        
+        // Buat loop pemantau DOM untuk menangkap momen tepat ketika loadLayout() selesai menempelkan topbar
+        const watchTopbarDOM = setInterval(async () => {
+            attempts++;
             const container = document.getElementById('superAdminOpdSelectorContainer');
             const selector = document.getElementById('globalOpdSelector');
             
+            // Jika container HTML topbar sudah terdeteksi eksis di halaman
             if (container && selector) {
-                clearInterval(checkTopbarReady); // Hentikan pengecekan karena element ketemu!
+                clearInterval(watchTopbarDOM); // Hentikan loop pemantauan secepatnya
                 
                 try {
-                    // Ambil koleksi data list OPD langsung melalui window.supabaseClient
+                    // Tarik koleksi daftar data OPD aktif dari Supabase
                     const { data: opds, error } = await window.supabaseClient
                         .from('opds')
                         .select('id, opd_name')
                         .order('opd_name', { ascending: true });
                     
                     if (!error && opds) {
-                        // Reset item bawaan agar bersih
+                        // Bersihkan render agar opsi tidak bertumpuk duplikat
                         selector.innerHTML = '<option value="ALL">-- Semua OPD (Konsolidasi) --</option>';
                         
                         opds.forEach(opd => {
@@ -393,27 +401,33 @@ async function injectSuperAdminSelector(profile) {
                             selector.appendChild(opt);
                         });
                         
-                        // Kunci nilai berdasarkan pilihan terakhir di localStorage
+                        // Set nilai ke pilihan terakhir yang tersimpan di localStorage
                         const savedOpdId = localStorage.getItem('selected-opd-id') || 'ALL';
                         selector.value = savedOpdId;
                         
-                        // Pasang event pendeteksi pergantian nilai
+                        // Listener pendeteksi pergantian pilihan OPD oleh Super Admin
                         selector.addEventListener('change', (e) => {
                             localStorage.setItem('selected-opd-id', e.target.value);
-                            window.location.reload(); // Segarkan halaman agar query supabase tersaring
+                            window.location.reload(); // Refresh halaman agar query filter terpicu ulang
                         });
                         
-                        // Hapus class d-none untuk memunculkan dropdown secara instan ke layar!
+                        // PAKSA TAMPILKAN DI LAYAR: Lepas kelas penyembunyi d-none
                         container.classList.remove('d-none');
+                        console.log("SIDEVA ENGINE: Dropdown Selector OPD Berhasil Diinjeksi!");
+                    } else {
+                        console.error("SIDEVA ENGINE: Gagal membaca tabel opds dari database:", error);
                     }
-                } catch (dbError) {
-                    console.error("Gagal menarik data dari tabel opds:", dbError);
+                } catch (dbErr) {
+                    console.error("SIDEVA ENGINE: Terjadi kendala internal database:", dbErr);
                 }
             }
-        }, 100);
-        
-        // Timeout pengaman max 4 detik
-        setTimeout(() => clearInterval(checkTopbarReady), 4000);
+            
+            // Pengaman batas atas tunggu maksimal 10 detik
+            if (attempts > 100) {
+                clearInterval(watchTopbarDOM);
+                console.error("SIDEVA ENGINE: Waktu tunggu habis, elemen topbar tidak ditemukan.");
+            }
+        }, 100); // Periksa ulang DOM setiap 100 milidetik
     }
 }
 
