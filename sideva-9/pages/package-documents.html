@@ -514,11 +514,6 @@ async function renderSidevaDocumentInternal(slug, pId) {
             `;
         } else if(slug === 'penetapan') {
             htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:13pt; text-decoration:underline; margin-bottom:20px;">SURAT PENETAPAN METODE PENGADAAN</div><p>Menimbang kesiapan komoditas pasar daring, Pejabat Pembuat Komitmen menetapkan paket:</p><p><strong>Nama Pekerjaan:</strong> ${paket.package_name}<br><strong>Metode Pemilihan:</strong> E-PURCHASING (KATALOG ELEKTRONIK)</p><p>Ketetapan ini dibuat untuk segera ditindaklanjuti oleh Pejabat Pengadaan.</p><div style="margin-top:60px; float:right; width:220px;">Ditetapkan, ${tgl}<br><strong>Pejabat Pembuat Komitmen</strong><br><br><br><br>( ......................... )</div><div style="clear:both;"></div>`;
-        } else {
-            // Berkas Berita Acara Rangkuman Administrasi Umum Lainnya
-            htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:12pt; text-decoration:underline; margin-bottom:15px;">BERITA ACARA ADMINISTRASI ALUR KERJA (SIDEVA-V9)</div><p>Menerangkan dengan sah bahwa dokumen pengadaan instansi untuk paket <strong>${paket.package_name}</strong> dengan alokasi HPS senilai <strong>${docFmtRp(paket.budget_ceiling)}</strong> telah diperiksa melalui sistem otomasi berkas fisik.</p><p>Status Kelayakan administrasi dinyatakan: <strong style="color:green;">MEMENUHI SYARAT (VALID)</strong></p><div style="margin-top:50px; display:flex; justify-content:between;"><div style="width:200px;"><strong>PPKom</strong><br><br><br><br>(........................)</div><div style="width:200px; text-align:right;"><strong>Pejabat Pengadaan</strong><br><br><br><br>(........................)</div></div>`;
-        }
-
         } else if(slug === 'spek') {
 
              let rows = '';
@@ -664,6 +659,11 @@ async function renderSidevaDocumentInternal(slug, pId) {
              ${ttdHtml}
              `;
          }
+
+         } else {
+            // Berkas Berita Acara Rangkuman Administrasi Umum Lainnya
+            htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:12pt; text-decoration:underline; margin-bottom:15px;">BERITA ACARA ADMINISTRASI ALUR KERJA (SIDEVA-V9)</div><p>Menerangkan dengan sah bahwa dokumen pengadaan instansi untuk paket <strong>${paket.package_name}</strong> dengan alokasi HPS senilai <strong>${docFmtRp(paket.budget_ceiling)}</strong> telah diperiksa melalui sistem otomasi berkas fisik.</p><p>Status Kelayakan administrasi dinyatakan: <strong style="color:green;">MEMENUHI SYARAT (VALID)</strong></p><div style="margin-top:50px; display:flex; justify-content:between;"><div style="width:200px;"><strong>PPKom</strong><br><br><br><br>(........................)</div><div style="width:200px; text-align:right;"><strong>Pejabat Pengadaan</strong><br><br><br><br>(........................)</div></div>`;
+        }
 
         targetDiv.innerHTML = `<div class="bg-white text-dark p-5 mx-auto text-start shadow-lg" style="width:100%; max-width:760px; min-height:900px; font-family:'Times New Roman',Times,serif; font-size:11pt; line-height:1.5; color:#000;">${htmlOutput}</div>`;
     } catch (e) { targetDiv.innerHTML = `<div class="alert alert-danger m-2 small">❌ Gagal memproses draf kertas: ${e.message}</div>`; }
