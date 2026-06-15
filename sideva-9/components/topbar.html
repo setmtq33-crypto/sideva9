@@ -12,62 +12,53 @@
 
     <div class="d-flex align-items-center gap-2 gap-md-3">
         
+        <div id="superAdminOpdSelectorContainer" class="d-none">
+            <select id="globalOpdSelector" class="form-select form-select-sm border-secondary-subtle bg-body-tertiary fw-semibold" style="min-width: 210px; border-radius: 8px; font-size: 0.8rem; height: 36px;">
+                <option value="ALL">-- Semua OPD (Konsolidasi) --</option>
+            </select>
+        </div>
+
         <button onclick="toggleAppTheme()" class="btn btn-icon-theme me-1" title="Ganti Mode Tampilan" aria-label="Switch Theme">
-            <i class="bi bi-sun-fill id="theme-icon-indicator" style="font-size: 1.1rem;"></i>
+            <i class="bi bi-sun-fill" id="theme-icon-indicator" style="font-size: 1.1rem;"></i>
         </button>
 
         <div class="text-end d-none d-md-block">
             <h6 class="mb-0 fw-bold header-profile-name" id="userName" style="font-size: 0.85rem;">Memuat Akun...</h6>
-            <small class="text-muted fw-semibold opacity-75" style="font-size: 0.7rem;">Supabase Active Auth</small>
-        </div>
-        
-        <div class="profile-avatar-circle d-flex align-items-center justify-content-center fw-bold">
-            <i class="bi bi-person-fill"></i>
+            <small class="text-muted fw-semibold opacity-75" style="font-size: 0.7rem;">Supabase Auth Platform</small>
         </div>
 
-        <div class="vr d-none d-sm-block mx-1" style="height: 24px; opacity: 0.2;"></div>
-
-        <button onclick="logout()" class="btn btn-logout-action" title="Logout dari sistem">
-            <i class="bi bi-power"></i>
+        <button onclick="logout()" class="btn-logout-action" title="Keluar dari Aplikasi">
+            <i class="bi bi-power fs-5"></i>
         </button>
     </div>
 </div>
 
 <style>
+    /* Desain Dasar Topbar Flex */
     .topbar-fluid {
         height: 70px;
         background: var(--bs-body-bg);
         border-bottom: 1px solid var(--bs-border-color);
         width: 100%;
     }
-    .secure-badge { font-size: 0.72rem; }
-    
-    /* Theme Toggle Dynamic Button */
+    .secure-badge {
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
     .btn-icon-theme {
         width: 36px;
         height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         border-radius: 10px;
         border: 1px solid var(--bs-border-color);
         background: var(--bs-tertiary-bg);
         color: var(--bs-body-color);
-        display: flex;
-        align-items: center;
-        justify-content: center;
         transition: all 0.2s;
     }
     .btn-icon-theme:hover {
         background: var(--bs-secondary-bg);
-        transform: rotate(15deg);
-    }
-    
-    .profile-avatar-circle {
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        background: var(--bs-primary-subtle);
-        color: var(--bs-primary);
-        font-size: 0.9rem;
-        border: 1px solid var(--bs-border-color-translucent);
     }
     .btn-logout-action {
         width: 36px;
@@ -85,8 +76,10 @@
         background: #dc3545;
         color: #ffffff;
     }
+</style>
 
-    /* THEME SWITCHER CORE LOGIC JAVASCRIPT */
+<script>
+    // CORE LAYOUT MECHANISM & CORE LOGIC MULTI-THEME
     function applySavedTheme() {
         const cachedTheme = localStorage.getItem('theme-mode') || 'light';
         document.documentElement.setAttribute('data-bs-theme', cachedTheme);
@@ -105,7 +98,55 @@
             icon.className = activeTheme === 'dark' ? 'bi bi-moon-stars-fill text-warning' : 'bi bi-sun-fill text-primary';
         }
     }
-    
-    // Jalankan pengecekan tema instan saat elemen dimasukkan ke DOM
-    setTimeout(applySavedTheme, 50);
-</style>
+
+    // LOGIKA PENYARINGAN DROPDOWN OPD GLOBAL UNTUK SUPER ADMIN
+    async function initGlobalOpdSelector() {
+        try {
+            // Memanggil fungsi profil bawaan auth.js aplikasi Anda
+            const userProfile = await getProfile(); 
+            
+            // Periksa hak akses tingkatan user
+            if (userProfile && (userProfile.role === 'super_admin' || userProfile.role === 'SUPER_ADMIN')) {
+                const container = document.getElementById('superAdminOpdSelectorContainer');
+                const selector = document.getElementById('globalOpdSelector');
+                
+                if (container && selector) {
+                    container.classList.remove('d-none'); // Tampilkan dropdown ke layar
+                    
+                    // Tarik koleksi data daftar OPD aktif langsung dari database Supabase Anda
+                    const { data: opds, error } = await window.supabaseClient
+                        .from('opds')
+                        .select('id, opd_name')
+                        .order('opd_name', { ascending: true });
+                    
+                    if (!error && opds) {
+                        opds.forEach(opd => {
+                            const opt = document.createElement('option');
+                            opt.value = opd.id;
+                            opt.innerText = opd.opd_name;
+                            selector.appendChild(opt);
+                        });
+                    }
+                    
+                    // Amankan posisi pilihan terakhir yang dipilih super admin dari localStorage
+                    const savedOpdId = localStorage.getItem('selected-opd-id') || 'ALL';
+                    selector.value = savedOpdId;
+                    
+                    // Saat pilihan bertukar, simpan id baru dan paksa halaman melakukan refresh instan
+                    selector.addEventListener('change', (e) => {
+                        localStorage.setItem('selected-opd-id', e.target.value);
+                        window.location.reload();
+                    });
+                }
+            }
+        } catch (err) {
+            console.error("Gagal memproses validasi Selector OPD Global:", err);
+        }
+    }
+
+    // Eksekusi asinkronus setelah elemen DOM selesai dirender sempurna oleh layout.js
+    setTimeout(() => {
+        applySavedTheme();
+        initGlobalOpdSelector();
+    }, 200);
+</script>
