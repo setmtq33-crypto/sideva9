@@ -336,22 +336,85 @@ function rupiah(v){
  }).format(v||0);
 }
 
+// GANTI FUNGSI init() LAMA ANDA DENGAN YANG INI:
 async function init(){
- const profile = await getProfile();
+  const profile = await getProfile();
 
- document.getElementById('welcomeText').innerHTML =
- `Sistem mendeteksi identifikasi masuk sebagai: <b>${profile.full_name}</b> dengan level status akses <b>(${profile.role})</b>`;
+  document.getElementById('welcomeText').innerHTML =
+  `Sistem mendeteksi identifikasi masuk sebagai: <b>${profile.full_name}</b> dengan level status akses <b>(${profile.role})</b>`;
 
- // Sinkronisasi Nama Pengguna ke elemen Topbar agar tidak kosong saat dipasang asinkronus
- setTimeout(() => {
-     const topbarUserEl = document.getElementById('userName');
-     if (topbarUserEl) topbarUserEl.innerText = profile.full_name;
- }, 300);
+  // Sinkronisasi Nama Pengguna ke elemen Topbar
+  setTimeout(() => {
+      const topbarUserEl = document.getElementById('userName');
+      if (topbarUserEl) topbarUserEl.innerText = profile.full_name;
+  }, 300);
 
- await loadKPI();
- await loadStatus();
- await loadOpdSummary();
- await loadRecentPackages();
+  // SEGERA JALANKAN INJEKSI DROP DOWN OPD SEKARANG
+  await injectSuperAdminSelector(profile);
+
+  // Jalankan query data bawaan dashboard Anda
+  await loadKPI();
+  await loadStatus();
+  await loadOpdSummary();
+  await loadRecentPackages();
+}
+
+// TAMBAHKAN FUNGSI BARU INI TEPAT DI BAWAH FUNGSI init():
+async function injectSuperAdminSelector(profile) {
+    if (!profile || !profile.role) return;
+    
+    // Normalisasi string huruf besar/kecil (Menghandle SUPER_ADMIN dari data Anda)
+    const normalizedRole = profile.role.toLowerCase().replace(/[^a-z0-9]/g, '');
+    
+    if (normalizedRole === 'superadmin') {
+        // Gunakan interval kecil untuk memastikan topbar.html selesai ditempel ke DOM oleh layout.js
+        const checkTopbarReady = setInterval(async () => {
+            const container = document.getElementById('superAdminOpdSelectorContainer');
+            const selector = document.getElementById('globalOpdSelector');
+            
+            if (container && selector) {
+                clearInterval(checkTopbarReady); // Hentikan pengecekan karena element ketemu!
+                
+                try {
+                    // Ambil koleksi data list OPD langsung melalui window.supabaseClient
+                    const { data: opds, error } = await window.supabaseClient
+                        .from('opds')
+                        .select('id, opd_name')
+                        .order('opd_name', { ascending: true });
+                    
+                    if (!error && opds) {
+                        // Reset item bawaan agar bersih
+                        selector.innerHTML = '<option value="ALL">-- Semua OPD (Konsolidasi) --</option>';
+                        
+                        opds.forEach(opd => {
+                            const opt = document.createElement('option');
+                            opt.value = opd.id;
+                            opt.innerText = opd.opd_name;
+                            selector.appendChild(opt);
+                        });
+                        
+                        // Kunci nilai berdasarkan pilihan terakhir di localStorage
+                        const savedOpdId = localStorage.getItem('selected-opd-id') || 'ALL';
+                        selector.value = savedOpdId;
+                        
+                        // Pasang event pendeteksi pergantian nilai
+                        selector.addEventListener('change', (e) => {
+                            localStorage.setItem('selected-opd-id', e.target.value);
+                            window.location.reload(); // Segarkan halaman agar query supabase tersaring
+                        });
+                        
+                        // Hapus class d-none untuk memunculkan dropdown secara instan ke layar!
+                        container.classList.remove('d-none');
+                    }
+                } catch (dbError) {
+                    console.error("Gagal menarik data dari tabel opds:", dbError);
+                }
+            }
+        }, 100);
+        
+        // Timeout pengaman max 4 detik
+        setTimeout(() => clearInterval(checkTopbarReady), 4000);
+    }
 }
 
 // INTEGRASI SELECTOR OPD GLOBAL PADA QUERY KPI
