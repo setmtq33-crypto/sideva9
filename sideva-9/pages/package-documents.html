@@ -226,6 +226,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
         const { data: akun } = await documentDb.from('budget_accounts').select('*').eq('id', paket.budget_account_id).single(); console.log("AKUN :", akun);
         const { data: items, error: itemsError } = await documentDb.from('package_items').select('*,price_surveys(*)').eq('package_id', pId); if(itemsError){throw itemsError;} console.log("ITEMS :", items);
         const { data: ppk } = await documentDb.from('ppkoms').select('*').eq('opd_id', paket.opd_id).single(); console.log("PPK :", ppk);
+        const { data: bidang } = await documentDb.from('bidangs').select('*').eq('id', paket.bidang_id).single(); console.log("BIDANG :", bidang);
         const listItems = items || [];
         const kopHtml = `<div style="text-align:center; border-bottom:3px double #000; padding-bottom:6px; margin-bottom:20px; font-family:'Times New Roman',Times,serif; color:#000;"><h4 style="margin:0; font-size:13pt; font-weight:bold;">PEMERINTAH KABUPATEN DAERAH</h4><h3 style="margin:2px 0; font-size:15pt; font-weight:bold;">DINAS PERANGKAT DAERAH</h3><p style="margin:0; font-size:9.5pt; font-style:italic;">Sistem Administrasi Verifikasi Dokumen Terintegrasi v9</p></div>`;
         const tgl = docFmtDate(new Date());
@@ -440,78 +441,77 @@ async function renderSidevaDocumentInternal(slug, pId) {
             </div>
             
             <table
-            style="
-            width:100%;
-            border-collapse:collapse;
-            margin-top:40px;
-            font-size:10pt;
-            ">
-            
-            <tr>
-            
-            <td
-            style="
-            width:50%;
-            border:1px solid #000;
-            padding:10px;
-            vertical-align:top;
-            ">
-            
-            Disusun pada tanggal
-            <br>
-            ${tgl}
-            
-            <br><br>
-            
-            Ditetapkan oleh,
-            <br>
-            ${ppk?.position || 'PA/KPA/PPK'}
-            
-            <br><br>
-            
-            ${opd?.name || ''}
-            
-            <br><br><br><br>
-            
-            <strong>
-            ${ppk?.full_name || '-'}
-            </strong>
-            
-            <br>
-            
-            NIP. ${ppk?.nip || '-'}
-            
-            </td>
-            
-            <td
-            style="
-            width:50%;
-            border:1px solid #000;
-            padding:10px;
-            vertical-align:top;
-            ">
-            
-            Disusun oleh,
-            
-            <br>
-            
-            ${bidang?.name || 'Kepala Bidang'}
-            
-            <br><br><br><br><br><br>
-            
-            <strong>
-            ${bidang?.kepala_bidang || '-'}
-            </strong>
-            
-            <br>
-            
-            NIP. ${bidang?.nip || '-'}
-            
-            </td>
-            
-            </tr>
-            
-            </table>
+             style="
+             width:100%;
+             border-collapse:collapse;
+             margin-top:40px;
+             font-size:10pt;
+             ">
+             
+             <tr>
+             
+             <td
+             style="
+             width:50%;
+             border:1px solid #000;
+             padding:10px;
+             vertical-align:top;
+             ">
+             
+             Disusun pada tanggal
+             <br>
+             ${tgl}
+             
+             <br><br>
+             
+             Ditetapkan oleh,
+             <br>
+             ${ppk?.position || 'PA/KPA/PPK'}
+             
+             <br><br><br><br><br>
+             
+             <strong>
+             ${ppk?.full_name || '-'}
+             </strong>
+             
+             <br>
+             
+             NIP. ${ppk?.nip || '-'}
+             
+             </td>
+             
+             <td
+             style="
+             width:50%;
+             border:1px solid #000;
+             padding:10px;
+             vertical-align:top;
+             ">
+             
+             Disusun oleh,
+             <br>
+             
+             ${bidang?.position_name || 'Kepala Bidang'}
+             
+             <br>
+             
+             ${bidang?.bidang_name || ''}
+             
+             <br><br><br><br><br>
+             
+             <strong>
+             ${bidang?.head_name || '-'}
+             </strong>
+             
+             <br>
+             
+             ${bidang?.head_nip || '-'}
+             
+             </td>
+             
+             </tr>
+             
+             </table>
             
             <div style="clear:both;"></div>
             `;
