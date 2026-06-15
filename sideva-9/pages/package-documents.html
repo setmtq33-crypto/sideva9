@@ -224,7 +224,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
     try {
         const { data: paket, error: paketError } = await documentDb.from('packages').select('*').eq('id', pId).single(); if(paketError){throw paketError;} console.log("PAKET :", paket); alert(JSON.stringify(paket,null,2));
         const { data: akun } = await documentDb.from('budget_accounts').select('*').eq('id', paket.budget_account_id).single(); console.log("AKUN :", akun);
-        const { data: items, error: itemsError } = await documentDb.from('package_items').select('*').eq('package_id', pId); if(itemsError){throw itemsError;} console.log("ITEMS :", items);
+        const { data: items, error: itemsError } = await documentDb.from('package_items').select('*,price_surveys(*)').eq('package_id', pId); if(itemsError){throw itemsError;} console.log("ITEMS :", items);
         const listItems = items || [];
         const kopHtml = `<div style="text-align:center; border-bottom:3px double #000; padding-bottom:6px; margin-bottom:20px; font-family:'Times New Roman',Times,serif; color:#000;"><h4 style="margin:0; font-size:13pt; font-weight:bold;">PEMERINTAH KABUPATEN DAERAH</h4><h3 style="margin:2px 0; font-size:15pt; font-weight:bold;">DINAS PERANGKAT DAERAH</h3><p style="margin:0; font-size:9.5pt; font-style:italic;">Sistem Administrasi Verifikasi Dokumen Terintegrasi v9</p></div>`;
         const tgl = docFmtDate(new Date());
@@ -379,6 +379,48 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 </td>
             </tr>
             `).join('')}
+            
+            </table>
+
+            <div style="margin-top:25px;">
+                <strong>
+                    C. KETERSEDIAAN PRODUK DAN PELAKU USAHA
+                </strong>
+            </div>
+            
+            <table
+            style="
+            width:100%;
+            border-collapse:collapse;
+            margin-top:10px;
+            font-size:10pt;
+            ">
+            
+            ${listItems.flatMap(item =>
+            (item.price_surveys || []).map((ps,idx)=>`
+            <tr>
+            <td
+            style="
+            border:1px solid #000;
+            padding:6px;
+            width:40px;
+            vertical-align:top;
+            ">
+            ${idx+1}
+            </td>
+            
+            <td
+            style="
+            border:1px solid #000;
+            padding:6px;
+            ">
+            <strong>${ps.vendor_name}</strong>
+            <br>
+            ${ps.source_url || '-'}
+            </td>
+            </tr>
+            `)
+            ).join('')}
             
             </table>
             
