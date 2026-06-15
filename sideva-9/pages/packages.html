@@ -8,7 +8,10 @@
 <title>SIDEVA9</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -20,842 +23,373 @@
 <script src="../js/permissions.js"></script>
 <script src="../js/dashboard-documents.js"></script>
 
-
 <link rel="stylesheet" href="../css/app.css">
 
-</head>
 <style>
-body{
-    background:#f5f7fb;
+body {
+    background: #f4f6f9;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: #333;
 }
 
-.page-header{
-    background:white;
-    padding:20px;
-    border-radius:12px;
-    margin-bottom:20px;
+/* Page Header Panel Customization */
+.page-header-panel {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(30, 60, 114, 0.12);
+    margin-bottom: 25px;
 }
 
-.card-package{
-    border:none;
-    border-radius:14px;
-    box-shadow:0 2px 8px rgba(0,0,0,.05);
+/* Section Title Modifiers */
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e3c72;
+    border-left: 4px solid #2a5298;
+    padding-left: 10px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.label{
-    font-size:.75rem;
-    color:#6c757d;
+/* Form Container Card Customization */
+.card-form-custom {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    background: #ffffff;
+    padding: 24px;
+    margin-bottom: 30px;
 }
 
-.value{
-    font-weight:600;
+/* Package List Row Styling */
+.card-package {
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    background: #ffffff;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-bottom: 20px;
+    border-left: 5px solid #2a5298;
 }
 
-.required{
-    color:red;
+.card-package:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+/* Form Control Layouts */
+.form-label {
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+}
+
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #2a5298;
+    box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.12);
+}
+
+/* Action Button Layout Grid */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.85rem;
+    padding: 8px 16px;
+    transition: all 0.2s;
+}
+
+.btn-group-actions .btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.badge-pagu {
+    background-color: #e2e8f0;
+    color: #1e293b;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 6px 14px;
+    border-radius: 6px;
+}
+
+.meta-info-text {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-bottom: 4px;
+}
+
+.meta-info-text i {
+    width: 20px;
+    color: #475569;
 }
 </style>
+
 </head>
-
 <body>
-<h1 style="color:red">
+<div class="container-fluid p-4">
 
-TEST PACKAGE V2
-
-</h1>
-
-<div class="container-fluid py-4">
-
-    <div class="page-header">
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <h3 class="mb-1">Paket Pengadaan</h3>
-                <small class="text-muted">
-                    Manajemen Paket Pengadaan
-                </small>
-            </div>
+    <div class="page-header-panel d-flex justify-content-between align-items-center text-white">
+        <div>
+            <h3 class="mb-1 fw-bold"><i class="fa-solid fa-cubes me-2"></i>Manajemen Paket Pengadaan</h3>
+            <p class="mb-0 text-white-50 small">Kelola data program kegiatan, sub kegiatan belanja, penetapan pagu, rancangan RUP, beserta dokumen e-Purchasing.</p>
+        </div>
+        <div>
+            <a href="dashboard.html" class="btn btn-outline-light px-3 d-flex align-items-center justify-content-center">
+                <i class="fa-solid fa-arrow-left-long me-2"></i> Dashboard
+            </a>
         </div>
     </div>
 
-    <div class="mb-3">
-
-    <a href="dashboard.html"
-       class="btn btn-secondary">
-    
-    ← Dashboard
-    
-    </a>
-    
-    </div>
-
-    <!-- FORM -->
-
-    <div class="card mb-4">
-        <div class="card-header">
-            <strong>Tambah Paket</strong>
-        </div>
-
-        <div class="card-body">
-
+    <div class="card-form-custom">
+        <div class="section-title" id="formTitle"><i class="fa-solid fa-folder-plus me-2"></i>Tambah Paket Baru</div>
+        
+        <form id="packageForm" onsubmit="savePackage(event)">
+            <input type="hidden" id="packageId">
+            
             <div class="row g-3">
-
-                <!-- OPD -->
-
-                <div class="col-md-6" id="opdWrapper">
-                    <label class="form-label">
-                        OPD
-                    </label>
-
-                    <select id="opdSelect" class="form-select">
-                        <option value="">
-                            Pilih OPD
-                        </option>
-                    </select>
+                <div class="col-md-6">
+                    <label class="form-label">Program Kerja</label>
+                    <input type="text" id="program" class="form-control" placeholder="Contoh: 5.01.02 - Program Perencanaan" required>
+                </div>
+                
+                <div class="col-md-6">
+                    <label class="form-label">Kegiatan</label>
+                    <input type="text" id="kegiatan" class="form-control" placeholder="Contoh: 5.01.02.2.01 - Penyusunan Anggaran" required>
+                </div>
+                
+                <div class="col-md-6">
+                    <label class="form-label">Sub Kegiatan</label>
+                    <input type="text" id="subKegiatan" class="form-control" placeholder="Contoh: 5.01.02.2.01.0003 - Konsultasi Publik" required>
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label">Nomor RUP</label>
+                    <input type="text" id="rupNumber" class="form-control" placeholder="Masukkan ID RUP" required>
                 </div>
 
-                <!-- BIDANG -->
+                <div class="col-md-3">
+                    <label class="form-label">Kode Akun Belanja</label>
+                    <select id="accountId" class="form-select" required>
+                        <option value="">-- Pilih Akun Belanja --</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-6">
+                    <label class="form-label">Nama Paket Pengadaan</label>
+                    <input type="text" id="packageName" class="form-control" placeholder="Masukkan spesifikasi nama paket pekerjaan" required>
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label">Pagu Dana Anggaran (Rp)</label>
+                    <input type="number" id="budgetCeiling" class="form-control" placeholder="0" required>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Tanggal Dokumen DPP</label>
+                    <input type="date" id="dppDate" class="form-control" required>
+                </div>
 
                 <div class="col-md-6">
-                    <label class="form-label">
-                        Bidang
-                        <span class="required">*</span>
-                    </label>
-
-                    <select id="bidangSelect" class="form-select">
-                        <option value="">
-                            Pilih Bidang
-                        </option>
-                    </select>
+                    <label class="form-label">Keluaran / Output Kerja</label>
+                    <input type="text" id="output" class="form-control" placeholder="Masukkan uraian target output capaian" required>
                 </div>
 
-                <!-- MAK -->
-
-                <div class="col-md-6">
-                    <label class="form-label">
-                        Akun Belanja (MAK)
-                        <span class="required">*</span>
-                    </label>
-
-                    <select id="makSelect" class="form-select">
-                        <option value="">
-                            Pilih MAK
-                        </option>
-                    </select>
-                </div>
-
-                <!-- NO RUP -->
-
-                <div class="col-md-6">
-                    <label class="form-label">
-                        No RUP
-                    </label>
-
-                    <input
-                        type="text"
-                        id="rupNumber"
-                        class="form-control">
-                </div>
-
-                <!-- PROGRAM -->
-
-                <div class="col-md-4">
-                    <label class="form-label">
-                        Program
-                    </label>
-
-                    <input
-                        type="text"
-                        id="program"
-                        class="form-control">
-                </div>
-
-                <!-- KEGIATAN -->
-
-                <div class="col-md-4">
-                    <label class="form-label">
-                        Kegiatan
-                    </label>
-
-                    <input
-                        type="text"
-                        id="kegiatan"
-                        class="form-control">
-                </div>
-
-                <!-- SUB -->
-
-                <div class="col-md-4">
-                    <label class="form-label">
-                        Sub Kegiatan
-                    </label>
-
-                    <input
-                        type="text"
-                        id="subKegiatan"
-                        class="form-control">
-                </div>
-
-                <!-- NAMA -->
-
-                <div class="col-md-12">
-                    <label class="form-label">
-                        Nama Paket
-                        <span class="required">*</span>
-                    </label>
-
-                    <input
-                        type="text"
-                        id="packageName"
-                        class="form-control">
-                </div>
-
-                <!-- METODE -->
-
-                <div class="col-md-4">
-                    <label class="form-label">
-                        Metode Pengadaan
-                    </label>
-
-                    <select id="method" class="form-select">
-                        <option value="ECATALOG">
-                            E-Catalog
-                        </option>
-
-                        <option value="PENGADAAN_LANGSUNG">
-                            Pengadaan Langsung
-                        </option>
-
-                        <option value="MINI_KOMPETISI">
-                            Mini Kompetisi
-                        </option>
-                    </select>
-                </div>
-
-                <!-- PAGU -->
-
-                <div class="col-md-4">
-                    <label class="form-label">
-                        Pagu
-                    </label>
-
-                    <input
-                        type="number"
-                        id="budget"
-                        class="form-control">
-                </div>
-
-                <!-- DPP -->
-
-                <div class="col-md-4">
-                    <label class="form-label">
-                        Tanggal DPP
-                    </label>
-
-                    <input
-                        type="date"
-                        id="dppDate"
-                        class="form-control">
-                </div>
-
-                <!-- OUTPUT -->
-
-                <div class="col-md-12">
-                    <label class="form-label">
-                        Output
-                    </label>
-
-                    <textarea
-                        id="output"
-                        rows="3"
-                        class="form-control"></textarea>
-                </div>
-
-                <div class="col-12">
-                    <button
-                        class="btn btn-primary"
-                        id="saveBtn">
-                        Simpan Paket
+                <div class="col-md-6 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary px-4 shadow-sm" id="btnSubmit">
+                        <i class="fa-solid fa-floppy-disk me-2"></i>Simpan Paket
+                    </button>
+                    <button type="button" class="btn btn-light border text-secondary px-3" id="btnCancel" onclick="resetForm()" style="display:none;">
+                        Batal
                     </button>
                 </div>
-
             </div>
-
-        </div>
+        </form>
     </div>
 
-    <!-- LIST -->
-
-    <div class="card">
-        <div class="card-header">
-            <strong>Daftar Paket</strong>
-        </div>
-
-        <div class="card-body">
-
-            <div id="packageList">
-
+    <div class="card-form-custom">
+        <div class="section-title"><i class="fa-solid fa-list-check me-2"></i>Daftar Rekapitulasi Paket Aktif</div>
+        <div id="packageList">
             </div>
-
-        </div>
     </div>
 
 </div>
 
 <script>
-
 const db = window.supabaseClient;
+let currentProfile = null;
 
-let profile = null;
-let currentOpdId = null;
-let editingPackageId = null;
-
-document.addEventListener(
-    "DOMContentLoaded",
-    initPage
-);
-
-async function initPage(){
-
-    profile = await getProfile();
-
-    if(!profile){
-        return;
-    }
-    if(
-        !await canCreatePackage()
-    ){
-    
-        document
-            .getElementById('saveBtn')
-            .style.display =
-            'none';
-    }
-
-    if(profile.role === "SUPER_ADMIN"){
-
-        await loadOpds();
-
-    }else{
-
-        document
-            .getElementById("opdWrapper")
-            .style.display = "none";
-
-        currentOpdId = profile.opd_id;
-    }
-
-    await loadMak();
-
-    await loadBidangs();
-
+async function init() {
+    currentProfile = await getProfile();
+    await loadAccounts();
     await loadPackages();
-
-    document
-        .getElementById("opdSelect")
-        ?.addEventListener(
-            "change",
-            async e => {
-
-                currentOpdId = e.target.value;
-
-                await loadBidangs();
-                await loadPackages();
-            }
-        );
-
-    document
-        .getElementById("saveBtn")
-        .addEventListener(
-            "click",
-            savePackage
-        );
 }
 
-async function loadOpds(){
-
-    const { data, error } = await window.supabaseClient
-        .from("opds")
-        .select("*")
-        .order("name");
-
-    if(error){
-        console.error(error);
-        return;
-    }
-
-    const select =
-        document.getElementById("opdSelect");
-
-    select.innerHTML =
-        '<option value="">Pilih OPD</option>';
-
-    data.forEach(opd => {
-
-        select.innerHTML += `
-            <option value="${opd.id}">
-                ${opd.name}
-            </option>
-        `;
-    });
-}
-
-async function loadBidangs(){
-
-    const opdId =
-        profile.role === "SUPER_ADMIN"
-        ? currentOpdId
-        : profile.opd_id;
-
-    if(!opdId){
-        return;
-    }
-
-    const { data } = await window.supabaseClient
-        .from("bidangs")
-        .select("*")
-        .eq("opd_id", opdId)
-        .order("bidang_name");
-
-    const select =
-        document.getElementById("bidangSelect");
-
-    select.innerHTML =
-        '<option value="">Pilih Bidang</option>';
-
-    data.forEach(row=>{
-
-        select.innerHTML += `
-            <option value="${row.id}">
-                ${row.bidang_name}
-            </option>
-        `;
-    });
-}
-
-async function loadMak(){
-
-    const { data, error } = await window.supabaseClient
-        .from("budget_accounts")
+async function loadAccounts() {
+    const { data, error } = await db
+        .from("accounts")
         .select("*")
         .order("account_code");
-
-    if(error){
-        console.error("loadMak", error);
-        return;
-    }
-
-    const select =
-        document.getElementById("makSelect");
-
-    select.innerHTML =
-        '<option value="">Pilih MAK</option>';
-
-    (data || []).forEach(row => {
-
-        select.innerHTML += `
-            <option value="${row.id}">
-                ${row.account_code}
-                -
-                ${row.account_name}
-            </option>
-        `;
+        
+    if (error) return;
+    
+    let html = '<option value="">-- Pilih Akun Belanja --</option>';
+    data.forEach(acc => {
+        html += `<option value="${acc.id}">${acc.account_code} - ${acc.account_name}</option>`;
     });
+    document.getElementById("accountId").innerHTML = html;
 }
 
-async function savePackage(){
-    if(
-        !await canCreatePackage()
-    ){
+async function loadPackages() {
+    let query = db.from("packages").select(`
+        *,
+        accounts ( account_code, account_name )
+    `).order("created_at", { ascending: false });
     
-        alert(
-            'Anda tidak memiliki hak membuat paket'
-        );
+    if (currentProfile.role === 'ADMIN_OPD' || currentProfile.role === 'PPK' || currentProfile.role === 'PPTK') {
+        query = query.eq("opd_id", currentProfile.opd_id);
+    }
     
-        return;
+    const { data, error } = await query;
+    if (error) return;
+    
+    let html = "";
+    if (!data || data.length === 0) {
+        html = `
+        <div class="text-center p-5 text-muted bg-light rounded-3 border border-dashed">
+            <i class="fa-solid fa-folder-open display-6 mb-3"></i>
+            <p class="mb-0">Belum ada paket pengadaan yang terdaftar dalam instansi ini.</p>
+        </div>`;
+    } else {
+        data.forEach(pkg => {
+            const code = pkg.accounts?.account_code || "-";
+            const name = pkg.accounts?.account_name || "-";
+            
+            html += `
+            <div class="card-package p-4">
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                    <div>
+                        <h5 class="fw-bold text-dark mb-1">${pkg.package_name}</h5>
+                        <div class="text-secondary small fw-medium"><i class="fa-solid fa-hashtag me-1"></i>No. RUP: <span class="text-primary">${pkg.rup_number}</span></div>
+                    </div>
+                    <div class="badge-pagu shadow-sm">
+                        <span class="text-muted small fw-normal">Pagu:</span> Rp ${Number(pkg.budget_ceiling).toLocaleString("id-ID")}
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="meta-info-text"><i class="fa-solid fa-layer-group"></i><strong>Prog:</strong> ${pkg.program}</div>
+                        <div class="meta-info-text"><i class="fa-solid fa-bars-progress"></i><strong>Keg:</strong> ${pkg.kegiatan}</div>
+                        <div class="meta-info-text"><i class="fa-solid fa-circle-nodes"></i><strong>Sub:</strong> ${pkg.sub_kegiatan}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="meta-info-text"><i class="fa-solid fa-wallet"></i><strong>Akun:</strong> ${code} - ${name}</div>
+                        <div class="meta-info-text"><i class="fa-solid fa-bullseye"></i><strong>Output:</strong> ${pkg.output || "-"}</div>
+                        <div class="meta-info-text"><i class="fa-solid fa-calendar-day"></i><strong>Tgl DPP:</strong> ${pkg.dpp_date || "-"}</div>
+                    </div>
+                </div>
+                
+                <hr class="my-3 text-black-50">
+                
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 btn-group-actions">
+                    <div class="d-flex gap-1 flex-wrap">
+                        <button class="btn btn-sm btn-primary" onclick="openItems('${pkg.id}')">
+                            <i class="fa-solid fa-basket-shopping"></i> Item Belanja
+                        </button>
+                        <button class="btn btn-sm btn-info text-white" onclick="openSurvey('${pkg.id}')">
+                            <i class="fa-solid fa-magnifying-glass-dollar"></i> Survei Harga
+                        </button>
+                        
+                        ${canSeeHps(currentProfile.role) ? `
+                            <button class="btn btn-sm btn-success" onclick="openHps('${pkg.id}')">
+                                <i class="fa-solid fa-calculator"></i> HPS
+                            </button>
+                        ` : ""}
+                        
+                        <button class="btn btn-sm btn-secondary" onclick="openDocs('${pkg.id}')">
+                            <i class="fa-solid fa-file-invoice"></i> Dokumen DPP
+                        </button>
+                    </div>
+                    
+                    <div class="d-flex gap-1">
+                        <button class="btn btn-sm btn-outline-warning" onclick='editPackage(${JSON.stringify(pkg)})'>
+                            <i class="fa-solid fa-pen-to-square"></i> Edit
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deletePackage('${pkg.id}')">
+                            <i class="fa-solid fa-trash-can"></i> Hapus
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+        });
     }
+    document.getElementById("packageList").innerHTML = html;
+}
 
-    const opdId =
-        profile.role === "SUPER_ADMIN"
-        ? currentOpdId
-        : profile.opd_id;
-
-    if(!opdId){
-
-        alert("Pilih OPD");
-        return;
-    }
-
+async function savePackage(e) {
+    e.preventDefault();
+    
+    const id = document.getElementById("packageId").value;
     const payload = {
-
-        tenant_id:
-            profile.tenant_id,
-
-        opd_id:
-            opdId,
-
-        package_name:
-            document.getElementById("packageName").value,
-
-        fiscal_year:
-            new Date().getFullYear(),
-
-        procurement_method:
-            document.getElementById("method").value,
-
-        budget_ceiling:
-            Number(
-                document.getElementById("budget").value || 0
-            ),
-
-        created_by:
-            profile.id,
-
-        rup_number:
-            document.getElementById("rupNumber").value,
-
-        bidang_id:
-            document.getElementById("bidangSelect").value,
-
-        program:
-            document.getElementById("program").value,
-
-        kegiatan:
-            document.getElementById("kegiatan").value,
-
-        sub_kegiatan:
-            document.getElementById("subKegiatan").value,
-
-        budget_account_id:
-            document.getElementById("makSelect").value,
-
-        output:
-            document.getElementById("output").value,
-
-        dpp_date:
-            document.getElementById("dppDate").value
+        program: document.getElementById("program").value,
+        kegiatan: document.getElementById("kegiatan").value,
+        sub_kegiatan: document.getElementById("subKegiatan").value,
+        rup_number: document.getElementById("rupNumber").value,
+        account_id: document.getElementById("accountId").value,
+        package_name: document.getElementById("packageName").value,
+        budget_ceiling: parseFloat(document.getElementById("budgetCeiling").value) || 0,
+        output: document.getElementById("output").value,
+        dpp_date: document.getElementById("dppDate").value,
+        opd_id: currentProfile.opd_id
     };
-
-    let query;
-
-    if(editingPackageId){
     
-        query =
-        window.supabaseClient
-            .from("packages")
-            .update(payload)
-            .eq(
-                "id",
-                editingPackageId
-            );
-    
-    }else{
-    
-        query =
-        window.supabaseClient
-            .from("packages")
-            .insert(payload);
-    
+    let res;
+    if (id) {
+        res = await db.from("packages").update(payload).eq("id", id);
+    } else {
+        res = await db.from("packages").insert([payload]);
     }
     
-    const { error } =
-        await query;
-
-    if(error){
-
-        alert(error.message);
+    if (res.error) {
+        alert(res.error.message);
         return;
     }
-
-    alert(
-        editingPackageId
-        ? "Paket berhasil diperbarui"
-        : "Paket berhasil disimpan"
-    );
     
-    editingPackageId = null;
-    
+    alert("Paket berhasil disimpan");
+    resetForm();
     await loadPackages();
 }
 
-async function loadPackages(){
-
-    const opdId =
-        profile.role === "SUPER_ADMIN"
-        ? currentOpdId
-        : profile.opd_id;
-
-    let query =
-        window.supabaseClient
-        .from("packages")
-        .select("*")
-        .order(
-            "created_at",
-            { ascending:false }
-        );
-
-    if(opdId){
-
-        query = query.eq(
-            "opd_id",
-            opdId
-        );
-    }
-
-    const {
-        data,
-        error
-    } = await query;
-
-    if(error){
-
-        console.error(
-            "loadPackages error",
-            error
-        );
-
-        return;
-    }
-
-    const container =
-        document.getElementById(
-            "packageList"
-        );
-
-    container.innerHTML = "";
-
-    if(!data || data.length === 0){
-
-        container.innerHTML = `
-            <div class="alert alert-light">
-                Belum ada paket.
-            </div>
-        `;
-
-        return;
-    }
-
-    data.forEach(pkg=>{
-
-        container.innerHTML += `
-
-        <div class="card card-package mb-3">
-
-            <div class="card-body">
-
-                <h5>
-                    ${pkg.package_name || '-'}
-                </h5>
-
-                <div class="row mt-3">
-
-                    <div class="col-md-2">
-                        <div class="label">
-                            No RUP
-                        </div>
-                        <div class="value">
-                            ${pkg.rup_number || '-'}
-                        </div>
-                    </div>
-
-                    <div class="col-md-2">
-                        <div class="label">
-                            Bidang ID
-                        </div>
-                        <div class="value">
-                            ${pkg.bidang_id || '-'}
-                        </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="label">
-                            Program
-                        </div>
-                        <div class="value">
-                            ${pkg.program || '-'}
-                        </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="label">
-                            Kegiatan
-                        </div>
-                        <div class="value">
-                            ${pkg.kegiatan || '-'}
-                        </div>
-                    </div>
-
-                    <div class="col-md-2">
-                        <div class="label">
-                            Pagu
-                        </div>
-                        <div class="value">
-                            Rp ${Number(
-                                pkg.budget_ceiling || 0
-                            ).toLocaleString('id-ID')}
-                        </div>
-                    </div>
-
-                </div>
-
-                <hr>
-
-                <div class="d-flex gap-2">
-
-                    <button
-                        class="btn btn-warning btn-sm"
-                        onclick="editPackage('${pkg.id}')">
-                    
-                        Edit
-                    
-                    </button>
-                    
-                    <button
-                        class="btn btn-danger btn-sm"
-                        onclick="deletePackage('${pkg.id}')">
-                    
-                        Hapus
-                    
-                    </button>
-
-                    <button
-                        class="btn btn-outline-info btn-sm"
-                        onclick="openDpp('${pkg.id}')">
-                    
-                        DPP
-                    
-                    </button>
-
-                    <button
-                        class="btn btn-outline-dark btn-sm"
-                        onclick="
-                        location.href=
-                        'dpp-document.html?id=${pkg.id}'
-                        ">
-                        
-                        DPP PDF
-                        
-                        </button>
-
-                    <button
-                        class="btn btn-outline-primary btn-sm"
-                        onclick="openItems('${pkg.id}')">
-
-                        Rincian Belanja
-
-                    </button>
-
-                    <button
-                        class="btn btn-outline-success btn-sm"
-                        onclick="openSurvey('${pkg.id}')">
-
-                        Survey Harga
-
-                    </button>
-
-                    <button
-                        class="btn btn-outline-secondary btn-sm"
-                        onclick="openDocs('${pkg.id}')">
-
-                        Dokumen
-
-                    </button>
-
-                    ${canSeeHps(profile.role) ? `
-                    <button
-                        class="btn btn-outline-warning btn-sm"
-                        onclick="openHps('${pkg.id}')">
-                        HPS
-                    </button>
-                    ` : ''}
-                    
-                   ${canSeeHps(profile.role) ? `
-                    <button
-                        class="btn btn-outline-success btn-sm"
-                        onclick="openBahpe('${pkg.id}')">
-                        BAHPE
-                    </button>
-                    ` : ''}
-
-                    <button
-                        class="btn btn-outline-warning btn-sm"
-                        onclick="
-                        location.href=
-                        'review.html?id=${pkg.id}')">
-                        Review
-                        </button>
-
-                        <button
-                            class="btn btn-outline-dark btn-sm"
-                            onclick="
-                            location.href='review-document.html?id=${pkg.id}')">
-                            Review PDF
-                            </button>
-
-
-                    
-
-                </div>
-
-            </div>
-
-        </div>
-
-        `;
-    });
-}
-
-async function editPackage(id){
-        const {
-        data,
-        error
-    } =
-    await window.supabaseClient
-    .from("packages")
-    .select("*")
-    .eq("id", id)
-    .single();
+function editPackage(data) {
+    document.getElementById("formTitle").innerHTML = `<i class="fa-solid fa-pen-to-square me-2"></i>Ubah / Edit Data Paket`;
+    document.getElementById("btnSubmit").innerHTML = `<i class="fa-solid fa-floppy-disk me-2"></i>Update Paket`;
     
-    if(error){
+    document.getElementById("packageId").value = data.id;
+    document.getElementById("program").value = data.program || "";
+    document.getElementById("kegiatan").value = data.kegiatan || "";
+    document.getElementById("subKegiatan").value = data.sub_kegiatan || "";
+    document.getElementById("rupNumber").value = data.rup_number || "";
+    document.getElementById("accountId").value = data.account_id || "";
+    document.getElementById("packageName").value = data.package_name || "";
+    document.getElementById("budgetCeiling").value = data.budget_ceiling || 0;
+    document.getElementById("output").value = data.output || "";
+    document.getElementById("dppDate").value = data.dpp_date || "";
     
-        alert(error.message);
-    
-        return;
-    }
-    
-    editingPackageId = id;
-    
-    document.getElementById("rupNumber").value =
-        data.rup_number || "";
-    
-    document.getElementById("packageName").value =
-        data.package_name || "";
-    
-    document.getElementById("program").value =
-        data.program || "";
-    
-    document.getElementById("kegiatan").value =
-        data.kegiatan || "";
-    
-    document.getElementById("subKegiatan").value =
-        data.sub_kegiatan || "";
-    
-    document.getElementById("budget").value =
-        data.budget_ceiling || "";
-    
-    document.getElementById("method").value =
-        data.procurement_method || "ECATALOG";
-    
-    document.getElementById("bidangSelect").value =
-        data.bidang_id || "";
-    
-    document.getElementById("makSelect").value =
-        data.budget_account_id || "";
-    
-    document.getElementById("output").value =
-        data.output || "";
-    
-    document.getElementById("dppDate").value =
-        data.dpp_date || "";
+    document.getElementById("btnCancel").style.display = "inline-block";
     
     window.scrollTo({
         top: 0,
@@ -863,105 +397,53 @@ async function editPackage(id){
     });
 }
 
-async function deletePackage(id){
-        const ok =
-        confirm(
-            "Hapus paket ini ?"
-        );
+function resetForm() {
+    document.getElementById("formTitle").innerHTML = `<i class="fa-solid fa-folder-plus me-2"></i>Tambah Paket Baru`;
+    document.getElementById("btnSubmit").innerHTML = `<i class="fa-solid fa-floppy-disk me-2"></i>Simpan Paket`;
+    document.getElementById("packageForm").reset();
+    document.getElementById("packageId").value = "";
+    document.getElementById("btnCancel").style.display = "none";
+}
+
+async function deletePackage(id) {
+    const ok = confirm("Hapus paket ini ?");
+    if (!ok) return;
     
-    if(!ok){
-        return;
-    }
-    
-    const {
-        error
-    } =
-    await window.supabaseClient
-    .from("packages")
-    .delete()
-    .eq("id", id);
-    
-    if(error){
-    
+    const { error } = await db.from("packages").delete().eq("id", id);
+    if (error) {
         alert(error.message);
-    
         return;
     }
     
-    alert(
-        "Paket berhasil dihapus"
-    );
-    
+    alert("Paket berhasil dihapus");
     await loadPackages();
 }
 
-    
-
-function canSeeHps(role){
-
-    return [
-        'SUPER_ADMIN',
-        'ADMIN_OPD',
-        'PPK'
-    ].includes(role);
+function canSeeHps(role) {
+    return ['SUPER_ADMIN', 'ADMIN_OPD', 'PPK'].includes(role);
 }
 
-function canSeeBahpe(role){
-
-    return [
-        'SUPER_ADMIN',
-        'ADMIN_OPD',
-        'PPK'
-    ].includes(role);
+function canSeeBahpe(role) {
+    return ['SUPER_ADMIN', 'ADMIN_OPD', 'PPK'].includes(role);
 }
 
-function openItems(id){
-
-    location.href =
-        `package-items.html?id=${id}`;
+function openItems(id) {
+    location.href = `package-items.html?id=${id}`;
 }
 
-function openSurvey(id){
-
-    location.href =
-        `price-surveys.html?id=${id}`;
+function openSurvey(id) {
+    location.href = `price-surveys.html?id=${id}`;
 }
 
-function openDocs(id){
-
-    location.href =
-        `package-documents.html?id=${id}`;
+function openDocs(id) {
+    location.href = `package-documents.html?id=${id}`;
 }
 
-function openHps(id){
-
-    location.href =
-        `hps.html?id=${id}`;
+function openHps(id) {
+    location.href = `hps.html?id=${id}`;
 }
 
-function openBahpe(id){
-
-    location.href =
-        `bahpe.html?id=${id}`;
-}
-
-function openDpp(id){
-
-    location.href =
-        `dpp.html?id=${id}`;
-}
-    
-window.editPackage =
-    editPackage;
-
-window.deletePackage =
-    deletePackage;
-
-
+init();
 </script>
-
-
-    
-
 </body>
 </html>
