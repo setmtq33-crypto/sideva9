@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dashboard SIDEVA9</title>
+<title>Dashboard SIDEVA v9</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
@@ -27,209 +27,160 @@ body{background:#f5f6fa}
 </head>
 <body>
 
-<div id="sidebar-container"></div>
+<div class="wrapper">
+    <nav id="sidebar-container" class="sidebar"></nav>
 
-<div class="main-content">
+    <div class="main-content" id="main-content-area">
+        <div id="topbar-container" class="topbar"></div>
+         
+        <div class="content-body">
+            <div class="container-fluid p-4">
 
-<div id="topbar-container"></div>
- 
-<div class="container-fluid p-4">
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="card p-2">
+                            <div class="card-body">
+                                <h4 class="fw-bold">Dashboard SIDEVA9</h4>
+                                <div id="welcomeText" class="text-muted">Mengambil data profil...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-<div class="row mb-4">
-<div class="col-md-12">
-<div class="card">
-<div class="card-body">
-<h3>Dashboard SIDEVA9</h3>
-<div id="welcomeText">Loading...</div>
-</div>
-</div>
-</div>
-</div>
+                <div class="row mb-4 g-3">
+                    <div class="col-xl-2 col-md-4 col-6">
+                        <div class="card h-100"><div class="card-body">
+                            <small class="text-muted text-uppercase fw-semibold d-block mb-1" style="font-size:0.75rem;">Jumlah Paket</small>
+                            <div id="totalPackages" class="kpi">0</div>
+                        </div></div>
+                    </div>
+                    <div class="col-xl-3 col-md-4 col-6">
+                        <div class="card h-100"><div class="card-body">
+                            <small class="text-muted text-uppercase fw-semibold d-block mb-1" style="font-size:0.75rem;">Total Pagu</small>
+                            <div id="totalBudget" class="kpi text-truncate">Rp0</div>
+                        </div></div>
+                    </div>
+                    <div class="col-xl-3 col-md-4 col-6">
+                        <div class="card h-100"><div class="card-body">
+                            <small class="text-muted text-uppercase fw-semibold d-block mb-1" style="font-size:0.75rem;">Total HPS</small>
+                            <div id="totalHps" class="kpi text-truncate">Rp0</div>
+                        </div></div>
+                    </div>
+                    <div class="col-xl-2 col-md-6 col-6">
+                        <div class="card h-100"><div class="card-body">
+                            <small class="text-muted text-uppercase fw-semibold d-block mb-1" style="font-size:0.75rem;">Efisiensi</small>
+                            <div id="efficiency" class="kpi text-success text-truncate">Rp0</div>
+                        </div></div>
+                    </div>
+                    <div class="col-xl-2 col-md-6 col-12">
+                        <div class="card h-100"><div class="card-body">
+                            <small class="text-muted text-uppercase fw-semibold d-block mb-1" style="font-size:0.75rem;">Ready Procure</small>
+                            <div id="readyProcurement" class="kpi text-info">0</div>
+                        </div></div>
+                    </div>
+                </div>
 
-<div class="row mb-4">
+                <div class="row mb-4">
+                    <div class="col-lg-8">
+                        <div class="card h-100">
+                            <div class="card-header">Grafik Perbandingan Pagu vs HPS</div>
+                            <div class="card-body" style="position: relative; height:300px;">
+                                <canvas id="chartPaguHps"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-header">Distribusi Status Alur Kerja</div>
+                            <div class="card-body" style="position: relative; height:300px;">
+                                <canvas id="chartStatusPie"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-<div class="col-md-3">
-<div class="card"><div class="card-body">
-<small>Jumlah Paket</small>
-<div id="totalPackages" class="kpi">0</div>
-</div></div>
-</div>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">Tabel Status Alur Kerja</div>
+                            <div class="card-body p-0" style="max-height: 350px; overflow-y:auto;">
+                                <table class="table table-hover align-middle mb-0">
+                                    <tbody id="statusTable"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
 
-<div class="col-md-3">
-<div class="card"><div class="card-body">
-<small>Total Pagu</small>
-<div id="totalBudget" class="kpi">Rp0</div>
-</div></div>
-</div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">Aksi Cepat Menu</div>
+                            <div class="card-body" style="max-height: 350px; overflow-y:auto;">
+                                <div class="row g-2">
+                                    <div class="col-6"><a href="packages.html" class="btn btn-outline-primary w-100 text-start py-2"><i class="bi bi-box-seam me-2"></i> Packages</a></div>
+                                    <div class="col-6"><a href="package-items.html" class="btn btn-outline-secondary w-100 text-start py-2"><i class="bi bi-list-stars me-2"></i> Items</a></div>
+                                    <div class="col-6"><a href="price-surveys.html" class="btn btn-outline-secondary w-100 text-start py-2"><i class="bi bi-search"></i> Surveys</a></div>
+                                    <div class="col-6"><a href="package-documents.html" class="btn btn-outline-secondary w-100 text-start py-2"><i class="bi bi-file-earmark-text"></i> Documents</a></div>
+                                    <div class="col-6"><a href="hps.html" class="btn btn-outline-secondary w-100 text-start py-2"><i class="bi bi-calculator"></i> HPS Engine</a></div>
+                                    <div class="col-6"><a href="procurement-ready.html" class="btn btn-success w-100 text-start py-2"><i class="bi bi-check-circle"></i> Ready Proc</a></div>
+                                    <div class="col-6"><a href="audit-logs.html" class="btn btn-dark w-100 text-start py-2"><i class="bi bi-journal-text"></i> Audit Logs</a></div>
+                                    <div class="col-6"><a href="users.html" class="btn btn-dark w-100 text-start py-2"><i class="bi bi-people"></i> Users</a></div>
+                                    <div class="col-6"><a href="opds.html" class="btn btn-outline-primary w-100 text-start py-2"><i class="bi bi-building"></i> OPD</a></div>
+                                    <div class="col-6"><a href="rup-import.html" class="btn btn-warning w-100 text-start py-2"><i class="bi bi-cloud-upload"></i> Import RUP</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-<div class="col-md-3">
-<div class="card"><div class="card-body">
-<small>Total HPS</small>
-<div id="totalHps" class="kpi">Rp0</div>
-</div></div>
-</div>
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">Ringkasan Anggaran per OPD</div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Nama Organisasi Perangkat Daerah (OPD)</th>
+                                                <th>Jumlah Paket</th>
+                                                <th>Total Pagu Anggaran</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="opdSummaryTable"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-<div class="col-md-3">
-<div class="card"><div class="card-body">
-<small>Efisiensi</small>
-<div id="efficiency" class="kpi">Rp0</div>
-</div></div>
-</div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">Daftar Paket Pengadaan Terbaru</div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Nama Paket Kontrak</th>
+                                                <th>Pagu Anggaran</th>
+                                                <th>Status Berjalan</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="recentPackages"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-<div class="col-md-3">
-<div class="card">
-<div class="card-body">
-<small>Ready Procurement</small>
-<div id="readyProcurement" class="kpi">0</div>
-</div>
-</div>
-</div>
+            </div>
+        </div>
 
- 
-</div>
-
-<div class="row mb-4">
-
-<div class="col-md-6">
-<div class="card">
-<div class="card-header">
-Workflow Status
-</div>
-<div class="card-body">
-<table class="table">
-<tbody id="statusTable"></tbody>
-</table>
-</div>
-</div>
-</div>
-
-<div class="col-md-6">
-<div class="card">
-<div class="card-header">
-Quick Actions
-</div>
-<div class="card-body d-grid gap-2">
-
-<a href="packages.html" class="btn btn-primary">
-Packages
-</a>
-
-<a href="package-items.html" class="btn btn-outline-primary">
-Package Items
-</a>
-
-<a href="price-surveys.html" class="btn btn-outline-primary">
-Price Surveys
-</a>
-
-<a href="package-documents.html" class="btn btn-outline-primary">
-Documents
-</a>
-
-<a href="hps.html" class="btn btn-outline-primary">
-HPS Engine
-</a>
-
- <a href="procurement-ready.html"class="btn btn-success">
- READY PROCUREMENT
- </a>
-
-<a href="audit-logs.html"class="btn btn-dark">
-AUDIT LOGS
-</a>
-
- <a
-href="users.html"class="btn btn-dark">
-Users
-</a>
-
-<a
-href="opds.html"class="btn btn-primary">
-OPD
-</a>
-
-<a
-href="rup-import.html"class="btn btn-warning">
-Import RUP
-</a>
- 
-
-</div>
-</div>
-</div>
-
-</div>
-
-<div class="row mb-4">
-
-<div class="col-md-12">
-
-<div class="card">
-
-<div class="card-header">
-Ringkasan OPD
-</div>
-
-<div class="card-body">
-
-<table class="table table-bordered">
-
-<thead>
-<tr>
-<th>OPD</th>
-<th>Jumlah Paket</th>
-<th>Total Pagu</th>
-</tr>
-</thead>
-
-<tbody id="opdSummaryTable">
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="row">
-
-<div class="col-md-12">
-
-<div class="card">
-
-<div class="card-header">
-Paket Terbaru
-</div>
-
-<div class="card-body">
-
-<table class="table table-bordered">
-
-<thead>
-<tr>
-<th>Nama Paket</th>
-<th>Pagu</th>
-<th>Status</th>
-</tr>
-</thead>
-
-<tbody id="recentPackages"></tbody>
-
-</table>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
+        <div id="footbar-container"></div>
+    </div>
 </div>
 
 <script>
