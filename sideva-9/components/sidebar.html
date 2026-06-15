@@ -1,8 +1,11 @@
 <nav class="sidebar border-end adaptive-sidebar" data-bs-theme="dark">
-    <div class="sidebar-brand-panel p-4 border-bottom text-center">
-        <h5 class="fw-bold text-white mb-0 d-flex align-items-center justify-content-center gap-2 tracking-wide">
-            <i class="bi bi-layer-group text-info"></i> SIDEVA<span class="text-info">9</span>
-        </h5>
+    <div class="sidebar-brand-panel p-4 border-bottom text-center flex-column gap-2">
+        <div class="brand-logo-container mb-1 shadow-sm">
+            <img src="../img/logo-sideva.png" alt="SI-DEVA Logo" class="brand-logo-img">
+        </div>
+        <h6 class="fw-bold text-white mb-0 tracking-wide" style="font-size: 0.9rem;">
+            SIDEVA <span class="text-info">9</span>
+        </h6>
     </div>
     
     <div class="sidebar-scroller">
@@ -13,6 +16,11 @@
                 <a href="/pages/dashboard.html" class="nav-link text-white-50 d-flex align-items-center gap-3">
                     <i class="bi bi-speedometer2"></i> Dashboard
                 </a>
+            </li>
+            <li class="nav-item"> 
+		        <a href="rup-import.html" class="nav-link text-white-50 d-flex align-items-center gap-3">
+                    <i class="bi bi-folder2-open"></i> Input RUP
+                </a> 
             </li>
             <li class="nav-item">
                 <a href="/pages/packages.html" class="nav-link text-white-50 d-flex align-items-center gap-3">
@@ -64,11 +72,7 @@
                     <i class="bi bi-people"></i> Manajemen Users
                 </a>
             </li>
-            <li class="nav-item"> 
-                <a href="arsip.html" class="nav-link text-white-50 d-flex align-items-center gap-3">
-                    <i class="bi bi-folder2-open"></i> Arsip Dokumen v8
-                </a> 
-            </li>
+            
         
             <li class="my-3 border-top border-secondary border-opacity-25"></li>
             
@@ -86,7 +90,7 @@
     
     .adaptive-sidebar {
         width: var(--sidebar-width);
-        height: 100vh;
+        height: 100dvh; /* Optimal untuk Safari iOS/macOS */
         position: fixed;
         top: 0;
         left: 0;
@@ -97,14 +101,37 @@
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         border-color: rgba(255,255,255,0.08) !important;
     }
+    
+    /* Panel Brand dengan Dukungan Logo */
     .sidebar-brand-panel {
-        height: 70px;
+        height: auto;
+        min-height: 110px; /* Ditambah sedikit ruang untuk tinggi logo */
         background: #0b1329;
         display: flex;
         align-items: center;
         justify-content: center;
         border-color: rgba(255,255,255,0.08) !important;
     }
+
+    /* Pembungkus Bingkai Logo Premium */
+    .brand-logo-container {
+        width: 54px;
+        height: 54px;
+        background: #ffffff;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border: 2px solid rgba(255, 217, 0, 0.4); /* Border tipis keemasan */
+    }
+
+    .brand-logo-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Memastikan logo 3D emas terpasang presisi tanpa gepeng */
+    }
+
     .sidebar-scroller {
         flex-grow: 1;
         overflow-y: auto;
@@ -127,19 +154,19 @@
         color: #ffffff !important; 
     }
     .nav-link:hover i { color: #06b6d4 !important; }
+    
     .nav-link.active {
         background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
         color: #ffffff !important;
         box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
     }
     
-    /* RESPONSIVE BREAKPOINT FOR MOBILE & TABLET PADDING PRECISION */
     @media (max-width: 991.98px) {
         .adaptive-sidebar {
-            transform: translateX(-100%); /* Sembunyi ke kiri di HP */
+            transform: translateX(-100%);
         }
         body.sidebar-open .adaptive-sidebar {
-            transform: translateX(0); /* Muncul saat tombol menu diklik */
+            transform: translateX(0);
         }
     }
 </style>
