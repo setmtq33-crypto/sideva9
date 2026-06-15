@@ -1,98 +1,51 @@
 async function loadLayout() {
+    // 1. Bersihkan kontainer sebelum memuat ulang
+    const sidebarContainer = document.getElementById('sidebar-container');
+    const topbarContainer = document.getElementById('topbar-container');
+    if (sidebarContainer) sidebarContainer.innerHTML = '';
+    if (topbarContainer) topbarContainer.innerHTML = '';
 
-    const sidebar =
-        await fetch('/components/sidebar.html');
-
-    document
-        .getElementById('sidebar-container')
-        .innerHTML =
-        await sidebar.text();
-
-    const topbar =
-        await fetch('/components/topbar.html');
-
-    document
-        .getElementById('topbar-container')
-        .innerHTML =
-        await topbar.text();
-
-    const profile =
-        await getProfile();
-
-    if (!profile) return;
-
-    const userName =
-        document.getElementById('userName');
-
-    if (userName) {
-
-        userName.innerText =
-            profile.full_name;
+    // 2. Fetch Sidebar
+    try {
+        const sidebarResponse = await fetch('/components/sidebar.html');
+        const sidebarHtml = await sidebarResponse.text();
+        sidebarContainer.innerHTML = sidebarHtml;
+    } catch (err) {
+        console.error("Gagal memuat sidebar:", err);
     }
 
-    const role =
-        profile.role;
+    // 3. Fetch Topbar
+    try {
+        const topbarResponse = await fetch('/components/topbar.html');
+        const topbarHtml = await topbarResponse.text();
+        topbarContainer.innerHTML = topbarHtml;
+    } catch (err) {
+        console.error("Gagal memuat topbar:", err);
+    }
 
-    function hide(id) {
+    // 4. Update Nama User
+    const profile = await getProfile();
+    if (profile) {
+        const userName = document.getElementById('userName');
+        if (userName) userName.innerText = profile.full_name;
+        
+        // Logika hide menu berdasarkan role
+        const role = profile.role;
+        const menuConfigs = {
+            'ADMIN_OPD': ['menuOpds'],
+            'PPTK': ['menuUsers', 'menuOpds', 'menuAudit', 'menuHps'],
+            'PPK': ['menuUsers', 'menuOpds', 'menuAudit', 'menuSurvey', 'menuDocuments', 'menuBidangs', 'menuAccounts'],
+            'PBJ': ['menuUsers', 'menuOpds', 'menuAudit', 'menuSurvey', 'menuDocuments', 'menuHps', 'menuBidangs', 'menuAccounts'],
+            'VIEWER': ['menuUsers', 'menuOpds', 'menuAudit']
+        };
 
-        const el =
-            document.getElementById(id);
-
-        if (el) {
-
-            el.style.display =
-                'none';
+        if (menuConfigs[role]) {
+            menuConfigs[role].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
         }
-    }
-
-    // ADMIN OPD
-    if (role === 'ADMIN_OPD') {
-
-        hide('menuOpds');
-    }
-
-    // PPTK
-    if (role === 'PPTK') {
-
-        hide('menuUsers');
-        hide('menuOpds');
-        hide('menuAudit');
-        hide('menuHps');
-    }
-
-    // PPK
-    if (role === 'PPK') {
-
-        hide('menuUsers');
-        hide('menuOpds');
-        hide('menuAudit');
-        hide('menuSurvey');
-        hide('menuDocuments');
-        hide('menuBidangs');
-        hide('menuAccounts');
-    }
-
-    // PBJ
-    if (role === 'PBJ') {
-
-        hide('menuUsers');
-        hide('menuOpds');
-        hide('menuAudit');
-        hide('menuSurvey');
-        hide('menuDocuments');
-        hide('menuHps');
-        hide('menuBidangs');
-        hide('menuAccounts');
-    }
-
-    // VIEWER
-    if (role === 'VIEWER') {
-
-        hide('menuUsers');
-        hide('menuOpds');
-        hide('menuAudit');
     }
 }
 
-window.loadLayout =
-    loadLayout;
+window.loadLayout = loadLayout;
