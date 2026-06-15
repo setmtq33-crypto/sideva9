@@ -439,33 +439,79 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 Prioritas PDN, UMKM, Lokal Kabupaten Kapuas Hulu
             </div>
             
-            <div
-                style="
-                margin-top:50px;
-                float:right;
-                width:320px;
-                text-align:center;
-                ">
-                
-                Disahkan, ${tgl}
-                
-                <br>
-                
-                <strong>
-                ${ppk?.position || 'Pejabat Pembuat Komitmen'}
-                </strong>
-                
-                <br><br><br><br>
-                
-                <strong>
-                ${ppk?.full_name || '(Belum Ditentukan)'}
-                </strong>
-                
-                <br>
-                
-                NIP. ${ppk?.nip || '-'}
-                
-                </div>
+            <table
+            style="
+            width:100%;
+            border-collapse:collapse;
+            margin-top:40px;
+            font-size:10pt;
+            ">
+            
+            <tr>
+            
+            <td
+            style="
+            width:50%;
+            border:1px solid #000;
+            padding:10px;
+            vertical-align:top;
+            ">
+            
+            Disusun pada tanggal
+            <br>
+            ${tgl}
+            
+            <br><br>
+            
+            Ditetapkan oleh,
+            <br>
+            ${ppk?.position || 'PA/KPA/PPK'}
+            
+            <br><br>
+            
+            ${opd?.name || ''}
+            
+            <br><br><br><br>
+            
+            <strong>
+            ${ppk?.full_name || '-'}
+            </strong>
+            
+            <br>
+            
+            NIP. ${ppk?.nip || '-'}
+            
+            </td>
+            
+            <td
+            style="
+            width:50%;
+            border:1px solid #000;
+            padding:10px;
+            vertical-align:top;
+            ">
+            
+            Disusun oleh,
+            
+            <br>
+            
+            ${bidang?.name || 'Kepala Bidang'}
+            
+            <br><br><br><br><br><br>
+            
+            <strong>
+            ${bidang?.kepala_bidang || '-'}
+            </strong>
+            
+            <br>
+            
+            NIP. ${bidang?.nip || '-'}
+            
+            </td>
+            
+            </tr>
+            
+            </table>
             
             <div style="clear:both;"></div>
             `;
