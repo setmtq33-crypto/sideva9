@@ -38,38 +38,57 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/pages/hps.html" class="nav-link text-white-50 d-flex align-items-center gap-3">
-                    <i class="bi bi-calculator"></i> HPS Engine
+                <a href="/pages/hps.html" class="nav-link d-flex align-items-center gap-3">
+                    <div class="nav-icon-wrapper"><i class="bi bi-calculator-fill"></i></div>
+                    <span>HPS Engine Pro</span>
                 </a>
             </li>
             
-            <li class="my-3 border-top border-secondary border-opacity-25"></li>
+            <li class="my-2 border-top border-secondary border-opacity-25"></li>
             
-            <li class="menu-title text-uppercase fw-bold text-muted mb-2 px-3">Pengaturan & Admin</li>
+            <li class="menu-divider text-uppercase fw-bold text-info mb-1 px-3">
+                <i class="bi bi-cloud-arrow-down-fill me-2 opacity-50"></i>Ekstensi & Sinkronisasi
+            </li>
+            <li class="nav-item">
+                <a href="/pages/sipd-integration.html" class="nav-link d-flex align-items-center gap-3 border border-info border-opacity-20 bg-info bg-opacity-5">
+                    <div class="nav-icon-wrapper text-info"><i class="bi bi-cloud-lightning-fill"></i></div>
+                    <span class="fw-semibold text-info">Sinkronisasi SIPD-RI</span>
+                </a>
+            </li>
             
+            <li class="my-2 border-top border-secondary border-opacity-25"></li>
+            
+            <li class="menu-divider text-uppercase fw-bold text-muted mb-1 px-3">
+                <i class="bi bi-sliders me-2 opacity-50"></i>Sistem & Pengaturan
+            </li>
             <li class="nav-item">
-                <a href="/pages/pengaturan.html" class="nav-link text-white-50 d-flex align-items-center gap-3">
-                    <i class="bi bi-gear"></i> Pengaturan
+                <a href="/pages/pengaturan.html" class="nav-link d-flex align-items-center gap-3">
+                    <div class="nav-icon-wrapper"><i class="bi bi-gear-wide-connected"></i></div>
+                    <span>Konfigurasi Sistem</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/pages/opds.html" class="nav-link text-white-50 d-flex align-items-center gap-3">
-                    <i class="bi bi-building"></i> Data OPDs
+                <a href="/pages/opds.html" class="nav-link d-flex align-items-center gap-3">
+                    <div class="nav-icon-wrapper"><i class="bi bi-building-fill"></i></div>
+                    <span>Data Master OPD</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/pages/bidangs.html" class="nav-link text-white-50 d-flex align-items-center gap-3">
-                    <i class="bi bi-diagram-3"></i> Data Bidang
+                <a href="/pages/bidangs.html" class="nav-link d-flex align-items-center gap-3">
+                    <div class="nav-icon-wrapper"><i class="bi bi-diagram-3-fill"></i></div>
+                    <span>Struktur Bidang</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/pages/budget-accounts.html" class="nav-link text-white-50 d-flex align-items-center gap-3">
-                    <i class="bi bi-bank"></i> Rekening Belanja
+                <a href="/pages/budget-accounts.html" class="nav-link d-flex align-items-center gap-3">
+                    <div class="nav-icon-wrapper"><i class="bi bi-bank2"></i></div>
+                    <span>Rekening Belanja</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/pages/users.html" class="nav-link text-white-50 d-flex align-items-center gap-3">
-                    <i class="bi bi-people"></i> Manajemen Users
+                <a href="/pages/users.html" class="nav-link d-flex align-items-center gap-3">
+                    <div class="nav-icon-wrapper"><i class="bi bi-people-fill"></i></div>
+                    <span>Manajemen User</span>
                 </a>
             </li>
             
@@ -86,80 +105,112 @@
 </nav>
 
 <style>
-    :root { --sidebar-width: 260px; }
+    :root { --sidebar-width: 270px; }
     
     .adaptive-sidebar {
         width: var(--sidebar-width);
-        height: 100dvh; /* Mengamankan rasio penuh di Safari macOS / iOS */
+        height: 100vh;
         position: fixed;
         top: 0;
         left: 0;
-        background: #0f172a;
+        background: #090d16 !important;
         z-index: 1040;
         display: flex;
         flex-direction: column;
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        border-color: rgba(255,255,255,0.08) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
     }
-    
     .sidebar-brand-panel {
-        height: auto;
-        min-height: 115px; /* Memberikan ruang ideal untuk logo box */
-        background: #0b1329;
+        height: 70px;
+        background: #05080f;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-color: rgba(255,255,255,0.08) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
     }
-
-    /* Pembungkus Frame Logo Emas Sesuai Gambar Klien */
-    .brand-logo-container {
-        width: 54px;
-        height: 54px;
-        background: #ffffff;
-        border-radius: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        border: 2px solid rgba(255, 217, 0, 0.4);
+    .logo-text {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        letter-spacing: 1.5px;
     }
-
-    .brand-logo-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover; /* Mencegah gambar gepeng atau melar di layar monitor lebar */
+    .animate-pulse {
+        animation: pulse 2s infinite;
     }
-
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 0.8; }
+        50% { transform: scale(1.08); opacity: 1; text-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
+        100% { transform: scale(1); opacity: 0.8; }
+    }
     .sidebar-scroller {
         flex-grow: 1;
         overflow-y: auto;
-        scrollbar-width: thin;
+        scrollbar-width: none;
     }
-    .menu-title {
+    .sidebar-scroller::-webkit-scrollbar { display: none; }
+    
+    .menu-divider {
         font-size: 0.65rem !important;
-        letter-spacing: 1px;
+        letter-spacing: 1.2px;
+        opacity: 0.6;
+        padding-top: 10px;
+    }
+    .nav-icon-wrapper {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        color: #94a3b8;
     }
     .nav-link { 
-        padding: 11px 16px; 
-        transition: all 0.2s ease; 
-        border-radius: 10px; 
-        font-size: 0.88rem;
+        padding: 8px 12px; 
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
+        border-radius: 12px; 
+        font-size: 0.85rem;
         font-weight: 500;
+        color: #94a3b8 !important;
         margin: 0 4px;
     }
     .nav-link:hover { 
-        background-color: rgba(255, 255, 255, 0.06); 
+        background-color: rgba(255, 255, 255, 0.05); 
         color: #ffffff !important; 
     }
-    .nav-link:hover i { color: #06b6d4 !important; }
-    
+    .nav-link:hover .nav-icon-wrapper {
+        background: rgba(6, 182, 212, 0.15);
+        color: #06b6d4 !important;
+        transform: scale(1.05);
+    }
+    /* Pencocokan link aktif otomatis */
+    .nav-link.active {
+        background: linear-gradient(135deg, #1e3c72 0%, #0284c7 100%) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 15px rgba(2, 132, 199, 0.25);
+    }
+    .nav-link.active .nav-icon-wrapper {
+        background: rgba(255, 255, 255, 0.15);
+        color: #ffffff !important;
+    }
+    .logout-link:hover {
+        background: #dc3545 !important;
+        color: #ffffff !important;
+    }
+    .logout-link:hover .nav-icon-wrapper {
+        background: rgba(255, 255, 255, 0.2) !important;
+        color: #ffffff !important;
+    }
     @media (max-width: 991.98px) {
-        .adaptive-sidebar {
-            transform: translateX(-100%);
-        }
-        body.sidebar-open .adaptive-sidebar {
-            transform: translateX(0);
-        }
+        .adaptive-sidebar { transform: translateX(-100%); }
+        body.sidebar-open .adaptive-sidebar { transform: translateX(0); }
     }
 </style>
+
+<script>
+    // Automatisasi penanda halaman aktif
+    document.querySelectorAll('.nav-link').forEach(link => {
+        if(link.getAttribute('href') === window.location.pathname) {
+            link.classList.add('active');
+        }
+    });
+</script>
