@@ -235,12 +235,6 @@ async function saveItem(){
     
     const payload = {
     
-        tenant_id:
-            currentPackage.tenant_id,
-    
-        opd_id:
-            currentPackage.opd_id,
-    
         package_id:
             packageId,
     
@@ -296,13 +290,9 @@ async function saveItem(){
     
     if(result.error){
     
-        console.error(
-            result.error
-        );
+        console.error(result.error);
     
-        alert(
-            result.error.message
-        );
+        alert(result.error.message);
     
         return;
     }
