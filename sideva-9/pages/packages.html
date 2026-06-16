@@ -211,21 +211,6 @@
                 <textarea id="output" rows="3" class="form-control" placeholder="Tulis rincian deskripsi output capaian pekerjaan..."></textarea>
             </div>
 
-            <hr>
-
-            <h5>Sumber Pendanaan</h5>
-            
-            <div id="fundingContainer"></div>
-            
-            <button
-            type="button"
-            class="btn btn-outline-primary"
-            onclick="addFundingRow()">
-            
-            + Tambah Sumber Dana
-            
-            </button>
-
             <div class="col-12 mt-4">
                 <button class="btn btn-primary px-4 shadow-sm" id="saveBtn">
                     <i class="fa-solid fa-floppy-disk me-2"></i>Simpan Paket
@@ -315,730 +300,162 @@ async function loadMak(){
     });
 }
 
-async function addFundingRow(data = {}) {
-
-    const opdId =
-        profile.role === "SUPER_ADMIN"
-        ? currentOpdId
-        : profile.opd_id;
-
-    if (!opdId) {
-
-        alert(
-            "Pilih OPD terlebih dahulu sebelum menambah sumber pendanaan."
-        );
-
-        return;
-    }
-
-    const container =
-        document.getElementById("fundingContainer");
-
-    const row =
-        document.createElement("div");
-
-    row.className =
-        "row g-2 border rounded p-3 mb-2 funding-row bg-light";
-
-    row.innerHTML = `
-
-        <div class="col-md-2">
-            <label class="form-label">
-                Bidang
-            </label>
-            <select class="form-select funding-bidang">
-                <option value="">
-                    Loading...
-                </option>
-            </select>
-        </div>
-
-        <div class="col-md-2">
-            <label class="form-label">
-                Program
-            </label>
-            <input
-                type="text"
-                class="form-control funding-program"
-                value="${data.program || ""}"
-                placeholder="Program">
-        </div>
-
-        <div class="col-md-2">
-            <label class="form-label">
-                Kegiatan
-            </label>
-            <input
-                type="text"
-                class="form-control funding-kegiatan"
-                value="${data.kegiatan || ""}"
-                placeholder="Kegiatan">
-        </div>
-
-        <div class="col-md-2">
-            <label class="form-label">
-                Sub Kegiatan
-            </label>
-            <input
-                type="text"
-                class="form-control funding-sub"
-                value="${data.sub_kegiatan || ""}"
-                placeholder="Sub Kegiatan">
-        </div>
-
-        <div class="col-md-2">
-            <label class="form-label">
-                MAK
-            </label>
-            <select class="form-select funding-mak">
-                <option value="">
-                    Loading...
-                </option>
-            </select>
-        </div>
-
-        <div class="col-md-1">
-            <label class="form-label">
-                Nilai
-            </label>
-            <input
-                type="number"
-                class="form-control funding-budget"
-                value="${data.allocated_budget || 0}">
-        </div>
-
-        <div class="col-md-1 d-flex align-items-end">
-            <button
-                type="button"
-                class="btn btn-danger w-100 remove-funding">
-
-                <i class="fa fa-trash"></i>
-
-            </button>
-        </div>
-    `;
-
-    container.appendChild(row);
-
-    const bidangSelect =
-        row.querySelector(".funding-bidang");
-
-    const makSelect =
-        row.querySelector(".funding-mak");
-
-    const removeBtn =
-        row.querySelector(".remove-funding");
-
-    removeBtn.addEventListener(
-        "click",
-        () => {
-            row.remove();
-        }
-    );
-
-    /*
-    ===========================
-    LOAD BIDANG
-    ===========================
-    */
-
-    const {
-        data: bidangs,
-        error: bidangError
-    } = await db
-        .from("bidangs")
-        .select("*")
-        .eq("opd_id", opdId)
-        .order("bidang_name");
-
-    bidangSelect.innerHTML =
-        '<option value="">Pilih Bidang</option>';
-
-    if (!bidangError && bidangs) {
-
-        bidangs.forEach(item => {
-
-            bidangSelect.innerHTML += `
-                <option value="${item.id}">
-                    ${item.bidang_name}
-                </option>
-            `;
-        });
-    }
-
-    if (data.bidang_id) {
-
-        bidangSelect.value =
-            data.bidang_id;
-    }
-
-    /*
-    ===========================
-    LOAD MAK
-    ===========================
-    */
-
-    const {
-        data: maks,
-        error: makError
-    } = await db
-        .from("budget_accounts")
-        .select("*")
-        .order("account_code");
-
-    makSelect.innerHTML =
-        '<option value="">Pilih MAK</option>';
-
-    if (!makError && maks) {
-
-        maks.forEach(item => {
-
-            makSelect.innerHTML += `
-                <option value="${item.id}">
-                    ${item.account_code}
-                    -
-                    ${item.account_name}
-                </option>
-            `;
-        });
-    }
-
-    if (data.budget_account_id) {
-
-        makSelect.value =
-            data.budget_account_id;
-    }
-}
-
-async function loadFundingDropdowns(row, data = {}) {
-
-    const bidangSelect =
-        row.querySelector(".funding-bidang");
-
-    const makSelect =
-        row.querySelector(".funding-mak");
-
-    const opdId =
-        profile.role === "SUPER_ADMIN"
-        ? currentOpdId
-        : profile.opd_id;
-
-    const { data: bidangs } =
-        await db
-            .from("bidangs")
-            .select("*")
-            .eq("opd_id", opdId)
-            .order("bidang_name");
-
-    bidangSelect.innerHTML =
-        '<option value="">Bidang</option>';
-
-    (bidangs || []).forEach(item => {
-
-        bidangSelect.innerHTML += `
-            <option value="${item.id}">
-                ${item.bidang_name}
-            </option>
-        `;
-    });
-
-    if(data.bidang_id)
-        bidangSelect.value = data.bidang_id;
-
-    const { data: maks } =
-        await db
-            .from("budget_accounts")
-            .select("*")
-            .order("account_code");
-
-    makSelect.innerHTML =
-        '<option value="">MAK</option>';
-
-    (maks || []).forEach(item => {
-
-        makSelect.innerHTML += `
-            <option value="${item.id}">
-                ${item.account_code}
-                -
-                ${item.account_name}
-            </option>
-        `;
-    });
-
-    if(data.budget_account_id)
-        makSelect.value =
-            data.budget_account_id;
-}
-    
-
 async function savePackage(){
-    if(
-        profile.role !== "SUPER_ADMIN" &&
-        !await canCreatePackage()
-    ){
-        alert("Anda tidak memiliki hak membuat paket");
+    // ATURAN MAIN: SUPER_ADMIN bypass verifikasi canCreatePackage()
+    if(profile.role !== "SUPER_ADMIN" && !await canCreatePackage()){
+        alert('Anda tidak memiliki hak membuat paket');
         return;
     }
 
-    const opdId =
-        profile.role === "SUPER_ADMIN"
-            ? currentOpdId
-            : profile.opd_id;
-
+    const opdId = profile.role === "SUPER_ADMIN" ? currentOpdId : profile.opd_id;
     if(!opdId){
         alert("Pilih OPD terlebih dahulu");
         return;
     }
 
-    const dppDateValue =
-        document.getElementById("dppDate").value;
-
     const payload = {
-
         tenant_id: profile.tenant_id,
-
         opd_id: opdId,
-
-        package_name:
-            document.getElementById("packageName").value,
-
-        fiscal_year:
-            new Date().getFullYear(),
-
-        procurement_method:
-            document.getElementById("method").value,
-
-        budget_ceiling:
-            Number(
-                document.getElementById("budget").value || 0
-            ),
-
-        created_by:
-            profile.id,
-
-        rup_number:
-            document.getElementById("rupNumber").value,
-
-        bidang_id:
-            document.getElementById("bidangSelect").value || null,
-
-        program:
-            document.getElementById("program").value || null,
-
-        kegiatan:
-            document.getElementById("kegiatan").value || null,
-
-        sub_kegiatan:
-            document.getElementById("subKegiatan").value || null,
-
-        budget_account_id:
-            document.getElementById("makSelect").value || null,
-
-        output:
-            document.getElementById("output").value || null,
-
-        dpp_date:
-            dppDateValue || null
+        package_name: document.getElementById("packageName").value,
+        fiscal_year: new Date().getFullYear(),
+        procurement_method: document.getElementById("method").value,
+        budget_ceiling: Number(document.getElementById("budget").value || 0),
+        created_by: profile.id,
+        rup_number: document.getElementById("rupNumber").value,
+        bidang_id: document.getElementById("bidangSelect").value,
+        program: document.getElementById("program").value,
+        kegiatan: document.getElementById("kegiatan").value,
+        sub_kegiatan: document.getElementById("subKegiatan").value,
+        budget_account_id: document.getElementById("makSelect").value,
+        output: document.getElementById("output").value,
+        dpp_date: document.getElementById("dppDate").value
     };
 
-    let packageId = editingPackageId;
-
-    if(editingPackageId){
-
-        const { error } =
-            await db
-                .from("packages")
-                .update(payload)
-                .eq("id", editingPackageId);
-
-        if(error){
-            alert(error.message);
-            return;
-        }
-
-    } else {
-
-        const {
-            data,
-            error
-        } = await db
-            .from("packages")
-            .insert(payload)
-            .select()
-            .single();
-
-        if(error){
-            alert(error.message);
-            return;
-        }
-
-        packageId = data.id;
-    }
-
-    await db
-        .from("package_funding_sources")
-        .delete()
-        .eq("package_id", packageId);
-
-    const fundingRows =
-        document.querySelectorAll(
-            ".funding-row"
-        );
-
-    const fundingPayload = [];
-
-    fundingRows.forEach(row => {
-
-        fundingPayload.push({
-
-            tenant_id:
-                profile.tenant_id,
-
-            package_id:
-                packageId,
-
-            bidang_id:
-                row.querySelector(
-                    ".funding-bidang"
-                )?.value || null,
-
-            budget_account_id:
-                row.querySelector(
-                    ".funding-mak"
-                )?.value || null,
-
-            program:
-                row.querySelector(
-                    ".funding-program"
-                )?.value || null,
-
-            kegiatan:
-                row.querySelector(
-                    ".funding-kegiatan"
-                )?.value || null,
-
-            sub_kegiatan:
-                row.querySelector(
-                    ".funding-sub"
-                )?.value || null,
-
-            allocated_budget:
-                Number(
-                    row.querySelector(
-                        ".funding-budget"
-                    )?.value || 0
-                )
-        });
-
-    });
-
-    if(fundingPayload.length){
-
-        const {
-            error: fundingError
-        } = await db
-            .from(
-                "package_funding_sources"
-            )
-            .insert(
-                fundingPayload
-            );
-
-        if(fundingError){
-
-            alert(
-                fundingError.message
-            );
-
-            return;
-        }
-    }
-
-    const isUpdate =
-    !!editingPackageId;
-    
-    alert(
-    isUpdate
-    ? "Paket berhasil diperbarui"
-    : "Paket berhasil disimpan"
-    );
-    
-    await loadPackages();
-    
-    if(!isUpdate){
-    clearForm();
-    }
-}
-
-async function loadPackages() {
-    let query =
-        db
-        .from("packages")
-        .select("*")
-        .order("created_at", {
-            ascending: false
-        });
-
-    const opdId =
-        profile.role === "SUPER_ADMIN"
-            ? currentOpdId
-            : profile.opd_id;
-
-    if (opdId) {
-        query = query.eq("opd_id", opdId);
-    }
-
-    const { data, error } = await query;
-
-    const container = document.getElementById("packageList");
-    container.innerHTML = "";
-
-    if (error) {
-        console.error(error);
-        container.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
-        return;
-    }
-
-    if (!data || data.length === 0) {
-        container.innerHTML = `
-            <div class="alert alert-light border">
-                Belum ada paket.
-            </div>
-        `;
-        return;
-    }
-
-    /* LOAD FUNDING SOURCES */
-    const { data: fundingData } = await db
-        .from("package_funding_sources")
-        .select("*");
-
-    const fundingMap = {};
-    (fundingData || []).forEach(row => {
-        if (!fundingMap[row.package_id]) {
-            fundingMap[row.package_id] = [];
-        }
-        fundingMap[row.package_id].push(row);
-    });
-
-    /* RENDER PACKAGE */
-    data.forEach(pkg => {
-        const fundingList = fundingMap[pkg.id] || [];
-        
-        // Mengambil data funding pertama untuk referensi MAK
-        const firstFunding = fundingList[0] || {};
-
-        container.innerHTML += `
-        <div class="card-package p-4 mb-3">
-            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
-                <div>
-                    <h5 class="fw-bold text-dark mb-1">${pkg.package_name || '-'}</h5>
-                    <div class="text-secondary small fw-medium">
-                        <i class="fa-solid fa-hashtag me-1"></i> No. RUP:
-                        <span class="text-primary">${pkg.rup_number || '-'}</span>
-                        <span class="ms-3 text-muted">
-                            <i class="fa-solid fa-code-branch me-1"></i> Metode: ${pkg.procurement_method || '-'}
-                        </span>
-                    </div>
-                </div>
-                <div class="badge-pagu shadow-sm">
-                    <span class="text-muted small fw-normal">Pagu:</span>
-                    Rp ${Number(pkg.budget_ceiling || 0).toLocaleString('id-ID')}
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    ${fundingList.length 
-                        ? fundingList.map(item => `
-                            <div class="meta-info-text">
-                                <i class="fa-solid fa-layer-group"></i> <strong>Prog:</strong> ${item.program || '-'}
-                            </div>
-                            <div class="meta-info-text">
-                                <i class="fa-solid fa-bars-progress"></i> <strong>Keg:</strong> ${item.kegiatan || '-'}
-                            </div>
-                            <div class="meta-info-text">
-                                <i class="fa-solid fa-circle-nodes"></i> <strong>Sub:</strong> ${item.sub_kegiatan || '-'}
-                            </div>
-                            <hr class="my-2">
-                        `).join('') 
-                        : `
-                            <div class="meta-info-text"><strong>Prog/Keg/Sub:</strong> -</div>
-                        `
-                    }
-                </div>
-                <div class="col-md-6">
-                    <div class="meta-info-text">
-                        <i class="fa-solid fa-wallet"></i> <strong>MAK:</strong> ${firstFunding.budget_account_id || '-'}
-                    </div>
-                    <div class="meta-info-text">
-                        <i class="fa-solid fa-bullseye"></i> <strong>Output:</strong> ${pkg.output || '-'}
-                    </div>
-                    <div class="meta-info-text">
-                        <i class="fa-solid fa-calendar-day"></i> <strong>Tgl DPP:</strong> ${pkg.dpp_date || '-'}
-                    </div>
-                </div>
-            </div>
-
-            <hr>
-            <div class="d-flex gap-2 flex-wrap mb-2">
-                <button class="btn btn-sm btn-primary" onclick="openItems('${pkg.id}')">
-                    <i class="fa-solid fa-basket-shopping"></i> Rincian Belanja
-                </button>
-            
-                <button class="btn btn-sm btn-info text-white" onclick="openSurvey('${pkg.id}')">
-                    <i class="fa-solid fa-magnifying-glass-dollar"></i> Survey Harga
-                </button>
-            
-                <button class="btn btn-sm btn-outline-info" onclick="openDpp('${pkg.id}')">
-                    <i class="fa-solid fa-file-shield"></i> DPP
-                </button>
-            
-                <button class="btn btn-sm btn-outline-dark" onclick="location.href='dpp-document.html?id=${pkg.id}'">
-                    <i class="fa-solid fa-file-pdf"></i> DPP PDF
-                </button>
-            
-                <button class="btn btn-sm btn-secondary" onclick="openDocs('${pkg.id}')">
-                    <i class="fa-solid fa-folder"></i> Dokumen
-                </button>
-            
-                ${(profile.role === 'SUPER_ADMIN' || canSeeHps(profile.role)) ? `
-                    <button class="btn btn-sm btn-success" onclick="openHps('${pkg.id}')">
-                        <i class="fa-solid fa-calculator"></i> HPS
-                    </button>
-                    <button class="btn btn-sm btn-outline-success" onclick="openBahpe('${pkg.id}')">
-                        <i class="fa-solid fa-file-contract"></i> BAHPE
-                    </button>
-                ` : ""}
-            
-                <button class="btn btn-sm btn-outline-warning" onclick="location.href='review.html?id=${pkg.id}'">
-                    Review
-                </button>
-            
-                <button class="btn btn-sm btn-outline-dark" onclick="location.href='review-document.html?id=${pkg.id}'">
-                    <i class="fa-solid fa-file-pdf"></i> Review PDF
-                </button>
-            </div>
-            
-            <div class="d-flex gap-2">
-                <button class="btn btn-sm btn-warning" onclick="editPackage('${pkg.id}')">
-                    <i class="fa-solid fa-pen-to-square"></i> Edit
-                </button>
-                <button class="btn btn-sm btn-danger" onclick="deletePackage('${pkg.id}')">
-                    <i class="fa-solid fa-trash-can"></i> Hapus
-                </button>
-            </div>
-        </div>
-        `;
-    });
-}
-
-async function editPackage(id){
-        const {
-        data: pkg,
-        error
-    } = await db
-        .from("packages")
-        .select("*")
-        .eq("id", id)
-        .single();
+    let query = editingPackageId ? db.from("packages").update(payload).eq("id", editingPackageId) : db.from("packages").insert(payload);
+    const { error } = await query;
 
     if(error){
         alert(error.message);
         return;
     }
 
-    editingPackageId = id;
+    alert(editingPackageId ? "Paket berhasil diperbarui" : "Paket berhasil disimpan");
+    clearForm();
+    await loadPackages();
+}
 
-    document.getElementById("formTitle").innerHTML =
-        `<i class="fa-solid fa-pen-to-square me-2"></i>Ubah / Edit Data Paket`;
-
-    document.getElementById("saveBtn").innerHTML =
-        `<i class="fa-solid fa-floppy-disk me-2"></i>Perbarui Paket`;
-
-    document.getElementById("rupNumber").value =
-        pkg.rup_number ?? "";
-
-    document.getElementById("packageName").value =
-        pkg.package_name ?? "";
-
-    document.getElementById("program").value =
-        pkg.program ?? "";
-
-    document.getElementById("kegiatan").value =
-        pkg.kegiatan ?? "";
-
-    document.getElementById("subKegiatan").value =
-        pkg.sub_kegiatan ?? "";
-
-    document.getElementById("budget").value =
-        Number(pkg.budget_ceiling || 0);
-
-    document.getElementById("method").value =
-        pkg.procurement_method || "ECATALOG";
-
-    document.getElementById("bidangSelect").value =
-        pkg.bidang_id || "";
-
-    document.getElementById("makSelect").value =
-        pkg.budget_account_id || "";
-
-    document.getElementById("output").value =
-        pkg.output || "";
-
-    document.getElementById("dppDate").value =
-        pkg.dpp_date || "";
-
-    /*
-    ==================================
-    LOAD FUNDING SOURCES
-    ==================================
-    */
-
-    document.getElementById(
-        "fundingContainer"
-    ).innerHTML = "";
-
-    const {
-        data: fundingRows,
-        error: fundingError
-    } = await db
-        .from("package_funding_sources")
-        .select("*")
-        .eq("package_id", id)
-        .order("created_at");
-
-    if(!fundingError && fundingRows){
-
-        for(const row of fundingRows){
-
-            await addFundingRow({
-
-                bidang_id:
-                    row.bidang_id,
-
-                budget_account_id:
-                    row.budget_account_id,
-
-                program:
-                    row.program,
-
-                kegiatan:
-                    row.kegiatan,
-
-                sub_kegiatan:
-                    row.sub_kegiatan,
-
-                allocated_budget:
-                    row.allocated_budget
-            });
-        }
+async function loadPackages() {
+    let query = db.from("packages").select("*").order("created_at", { ascending: false });
+    
+    const opdId = profile.role === "SUPER_ADMIN" ? currentOpdId : profile.opd_id;
+    if (opdId) {
+        query = query.eq("opd_id", opdId);
     }
 
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
+    const { data, error } = await query;
+    const container = document.getElementById("packageList");
+    container.innerHTML = "";
+
+    if (error || !data || data.length === 0) {
+        container.innerHTML = `
+        <div class="text-center p-5 text-muted bg-light rounded-3 border border-dashed">
+            <i class="fa-solid fa-folder-open display-6 mb-3"></i>
+            <p class="mb-0">Belum ada paket pengadaan yang terdaftar dalam cakupan ini.</p>
+        </div>`;
+        return;
+    }
+
+    data.forEach(pkg => {
+        container.innerHTML += `
+        <div class="card-package p-4">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                <div>
+                    <h5 class="fw-bold text-dark mb-1">${pkg.package_name || '-'}</h5>
+                    <div class="text-secondary small fw-medium">
+                        <i class="fa-solid fa-hashtag me-1"></i>No. RUP: <span class="text-primary">${pkg.rup_number || '-'}</span>
+                        <span class="ms-3 text-muted"><i class="fa-solid fa-code-branch me-1"></i>Metode: ${pkg.procurement_method || '-'}</span>
+                    </div>
+                </div>
+                <div class="badge-pagu shadow-sm">
+                    <span class="text-muted small fw-normal">Pagu:</span> Rp ${Number(pkg.budget_ceiling || 0).toLocaleString('id-ID')}
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="meta-info-text"><i class="fa-solid fa-layer-group"></i><strong>Prog:</strong> ${pkg.program || '-'}</div>
+                    <div class="meta-info-text"><i class="fa-solid fa-bars-progress"></i><strong>Keg:</strong> ${pkg.kegiatan || '-'}</div>
+                    <div class="meta-info-text"><i class="fa-solid fa-circle-nodes"></i><strong>Sub:</strong> ${pkg.sub_kegiatan || '-'}</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="meta-info-text"><i class="fa-solid fa-wallet"></i><strong>MAK ID:</strong> ${pkg.budget_account_id || '-'}</div>
+                    <div class="meta-info-text"><i class="fa-solid fa-bullseye"></i><strong>Output:</strong> ${pkg.output || "-"}</div>
+                    <div class="meta-info-text"><i class="fa-solid fa-calendar-day"></i><strong>Tgl DPP:</strong> ${pkg.dpp_date || "-"}</div>
+                </div>
+            </div>
+            
+            <hr class="my-3 text-black-50">
+            
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 btn-group-actions">
+                <div class="d-flex gap-1 flex-wrap">
+                    <button class="btn btn-sm btn-primary" onclick="openItems('${pkg.id}')">
+                        <i class="fa-solid fa-basket-shopping"></i> Rincian Belanja
+                    </button>
+                    <button class="btn btn-sm btn-info text-white" onclick="openSurvey('${pkg.id}')">
+                        <i class="fa-solid fa-magnifying-glass-dollar"></i> Survey Harga
+                    </button>
+                    <button class="btn btn-sm btn-outline-info" onclick="openDpp('${pkg.id}')">
+                        <i class="fa-solid fa-file-shield"></i> DPP
+                    </button>
+                    <button class="btn btn-sm btn-outline-dark" onclick="location.href='dpp-document.html?id=${pkg.id}'">
+                        <i class="fa-solid fa-file-pdf"></i> DPP PDF
+                    </button>
+                    <button class="btn btn-sm btn-secondary" onclick="openDocs('${pkg.id}')">
+                        <i class="fa-solid fa-folder"></i> Dokumen
+                    </button>
+                    
+                    ${(profile.role === 'SUPER_ADMIN' || canSeeHps(profile.role)) ? `
+                        <button class="btn btn-sm btn-success" onclick="openHps('${pkg.id}')"><i class="fa-solid fa-calculator"></i> HPS</button>
+                        <button class="btn btn-sm btn-outline-success" onclick="openBahpe('${pkg.id}')"><i class="fa-solid fa-file-contract"></i> BAHPE</button>
+                    ` : ""}
+
+                    <button class="btn btn-sm btn-outline-warning" onclick="location.href='review.html?id=${pkg.id}'">Review</button>
+                    <button class="btn btn-sm btn-outline-dark" onclick="location.href='review-document.html?id=${pkg.id}'"><i class="fa-solid fa-file-pdf"></i> Review PDF</button>
+                </div>
+                
+                <div class="d-flex gap-1">
+                    <button class="btn btn-sm btn-warning" onclick="editPackage('${pkg.id}')"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                    <button class="btn btn-sm btn-danger" onclick="deletePackage('${pkg.id}')"><i class="fa-solid fa-trash-can"></i> Hapus</button>
+                </div>
+            </div>
+        </div>`;
     });
+}
+
+async function editPackage(id){
+    const { data, error } = await db.from("packages").select("*").eq("id", id).single();
+    if(error){
+        alert(error.message);
+        return;
+    }
+    
+    editingPackageId = id;
+    document.getElementById("formTitle").innerHTML = `<i class="fa-solid fa-pen-to-square me-2"></i>Ubah / Edit Data Paket`;
+    document.getElementById("saveBtn").innerHTML = `<i class="fa-solid fa-floppy-disk me-2"></i>Perbarui Paket`;
+
+    document.getElementById("rupNumber").value = data.rup_number || "";
+    document.getElementById("packageName").value = data.package_name || "";
+    document.getElementById("program").value = data.program || "";
+    document.getElementById("kegiatan").value = data.kegiatan || "";
+    document.getElementById("subKegiatan").value = data.sub_kegiatan || "";
+    document.getElementById("budget").value = data.budget_ceiling || "";
+    document.getElementById("method").value = data.procurement_method || "ECATALOG";
+    document.getElementById("bidangSelect").value = data.bidang_id || "";
+    document.getElementById("makSelect").value = data.budget_account_id || "";
+    document.getElementById("output").value = data.output || "";
+    document.getElementById("dppDate").value = data.dpp_date || "";
+    
+    window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 async function deletePackage(id){
@@ -1056,13 +473,8 @@ async function deletePackage(id){
 
 function clearForm(){
     editingPackageId = null;
-
-    document.getElementById("formTitle").innerHTML =
-        `<i class="fa-solid fa-folder-plus me-2"></i>Tambah Paket Baru`;
-
-    document.getElementById("saveBtn").innerHTML =
-        `<i class="fa-solid fa-floppy-disk me-2"></i>Simpan Paket`;
-
+    document.getElementById("formTitle").innerHTML = `<i class="fa-solid fa-folder-plus me-2"></i>Tambah Paket Baru`;
+    document.getElementById("saveBtn").innerHTML = `<i class="fa-solid fa-floppy-disk me-2"></i>Simpan Paket`;
     document.getElementById("rupNumber").value = "";
     document.getElementById("packageName").value = "";
     document.getElementById("program").value = "";
@@ -1071,16 +483,6 @@ function clearForm(){
     document.getElementById("budget").value = "";
     document.getElementById("output").value = "";
     document.getElementById("dppDate").value = "";
-
-    document.getElementById("method").value =
-        "ECATALOG";
-
-    document.getElementById("bidangSelect").value = "";
-    document.getElementById("makSelect").value = "";
-
-    document.getElementById(
-        "fundingContainer"
-    ).innerHTML = "";
 }
 
 function canSeeHps(role){ return ['SUPER_ADMIN', 'ADMIN_OPD', 'PPK'].includes(role); }
