@@ -1,6 +1,6 @@
 /* RESET TOTAL + VARIABLES */
 :root {
-  --sidebar-width: 280px;
+  --sidebar-width: 256px;
   --topbar-height: 70px;
   color-scheme: light dark;
 }
