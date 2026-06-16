@@ -1,1238 +1,477 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-bs-theme="light">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Import RUP SIRUP - SIDEVA v9</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --sideva-primary: #2a5298;
+      --sideva-secondary: #1e3c72;
+      --card-radius: 16px;
+    }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: #f6f8fb;
+      color: #0f172a;
+    }
+    [data-bs-theme="dark"] body {
+      background: #0b1220;
+      color: #e2e8f0;
+    }
+    .wrapper {
+      min-height: 100vh;
+      display: flex;
+    }
+    #sidebar-container {
+      width: 280px;
+      flex-shrink: 0;
+      background: var(--bs-body-bg);
+      border-right: 1px solid var(--bs-border-color);
+      display: none;
+    }
+    @media (min-width: 992px) {
+      #sidebar-container { display: block; }
+    }
+    .main-content {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    #topbar-container {
+      min-height: 68px;
+    }
+    .content-wrapper {
+      flex: 1;
+      padding: 1.25rem;
+    }
+    @media (min-width: 992px) {
+      .content-wrapper { padding: 1.75rem 2rem; }
+    }
 
-<meta charset="UTF-8">
-<meta name="viewport"
-content="width=device-width, initial-scale=1">
+    /* Banner */
+    .page-banner {
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      border-radius: var(--card-radius);
+      padding: 28px 26px;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(30, 60, 114, .25);
+      margin-bottom: 1.5rem;
+    }
+    .page-banner::before, .page-banner::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+    }
+    .page-banner::before { width: 220px; height: 220px; right: -60px; top: -80px; }
+    .page-banner::after { width: 140px; height: 140px; left: -40px; bottom: -50px; }
+    .banner-icon {
+      width: 56px; height: 56px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+      backdrop-filter: blur(6px);
+      flex-shrink: 0;
+    }
 
-<title>
-Import RUP
-</title>
+    /* Stepper */
+    .stepper-wrapper { margin: 1.75rem 0 1.25rem; }
+    .stepper {
+      display: flex; justify-content: space-between; gap: .5rem;
+      position: relative;
+    }
+    .stepper::before {
+      content: ""; position: absolute; top: 18px; left: 10%; right: 10%;
+      height: 2px; background: #e2e8f0; z-index: 0;
+    }
+    [data-bs-theme="dark"] .stepper::before { background: #1e293b; }
+    .step { flex: 1; text-align: center; position: relative; z-index: 1; }
+    .step-circle {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: #e9eef6; color: #64748b;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 8px; font-weight: 700; font-size: .9rem;
+      border: 3px solid #f6f8fb; transition: all .3s;
+    }
+    [data-bs-theme="dark"] .step-circle { background: #0f172a; border-color: #0b1220; color: #64748b; }
+    .step.active .step-circle {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff; box-shadow: 0 6px 16px rgba(42,82,152,.35);
+      transform: scale(1.05);
+    }
+    .step-label { font-size: .8rem; color: #64748b; font-weight: 500; }
+    .step.active .step-label { color: #2a5298; font-weight: 600; }
+    [data-bs-theme="dark"] .step.active .step-label { color: #93c5fd; }
 
-<link
-href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-rel="stylesheet">
+    /* Cards */
+    .card-modern {
+      border: 0; border-radius: var(--card-radius);
+      box-shadow: 0 8px 24px rgba(18,38,63,.06);
+      background: var(--bs-body-bg);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+    [data-bs-theme="dark"] .card-modern {
+      box-shadow: 0 8px 24px rgba(0,0,0,.4);
+      background: #111c30; border: 1px solid #1f2d46;
+    }
+    .card-modern .card-header {
+      background: transparent; border: 0;
+      padding: 1.25rem 1.5rem 0.5rem;
+    }
+    .step-badge {
+      width: 30px; height: 30px; border-radius: 9px;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff; display: inline-flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: .85rem; flex-shrink: 0;
+    }
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    /* Forms with icons */
+    .input-icon { position: relative; }
+    .input-icon > i {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      color: #8a93a6; font-size: 1.05rem; z-index: 5; pointer-events: none;
+    }
+    .form-floating.input-icon > .form-control,
+    .form-floating.input-icon > .form-select {
+      padding-left: 2.75rem; height: 60px; border-radius: 12px;
+      border-color: #e2e8f0; background-color: #fff;
+    }
+    [data-bs-theme="dark"] .form-floating.input-icon > .form-control,
+    [data-bs-theme="dark"] .form-floating.input-icon > .form-select {
+      background-color: #0f172a; border-color: #1e293b; color: #e2e8f0;
+    }
+    .form-floating.input-icon > label {
+      padding-left: 2.75rem; color: #64748b;
+    }
+    .form-floating > .form-control:focus ~ label { color: var(--sideva-primary); }
+    .form-control:focus, .form-select:focus {
+      border-color: var(--sideva-primary);
+      box-shadow: 0 0 0 .2rem rgba(42,82,152,.15);
+    }
 
-<script src="../js/config.js"></script>
-<script src="../js/supabase.js"></script>
-<script src="../js/auth.js"></script>
-<script src="../js/audit.js"></script>
-<script src="../js/layout.js"></script>
+    /* Buttons */
+    .btn-gradient-primary {
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      border: 0; color: #fff; font-weight: 600;
+      padding: .7rem 1.3rem; border-radius: 12px;
+      box-shadow: 0 8px 18px rgba(42,82,152,.22);
+      transition: all .2s;
+    }
+    .btn-gradient-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(42,82,152,.28); color: #fff; }
+    .btn-gradient-success {
+      background: linear-gradient(135deg, #0d9488 0%, #10b981 100%);
+      border: 0; color: #fff; font-weight: 600;
+      padding: .7rem 1.3rem; border-radius: 12px;
+      box-shadow: 0 8px 18px rgba(16,185,129,.22);
+      transition: all .2s;
+    }
+    .btn-gradient-success:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(16,185,129,.28); color: #fff; }
 
-<link
-rel="stylesheet"
-href="../css/app.css">
+    /* JSON Card */
+    .json-dropzone {
+      position: relative; background: linear-gradient(180deg, rgba(42,82,152,.04), transparent);
+      border: 2px dashed #cbd5e1; border-radius: 14px; padding: 10px; transition: .25s;
+    }
+    .json-dropzone:hover { border-color: #2a5298; background: rgba(42,82,152,.06); }
+    [data-bs-theme="dark"] .json-dropzone { border-color: #334155; background: rgba(15,23,42,.5); }
+    #sirupJson {
+      background: transparent; border: 0; resize: vertical;
+      min-height: 180px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: .875rem; line-height: 1.6; box-shadow: none !important;
+    }
+    .drop-hint {
+      position: absolute; right: 16px; bottom: 12px; font-size: .75rem;
+      color: #94a3b8; display: flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.8); padding: 4px 8px; border-radius: 6px;
+      pointer-events: none;
+    }
+    [data-bs-theme="dark"] .drop-hint { background: rgba(15,23,42,.8); }
 
-<style>
+    /* Table */
+    .table-modern { margin-bottom: 0; }
+    .table-modern thead th {
+      font-size: .72rem; text-transform: uppercase; letter-spacing: .06em;
+      color: #64748b; font-weight: 600; border-bottom: 1px solid var(--bs-border-color);
+      padding: 1rem 1.25rem; background: transparent; white-space: nowrap;
+    }
+    .table-modern tbody td {
+      padding: 1rem 1.25rem; vertical-align: middle;
+      border-bottom: 1px solid var(--bs-border-color-translucent);
+    }
+    .table-modern tbody tr:last-child td { border-bottom: 0; }
+    .table-modern tbody tr:hover { background: rgba(42,82,152,.03); }
+    [data-bs-theme="dark"] .table-modern tbody tr:hover { background: rgba(147,197,253,.04); }
+    .badge-pagu {
+      background: rgba(42,82,152,.1); color: #1e3c72;
+      font-weight: 600; padding: .45rem .7rem; border-radius: 9px; font-size: .8rem;
+      white-space: nowrap;
+    }
+    [data-bs-theme="dark"] .badge-pagu { background: rgba(147,197,253,.15); color: #bfdbfe; }
+    .badge-metode { font-weight: 500; font-size: .75rem; padding: .4rem .6rem; border-radius: 8px; }
+    .action-btns .btn {
+      width: 34px; height: 34px; padding: 0; display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 9px; border-width: 1.5px;
+    }
 
-body{
-    background:#f5f6fa;
-}
+    /* Empty State */
+    .empty-state { padding: 3.5rem 1.5rem; text-align: center; }
+    .empty-icon {
+      width: 80px; height: 80px; border-radius: 20px;
+      background: linear-gradient(135deg, rgba(30,60,114,.1), rgba(42,82,152,.12));
+      display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;
+      color: #2a5298; font-size: 36px;
+    }
+    [data-bs-theme="dark"] .empty-icon { background: rgba(147,197,253,.1); color: #93c5fd; }
 
-.card{
-    border:none;
-    border-radius:12px;
-}
-
-textarea{
-    min-height:250px;
-}
-
-</style>
-
+    @media (max-width: 390px) {
+      .content-wrapper { padding: 1rem .9rem; }
+      .page-banner { padding: 22px 18px; border-radius: 14px; }
+      .banner-icon { width: 48px; height: 48px; font-size: 24px; }
+      .page-banner h2 { font-size: 1.25rem; }
+      .step-label { font-size: .68rem; }
+      .step-circle { width: 32px; height: 32px; }
+      .stepper::before { top: 15px; }
+      .btn-gradient-primary, .btn-gradient-success { width: 100%; }
+      .action-btns { gap: 4px !important; }
+    }
+  </style>
 </head>
-
 <body>
-
-<div id="sidebar-container"></div>
-
-<div class="main-content">
-
-<div id="topbar-container"></div>
-
-<div class="container-fluid p-4">
-
-<div
-class="d-flex justify-content-between align-items-center mb-4">
-
-<div>
-
-<h3>
-Import RUP
-</h3>
-
-<small class="text-muted">
-Import data paket dari SIRUP
-</small>
-
-</div>
-
-<a
-href="dashboard.html"
-class="btn btn-secondary">
-
-Dashboard
-
-</a>
-
-</div>
-
-<div class="card mb-4">
-
-<div class="card-header">
-
-Paste Detail RUP
-
-</div>
-
-<div class="card-body">
-
-<div class="mb-3">
-
-<label class="form-label">
-
-Kode RUP
-
-</label>
-
-<input
-id="rupNumber"
-class="form-control">
-
-</div>
-
-<div class="mb-3">
-
-<label class="form-label">
-
-Nama OPD SIRUP
-
-</label>
-
-<input
-id="opdName"
-class="form-control">
-
-</div>
-
-<div class="mb-3">
-
-<label class="form-label">
-
-Nama Paket
-
-</label>
-
-<input
-id="packageName"
-class="form-control">
-
-</div>
-
-<div class="row">
-
-<div class="col-md-4">
-
-<label class="form-label">
-
-Tahun
-
-</label>
-
-<input
-id="fiscalYear"
-type="number"
-class="form-control">
-
-</div>
-
-<div class="col-md-4">
-
-<label class="form-label">
-
-Pagu
-
-</label>
-
-<input
-id="budgetCeiling"
-type="number"
-class="form-control">
-
-</div>
-
-<div class="col-md-4">
-
-<label class="form-label">
-
-Metode
-
-</label>
-
-<input
-id="procurementMethod"
-class="form-control">
-
-</div>
-
-</div>
-
-<div class="mt-3">
-
-<label class="form-label">
-
-Source URL
-
-</label>
-
-<input
-id="sourceUrl"
-class="form-control">
-
-</div>
-
-<div class="mt-4">
-
-<button
-id="saveBtn"
-class="btn btn-primary">
-
-Simpan RUP
-
-</button>
-
-<button
-id="syncSirupBtn"
-class="btn btn-success ms-2">
-
-Sync SIRUP 2026
-
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="card mb-4">
-
-    <div class="card-header">
-
-        Import JSON SIRUP
-
+  <div class="wrapper">
+    <aside id="sidebar-container"></aside>
+    
+    <div class="main-content">
+      <header id="topbar-container"></header>
+      
+      <main class="content-wrapper">
+        <div class="container-fluid px-0" style="max-width: 1280px; margin: 0 auto;">
+          
+          <!-- Banner -->
+          <div class="page-banner">
+            <div class="d-flex align-items-center gap-3 position-relative" style="z-index: 2;">
+              <div class="banner-icon">
+                <i class="bi bi-cloud-arrow-up-fill"></i>
+              </div>
+              <div>
+                <h2 class="mb-1 fw-bold">Import RUP SIRUP</h2>
+                <p class="mb-0 opacity-75">Sinkronisasi data paket dari SIRUP 2026 secara otomatis</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stepper -->
+          <div class="stepper-wrapper">
+            <div class="stepper">
+              <div class="step active">
+                <div class="step-circle">1</div>
+                <div class="step-label">Input Manual</div>
+              </div>
+              <div class="step">
+                <div class="step-circle">2</div>
+                <div class="step-label">Import JSON</div>
+              </div>
+              <div class="step">
+                <div class="step-circle">3</div>
+                <div class="step-label">Daftar RUP</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 1: Input Manual -->
+          <div class="card-modern">
+            <div class="card-header">
+              <div class="d-flex align-items-center gap-2">
+                <span class="step-badge">1</span>
+                <div>
+                  <h5 class="mb-0 fw-semibold">Input Manual</h5>
+                  <small class="text-muted">Tambahkan data RUP secara individual</small>
+                </div>
+              </div>
+            <div class="card-body px-4 pb-4 pt-3">
+              <div class="row g-3">
+                <div class="col-12 col-lg-6">
+                  <div class="form-floating input-icon">
+                    <i class="bi bi-upc"></i>
+                    <input type="text" class="form-control" id="rupNumber" placeholder="Nomor RUP">
+                    <label for="rupNumber">Nomor RUP</label>
+                  </div>
+                </div>
+                <div class="col-12 col-lg-6">
+                  <div class="form-floating input-icon">
+                    <i class="bi bi-building"></i>
+                    <input type="text" class="form-control" id="opdName" placeholder="Nama OPD">
+                    <label for="opdName">Nama OPD</label>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="form-floating input-icon">
+                    <i class="bi bi-box-seam"></i>
+                    <input type="text" class="form-control" id="packageName" placeholder="Nama Paket">
+                    <label for="packageName">Nama Paket Pengadaan</label>
+                  </div>
+                </div>
+                <div class="col-12 col-lg-6">
+                  <div class="form-floating input-icon">
+                    <i class="bi bi-calendar-event"></i>
+                    <input type="number" class="form-control" id="fiscalYear" placeholder="2026" value="2026">
+                    <label for="fiscalYear">Tahun Anggaran</label>
+                  </div>
+                <div class="col-12 col-lg-6">
+                  <div class="form-floating input-icon">
+                    <i class="bi bi-cash-stack"></i>
+                    <input type="number" class="form-control" id="budgetCeiling" placeholder="0">
+                    <label for="budgetCeiling">Pagu Anggaran (Rp)</label>
+                  </div>
+                </div>
+                <div class="col-12 col-lg-6">
+                  <div class="form-floating input-icon">
+                    <i class="bi bi-diagram-3"></i>
+                    <select class="form-select" id="procurementMethod">
+                      <option value="" selected>Pilih Metode</option>
+                      <option value="Tender">Tender</option>
+                      <option value="Seleksi">Seleksi</option>
+                      <option value="Pengadaan Langsung">Pengadaan Langsung</option>
+                      <option value="Penunjukan Langsung">Penunjukan Langsung</option>
+                      <option value="E-Purchasing">E-Purchasing</option>
+                      <option value="Swakelola">Swakelola</option>
+                    </select>
+                    <label for="procurementMethod">Metode Pengadaan</label>
+                  </div>
+                </div>
+                <div class="col-12 col-lg-6">
+                  <div class="form-floating input-icon">
+                    <i class="bi bi-link-45deg"></i>
+                    <input type="url" class="form-control" id="sourceUrl" placeholder="https://sirup.lkpp.go.id">
+                    <label for="sourceUrl">URL Sumber SIRUP</label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="d-flex flex-column flex-sm-row gap-2 mt-4 pt-2">
+                <button type="button" id="saveBtn" class="btn btn-gradient-primary" onclick="saveRup()">
+                  <i class="bi bi-save2 me-2"></i>Simpan Data
+                </button>
+                <button type="button" id="syncSirupBtn" class="btn btn-gradient-success" onclick="syncSirup()">
+                  <i class="bi bi-cloud-arrow-down me-2"></i>Sync SIRUP
+                </button>
+                <button type="button" class="btn btn-light ms-sm-auto" onclick="document.getElementById('rupNumber').value='';document.getElementById('opdName').value='';document.getElementById('packageName').value='';document.getElementById('budgetCeiling').value='';document.getElementById('sourceUrl').value='';">
+                  <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Import JSON -->
+          <div class="card-modern">
+            <div class="card-header">
+              <div class="d-flex align-items-center gap-2">
+                <span class="step-badge">2</span>
+                <div>
+                  <h5 class="mb-0 fw-semibold">Import JSON SIRUP</h5>
+                  <small class="text-muted">Tempel atau drop file JSON dari SIRUP</small>
+                </div>
+                <div class="ms-auto d-none d-md-block">
+                  <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                    <i class="bi bi-filetype-json me-1"></i>JSON
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="card-body px-4 pb-4 pt-2">
+              <div class="json-dropzone">
+                <textarea id="sirupJson" class="form-control" placeholder='Tempel JSON dari SIRUP di sini...
+Contoh: [{"rupNumber":"123...", "packageName":"..."}]'></textarea>
+                <div class="drop-hint">
+                  <i class="bi bi-cloud-arrow-up"></i>
+                  <span>Drag & drop file .json</span>
+                </div>
+              </div>
+              <div class="d-flex flex-column flex-sm-row gap-2 mt-3">
+                <button type="button" id="importJsonBtn" class="btn btn-gradient-primary" onclick="importSirupJson()">
+                  <i class="fa-solid fa-file-import me-2"></i>Import Data JSON
+                </button>
+                <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('sirupJson').value=''">
+                  <i class="bi bi-eraser me-1"></i>Bersihkan
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Daftar RUP -->
+          <div class="card-modern">
+            <div class="card-header">
+              <div class="d-flex align-items-center gap-2 w-100">
+                <span class="step-badge">3</span>
+                <div class="flex-grow-1">
+                  <h5 class="mb-0 fw-semibold">Daftar Import RUP</h5>
+                  <small class="text-muted">Kelola data yang telah diimport</small>
+                </div>
+                <div class="d-flex gap-2">
+                  <div class="input-group input-group-sm d-none d-md-flex" style="width: 220px;">
+                    <span class="input-group-text bg-transparent border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control border-start-0 ps-0" placeholder="Cari RUP..." id="searchRup" onkeyup="if(typeof filterRupTable==='function') filterRupTable(this.value)">
+                  </div>
+                  <button class="btn btn-sm btn-outline-primary d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#filterMobile">
+                    <i class="bi bi-funnel"></i>
+                  </button>
+                </div>
+              <div class="collapse mt-2 d-lg-none" id="filterMobile">
+                <input type="text" class="form-control form-control-sm" placeholder="Cari RUP, OPD, atau Paket...">
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover table-modern align-middle">
+                  <thead>
+                    <tr>
+                      <th style="min-width: 140px;">No RUP</th>
+                      <th style="min-width: 240px;">OPD / Paket</th>
+                      <th>Tahun</th>
+                      <th>Pagu</th>
+                      <th>Metode</th>
+                      <th class="text-end" style="min-width: 130px;">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="rupTable">
+                    <!-- Data akan diisi oleh loadRupImports() -->
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Empty State -->
+              <div id="rupEmptyState" class="empty-state">
+                <div class="empty-icon">
+                  <i class="bi bi-inboxes"></i>
+                </div>
+                <h6 class="fw-semibold mb-1">Belum Ada Data RUP</h6>
+                <p class="text-muted small mb-3">Sinkronisasi dari SIRUP atau input manual untuk memulai</p>
+                <button class="btn btn-sm btn-gradient-primary" onclick="document.getElementById('rupNumber').focus()">
+                  <i class="bi bi-plus-lg me-1"></i>Tambah Pertama
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center mt-4 mb-2">
+            <small class="text-muted">SIDEVA v9 • Import RUP SIRUP 2026 • <span class="text-primary">Sistem Terintegrasi</span></small>
+          </div>
+        </div>
+      </main>
     </div>
+  </div>
 
-    <div class="card-body">
-
-        <textarea
-            id="sirupJson"
-            class="form-control"
-            rows="10"
-            placeholder="Paste JSON response SIRUP di sini">
-        </textarea>
-
-        <button
-            id="importJsonBtn"
-            class="btn btn-success mt-3">
-
-            Import JSON SIRUP
-
-        </button>
-
-    </div>
-
-</div>
-
-    
-
-<div class="card">
-
-<div class="card-header">
-
-Daftar Import RUP
-
-</div>
-
-<div class="card-body">
-
-<table
-class="table table-bordered">
-
-<thead>
-
-<tr>
-
-<th>Kode RUP</th>
-<th>OPD</th>
-<th>Nama Paket</th>
-<th>Pagu</th>
-<th>Aksi</th>
-
-</tr>
-
-</thead>
-
-<tbody id="rupTable">
-
-<tr>
-
-<td colspan="5">
-
-Loading...
-
-</td>
-
-</tr>
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<script>
-
-const rupDb =
-    window.supabaseClient;
-
-let profile =
-    null;
-
-let editingRupId =
-    null;
-
-async function init(){
-
-    await loadLayout();
-
-    profile =
-        await getProfile();
-
-    if(!profile){
-        return;
-    }
-
-    document
-        .getElementById(
-            'saveBtn'
-        )
-        .onclick =
-        saveRup;
-
-    await loadRupImports();
-
-    document
-    .getElementById(
-        'syncSirupBtn'
-    )
-    .onclick =
-    syncSirup;
-
-    document
-    .getElementById(
-        'importJsonBtn'
-    )
-    .onclick =
-    importSirupJson;
-    
-}
-
-async function loadRupImports(){
-
-    const {
-        data,
-        error
-    } =
-    await rupDb
-    .from('rup_imports')
-    .select('*')
-    .order(
-        'created_at',
-        {
-            ascending:false
-        }
-    );
-
-    if(error){
-
-        console.error(error);
-
-        return;
-    }
-
-    let html='';
-
-    (data || [])
-    .forEach(row=>{
-
-        html += `
-
-        <tr>
-
-            <td>
-                ${row.rup_number || '-'}
-            </td>
-
-            <td>
-                ${row.opd_name || '-'}
-            </td>
-
-            <td>
-                ${row.package_name || '-'}
-            </td>
-
-            <td>
-                Rp ${Number(
-                    row.budget_ceiling || 0
-                ).toLocaleString('id-ID')}
-            </td>
-
-            <td>
-
-                <button
-                class="btn btn-success btn-sm"
-                onclick="importToPackage('${row.id}')">
-            
-                Import
-            
-                </button>
-            
-                <button
-                class="btn btn-warning btn-sm ms-1"
-                onclick="editRup('${row.id}')">
-            
-                Edit
-            
-                </button>
-            
-                <button
-                class="btn btn-danger btn-sm ms-1"
-                onclick="deleteRup('${row.id}')">
-            
-                Hapus
-            
-                </button>
-            
-            </td>
-
-        </tr>
-
-        `;
-    });
-
-    if(html === ''){
-
-        html = `
-
-        <tr>
-
-            <td colspan="5">
-
-                Belum ada data RUP
-
-            </td>
-
-        </tr>
-
-        `;
-    }
-
-    document
-        .getElementById(
-            'rupTable'
-        )
-        .innerHTML =
-        html;
-}
-
-async function saveRup(){
-
-        const rupNumber =
-        document
-        .getElementById(
-            'rupNumber'
-        )
-        .value
-        .trim();
-    
-    const opdName =
-        document
-        .getElementById(
-            'opdName'
-        )
-        .value
-        .trim();
-    
-    const packageName =
-        document
-        .getElementById(
-            'packageName'
-        )
-        .value
-        .trim();
-    
-    const fiscalYear =
-        document
-        .getElementById(
-            'fiscalYear'
-        )
-        .value;
-    
-    const budgetCeiling =
-        document
-        .getElementById(
-            'budgetCeiling'
-        )
-        .value;
-    
-    const procurementMethod =
-        document
-        .getElementById(
-            'procurementMethod'
-        )
-        .value
-        .trim();
-    
-    const sourceUrl =
-        document
-        .getElementById(
-            'sourceUrl'
-        )
-        .value
-        .trim();
-    
-    if(
-        !rupNumber ||
-        !packageName
-    ){
-    
-        alert(
-            'Kode RUP dan Nama Paket wajib diisi'
-        );
-    
-        return;
-    }
-    
-    let query;
-    
-    if(editingRupId){
-    
-        query =
-        rupDb
-        .from('rup_imports')
-        .update({
-    
-            opd_name:
-                opdName,
-    
-            rup_number:
-                rupNumber,
-    
-            package_name:
-                packageName,
-    
-            fiscal_year:
-                fiscalYear,
-    
-            budget_ceiling:
-                budgetCeiling,
-    
-            procurement_method:
-                procurementMethod,
-    
-            source_url:
-                sourceUrl
-    
-        })
-        .eq(
-            'id',
-            editingRupId
-        );
-    
-    }else{
-    
-        query =
-        rupDb
-        .from('rup_imports')
-        .insert({
-    
-            tenant_id:
-                profile.tenant_id,
-    
-            opd_name:
-                opdName,
-    
-            rup_number:
-                rupNumber,
-    
-            package_name:
-                packageName,
-    
-            fiscal_year:
-                fiscalYear,
-    
-            budget_ceiling:
-                budgetCeiling,
-    
-            procurement_method:
-                procurementMethod || 'ECATALOG',
-    
-            source_url:
-                sourceUrl,
-    
-            imported_by:
-                profile.id
-    
-        });
-    
-    }
-    
-    const {
-        error
-    } =
-    await query;
-    
-    if(error){
-    
-        alert(
-            error.message
-        );
-    
-        return;
-    }
-    
-    await writeAuditLog(
-    
-        'RUP_IMPORT',
-    
-        editingRupId
-            ? 'UPDATE'
-            : 'CREATE',
-    
-        editingRupId,
-    
-        editingRupId
-            ? `Update RUP ${rupNumber}`
-            : `Import RUP ${rupNumber}`
-    
-    );
-
-    
-    clearForm();
-    
-    await loadRupImports();
-    
-    alert(
-    
-        editingRupId
-        ? 'RUP berhasil diperbarui'
-        : 'RUP berhasil disimpan'
-    
-    );
-}
-
-function mapProcurementMethod(
-    method
-){
-
-    if(!method)
-        return 'ECATALOG';
-
-    const value =
-        method
-        .toUpperCase();
-
-    if(
-        value.includes(
-            'E-PURCHASING'
-        )
-    ){
-        return 'ECATALOG';
-    }
-
-    if(
-        value.includes(
-            'LANGSUNG'
-        )
-    ){
-        return 'PENGADAAN_LANGSUNG';
-    }
-
-    if(
-        value.includes(
-            'MINI'
-        )
-    ){
-        return 'MINI_KOMPETISI';
-    }
-
-    return 'ECATALOG';
-}
-    
-
-async function importToPackage(
-    rupId
-){
-
-    const {
-        data: rup,
-        error
-    } =
-    await rupDb
-    .from('rup_imports')
-    .select('*')
-    .eq(
-        'id',
-        rupId
-    )
-    .single();
-
-    if(error){
-
-        alert(
-            error.message
-        );
-
-        return;
-    }
-
-    const {
-        data: opd
-    } =
-    await rupDb
-    .from('opds')
-    .select('*')
-    .eq(
-        'sirup_name',
-        rup.opd_name
-    )
-    .single();
-
-    if(!opd){
-
-        alert(
-            'Mapping OPD tidak ditemukan'
-        );
-
-        return;
-    }
-
-    const {
-        error: packageError
-    } =
-    await rupDb
-    .from('packages')
-    .insert({
-
-        tenant_id:
-            profile.tenant_id,
-
-        opd_id:
-            opd.id,
-
-        package_name:
-            rup.package_name,
-
-        fiscal_year:
-            rup.fiscal_year,
-
-        procurement_method:
-            mapProcurementMethod(
-                rup.procurement_method
-            ),
-
-        budget_ceiling:
-            rup.budget_ceiling,
-
-        rup_number:
-            rup.rup_number,
-
-        package_status:
-            'DRAFT',
-
-        created_by:
-            profile.id
-
-    });
-
-    if(packageError){
-
-        alert(
-            packageError.message
-        );
-
-        return;
-    }
-
-    await writeAuditLog(
-
-        'RUP_IMPORT',
-
-        'IMPORT_PACKAGE',
-
-        rup.id,
-
-        `Import RUP ${rup.rup_number} ke Packages`
-
-    );
-
-    alert(
-        'Berhasil import ke Packages'
-    );
-}
-
-
-
-async function editRup(id){
-
-    console.log(
-        'EDIT',
-        id
-    );
-    
-    const {
-        data,
-        error
-    } =
-    await rupDb
-    .from('rup_imports')
-    .select('*')
-    .eq('id',id)
-    .single();
-
-    console.log(
-    data,
-    error
-    );
-
-    if(error){
-        alert(error.message);
-        return;
-    }
-
-    editingRupId = id;
-
-    document.getElementById(
-        'rupNumber'
-    ).value =
-    data.rup_number || '';
-
-    document.getElementById(
-        'opdName'
-    ).value =
-    data.opd_name || '';
-
-    document.getElementById(
-        'packageName'
-    ).value =
-    data.package_name || '';
-
-    document.getElementById(
-        'fiscalYear'
-    ).value =
-    data.fiscal_year || '';
-
-    document.getElementById(
-        'budgetCeiling'
-    ).value =
-    data.budget_ceiling || '';
-
-    document.getElementById(
-        'procurementMethod'
-    ).value =
-    data.procurement_method || '';
-
-    document.getElementById(
-        'sourceUrl'
-    ).value =
-    data.source_url || '';
-
-}
-
-async function deleteRup(id){
-
-    const ok =
-    confirm(
-        'Hapus data RUP ini ?'
-    );
-
-    if(!ok){
-        return;
-    }
-
-    const {
-        error
-    } =
-    await rupDb
-    .from('rup_imports')
-    .delete()
-    .eq('id',id);
-
-    if(error){
-
-        alert(
-            error.message
-        );
-
-        return;
-    }
-
-    await loadRupImports();
-
-    alert(
-        'RUP berhasil dihapus'
-    );
-
-}
-    
-    
-
-function clearForm(){
-
-    document
-        .getElementById(
-            'rupNumber'
-        )
-        .value='';
-
-    document
-        .getElementById(
-            'opdName'
-        )
-        .value='';
-
-    document
-        .getElementById(
-            'packageName'
-        )
-        .value='';
-
-    document
-        .getElementById(
-            'fiscalYear'
-        )
-        .value='';
-
-    document
-        .getElementById(
-            'budgetCeiling'
-        )
-        .value='';
-
-    document
-        .getElementById(
-            'procurementMethod'
-        )
-        .value='';
-
-    document
-        .getElementById(
-            'sourceUrl'
-        )
-        .value='';
-}
-
-async function syncSirup(){
-
-    try{
-
-        const endpoint =
-'https://sirup.inaproc.id/sirup/datatablectr/dataruppenyediasatker?tahun=2026&idSatker=404567&sEcho=1&iColumns=7&iDisplayStart=0&iDisplayLength=500';
-
-        const response =
-            await fetch(
-                endpoint,
-                {
-                    headers:{
-                        'X-Requested-With':
-                        'XMLHttpRequest'
-                    }
-                }
-            );
-
-        const result =
-            await response.json();
-
-        const rows =
-            result.aaData || [];
-
-        let imported = 0;
-
-        for(
-            const row of rows
-        ){
-
-            const rupNumber =
-                row[0];
-
-            const packageName =
-                row[1];
-
-            const budgetCeiling =
-                Number(
-                    row[2]
-                );
-
-            const procurementMethod =
-                row[3];
-
-            const sourceFund =
-                row[4];
-
-            const selectionSchedule =
-                row[6];
-
-            const {
-                error
-            } =
-            await rupDb
-            .from(
-                'rup_imports'
-            )
-            .upsert({
-
-                tenant_id:
-                    profile.tenant_id,
-
-                opd_name:
-'BADAN PERENCANAAN PEMBANGUNAN, RISET DAN INOVASI DAERAH',
-
-                rup_number:
-                    rupNumber,
-
-                package_name:
-                    packageName,
-
-                budget_ceiling:
-                    budgetCeiling,
-
-                procurement_method:
-                    procurementMethod,
-
-                source_fund:
-                    sourceFund,
-
-                selection_schedule:
-                    selectionSchedule,
-
-                fiscal_year:
-                    2026,
-
-                sync_year:
-                    2026,
-
-                sirup_satker_id:
-                    '404567',
-
-                imported_by:
-                    profile.id
-
-            });
-
-            if(
-                !error
-            ){
-                imported++;
-            }
-
-        }
-
-        await loadRupImports();
-
-        alert(
-            imported +
-            ' paket berhasil disinkronkan'
-        );
-
-    }
-    catch(err){
-
-        console.error(
-            err
-        );
-
-        alert(
-            'CORS Error atau gagal akses SIRUP'
-        );
-
-    }
-
-}
-
-async function importSirupJson(){
-
-    try{
-
-        const rawJson =
-            document
-            .getElementById(
-                'sirupJson'
-            )
-            .value
-            .trim();
-
-        if(
-            !rawJson
-        ){
-            alert(
-                'Paste JSON SIRUP terlebih dahulu'
-            );
-            return;
-        }
-
-        const json =
-            JSON.parse(
-                rawJson
-            );
-
-        const rows =
-            json.aaData || [];
-
-        if(
-            rows.length === 0
-        ){
-            alert(
-                'Tidak ada data paket'
-            );
-            return;
-        }
-
-        let imported = 0;
-
-        for(
-            const row of rows
-        ){
-
-            const rupNumber =
-                row[0];
-
-            const packageName =
-                row[1];
-
-            const budgetCeiling =
-                Number(
-                    row[2]
-                );
-
-            const sirupMethod =
-                row[3];
-
-            let procurementMethod =
-                'PENGADAAN_LANGSUNG';
-
-            if(
-                sirupMethod
-                ?.toUpperCase()
-                .includes(
-                    'E-PURCHASING'
-                )
-            ){
-                procurementMethod =
-                    'ECATALOG';
-            }
-
-            const {
-                error
-            } =
-            await rupDb
-            .from(
-                'rup_imports'
-            )
-            .upsert({
-
-                tenant_id:
-                    profile.tenant_id,
-
-                rup_number:
-                    rupNumber,
-
-                package_name:
-                    packageName,
-
-                budget_ceiling:
-                    budgetCeiling,
-
-                procurement_method:
-                    procurementMethod,
-
-                fiscal_year:
-                    2026,
-
-                sync_year:
-                    2026,
-
-                sirup_satker_id:
-                    '404567',
-
-                import_status:
-                    'PENDING',
-
-                imported_by:
-                    profile.id
-
-            },
-            {
-                onConflict:
-                'rup_number'
-            });
-
-            if(
-                !error
-            ){
-                imported++;
-            }
-            else{
-                console.error(
-                    error
-                );
-            }
-
-        }
-
-        await loadRupImports();
-
-        alert(
-
-            imported +
-
-            ' paket berhasil diimport'
-
-        );
-
-    }
-    catch(error){
-
-        console.error(
-            error
-        );
-
-        alert(
-            error.message
-        );
-
-    }
-
-}
-
-window.editRup =
-    editRup;
-
-window.deleteRup =
-    deleteRup;
-
-init();
-
-</script>
-
-</body>
+  
 </html>
