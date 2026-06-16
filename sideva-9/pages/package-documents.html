@@ -1,44 +1,47 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Package Documents - SIDEVA9</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package Documents - SIDEVA9</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <script src="../js/config.js"></script>
-    <script src="../js/supabase.js"></script>
-    <script src="../js/auth.js"></script>
-    <script src="../js/workflow.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/supabase.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/workflow.js"></script>
 
-    <link rel="stylesheet" href="../css/app.css">
-    
-    <style>
-        body { background: #f5f6fa; display: flex; margin: 0; padding: 0; }
-        .local-sidebar { width: 260px; background: #fff; border-right: 1px solid #e0e0e0; min-height: 100vh; padding: 20px 0; position: fixed; left: 0; top: 0; }
-        .local-sidebar h4 { padding: 0 20px; font-weight: bold; color: #333; margin-bottom: 25px; }
-        .local-sidebar a { display: block; padding: 12px 20px; color: #555; text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.2s; }
-        .local-sidebar a:hover { background: #f8f9fa; color: #0d6efd; }
-        .local-sidebar a.active { background: #e7f1ff; color: #0d6efd; font-weight: bold; border-left: 4px solid #0d6efd; }
-        .local-sidebar hr { margin: 15px 0; border-color: #eee; }
+<link rel="stylesheet" href="../css/app.css">
+ 
+<style>
+body { background: #f5f6fa; display: flex; margin: 0; padding: 0; }
+/* Integrasi Sidebar Mandiri Khas SIDEVA9 */
+.local-sidebar { width: 260px; background: #fff; border-right: 1px solid #e0e0e0; min-height: 100vh; padding: 20px 0; position: fixed; left: 0; top: 0; }
+.local-sidebar h4 { padding: 0 20px; font-weight: bold; color: #333; margin-bottom: 25px; }
+.local-sidebar a { display: block; padding: 12px 20px; color: #555; text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+.local-sidebar a:hover { background: #f8f9fa; color: #0d6efd; }
+.local-sidebar a.active { background: #e7f1ff; color: #0d6efd; font-weight: bold; border-left: 4px solid #0d6efd; }
+.local-sidebar hr { margin: 15px 0; border-color: #eee; }
 
-        .local-main-content { margin-left: 260px; width: calc(100% - 260px); padding: 30px; }
-        .card { border: none; border-radius: 12px; }
-        .paper-viewport { background: #6c757d; padding: 30px 15px; border-radius: 8px; min-height: 650px; display: flex; justify-content: center; }
+/* Konten Utama */
+.local-main-content { margin-left: 260px; width: calc(100% - 260px); padding: 30px; }
+.card { border: none; border-radius: 12px; }
+.paper-viewport { background: #6c757d; padding: 30px 15px; border-radius: 8px; min-height: 650px; display: flex; justify-content: center; }
 
-        @media print {
-            body * { visibility: hidden; }
-            #document-render-area, #document-render-area * { visibility: visible; }
-            #document-render-area { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none !important; padding: 0 !important; }
-            .local-sidebar, .local-main-content .card:first-child, #documentTab, #auto-doc-list, #btn-print-action, .col-lg-4 { display: none !important; }
-            .col-lg-8 { width: 100% !important; margin: 0 !important; }
-        }
-    </style>
+/* Aturan Cetak Kertas Kerja Pemerintah A4 */
+@media print {
+    body * { visibility: hidden; }
+    #document-render-area, #document-render-area * { visibility: visible; }
+    #document-render-area { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none !important; padding: 0 !important; }
+    .local-sidebar, .local-main-content .card:first-child, #documentTab, #auto-doc-list, #btn-print-action, .col-lg-4 { display: none !important; }
+    .col-lg-8 { width: 100% !important; margin: 0 !important; }
+}
+</style>
 </head>
 <body>
 
@@ -75,7 +78,7 @@
     <ul class="nav nav-pills mb-4" id="documentTab" role="tablist">
         <li class="nav-item">
             <button class="nav-link active px-4 fw-bold" id="auto-print-tab" data-bs-toggle="tab" data-bs-target="#auto-print" type="button">
-                <i class="bi bi-printer-fill me-2"></i>Cetak Dokumen Otomatis
+                <i class="bi bi-printer-fill me-2"></i>Cetak Dokumen Otomatis (10 Berkas)
             </button>
         </li>
         <li class="nav-item">
@@ -112,12 +115,11 @@
                 </div>
                 <div class="col-lg-8">
                     <div class="paper-viewport">
-                        <div id="document-render-area" class="w-100 bg-white shadow p-5" style="min-height: 842px; display: none;">
-                            <!-- Area render dokumen -->
-                        </div>
-                        <div id="render-placeholder" class="text-center text-white my-5 py-5">
-                            <i class="bi bi-file-earmark-pdf display-1 opacity-25"></i>
-                            <p class="mt-3 opacity-75">Silakan pilih jenis berkas di menu kiri untuk melihat draf cetak.</p>
+                        <div id="document-render-area" class="w-100">
+                            <div class="text-center text-white my-5 py-5">
+                                <i class="bi bi-file-earmark-pdf display-1 opacity-25"></i>
+                                <p class="mt-3 opacity-75">Silakan pilih jenis berkas di menu kiri untuk melihat draf cetak.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -128,7 +130,7 @@
             <div class="card p-4 shadow-sm bg-white">
                 <form id="uploadForm" class="row g-3 align-items-center mb-4">
                     <div class="col-md-4">
-                        <label class="form-label fw-bold">Jenis Dokumen</label>
+                        <label class="form-label font-weight-bold">Jenis Dokumen</label>
                         <select id="docType" class="form-select" required>
                             <option value="IDKB">IDKB</option>
                             <option value="PENETAPAN">PENETAPAN</option>
@@ -143,8 +145,8 @@
                         </select>
                     </div>
                     <div class="col-md-5">
-                        <label class="form-label fw-bold">Pilih File Berkas</label>
-                        <input type="file" id="docFile" class="form-control" required>
+                        <label class="form-label font-weight-bold">Pilih File Berkas</label>
+                        <input type="file" id="docFile" class="form-select" required>
                     </div>
                     <div class="col-md-3 mt-4 text-end">
                         <button type="submit" class="btn btn-primary w-100 mt-2">
@@ -163,7 +165,7 @@
                                 <th>Tanggal Unggah</th>
                                 <th width="180">Aksi</th>
                             </tr>
-                        </thead>
+                        </thead> <!-- Perbaikan: Gunakan </thead>, bukan </table> di sini -->
                         <tbody id="documentsTable">
                             <tr><td colspan="5" class="text-center text-muted">Memuat database storage...</td></tr>
                         </tbody>
@@ -175,67 +177,390 @@
 </div>
 
 <script>
-// Penanganan Error Syntax: Gunakan 'let' dan deklarasikan hanya sekali
-const db = window.supabaseClient;
-let currentPackage = null;
-let fundingSources = []; // Hanya satu kali deklarasi di sini
+// Penyelarasan Variabel Global Supabase Kluster Keamanan V9
+// Ganti bagian awal deklarasi database Anda menjadi seperti ini:
+const documentDb = window.supabaseClient || window.supabase || window.db; 
+const urlParams = new URLSearchParams(window.location.search);
+const packageId = urlParams.get('package_id') || urlParams.get('id');
+let documents = [];
 
-// Fungsi utama untuk mengubah tampilan cetak (Memperbaiki ReferenceError)
-function switchPrintView(viewType) {
-    const renderArea = document.getElementById('document-render-area');
-    const placeholder = document.getElementById('render-placeholder');
-    const printBtn = document.getElementById('btn-print-action');
-
-    placeholder.style.display = 'none';
-    renderArea.style.display = 'block';
-    printBtn.disabled = false;
-
-    renderArea.innerHTML = `
-        <div class="text-center">
-            <h4>DRAF DOKUMEN: ${viewType.toUpperCase()}</h4>
-            <hr>
-            <p class="text-start">Memproses data paket <strong>${currentPackage?.package_name || '...'}</strong>...</p>
-            <div class="spinner-border text-primary my-4" role="status"></div>
-        </div>
-    `;
-
-    // Logika pengambilan data spesifik dokumen bisa ditambahkan di sini
-    console.log("Menampilkan dokumen:", viewType);
-}
-
-// Ekspos ke window agar bisa diakses onclick HTML
-window.switchPrintView = switchPrintView;
-
-async function initPage() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const packageId = urlParams.get('id');
-
-    if (!packageId) {
-        Swal.fire('Error', 'ID Paket tidak ditemukan', 'error');
+async function initPackageHeader() {
+    if(!packageId) {
+        document.getElementById('packageName').innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Peringatan: Harap masuk melalui menu "Packages" lalu klik tombol dokumen agar ID paket terbaca.</span>`;
         return;
     }
-
-    try {
-        const { data, error } = await db
-            .from('packages')
-            .select('*')
-            .eq('id', packageId)
-            .single();
-
-        if (error) throw error;
-        
-        currentPackage = data;
+    // Pastikan pemanggilan di bawah ini menggunakan variabel baru 'documentDb'
+    const { data, error } = await documentDb.from('packages').select('*').eq('id', packageId).single();
+    if(!error && data) {
         document.getElementById('packageName').innerText = data.package_name;
         document.getElementById('packageRup').innerText = `ID RUP: ${data.rup_id || '-'}`;
-        
-    } catch (err) {
-        console.error(err);
-        Swal.fire('Gagal', 'Gagal memuat data paket', 'error');
     }
 }
 
-document.addEventListener('DOMContentLoaded', initPage);
-</script>
+function switchPrintView(slug) {
 
+    console.log("SLUG DIPILIH =", slug);
+
+    const listItems =
+        document.querySelectorAll('#auto-doc-list .list-group-item');
+
+    listItems.forEach(el =>
+        el.classList.remove('active'));
+
+    event.currentTarget.classList.add('active');
+
+    document
+        .getElementById('btn-print-action')
+        .removeAttribute('disabled');
+
+    renderSidevaDocumentInternal(slug, packageId);
+}
+
+// ─── CORE ENGINE GENERATOR ADMINISTRASI FISIK ───
+function docFmtRp(v) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(v || 0); }
+function docFmtDate(dateStr) {
+    const d = dateStr ? new Date(dateStr) : new Date();
+    const bulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    return `${d.getDate()} ${bulan[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function buildTtdHtml(ppk, bidang, tgl){
+   return `...`;
+}
+
+async function renderSidevaDocumentInternal(slug, pId) {
+    const targetDiv = document.getElementById('document-render-area');
+    if (!pId) {
+        targetDiv.innerHTML = `<div class="alert alert-warning text-dark m-3">ID Paket Kosong. Buka halaman ini dari menu Detail Paket.</div>`;
+        return;
+    }
+    targetDiv.innerHTML = `<div class="text-center text-white p-5"><div class="spinner-border text-light spinner-border-sm"></div><p class="small mt-2">Menyinkronkan data database...</p></div>`;
+    
+    try {
+        const { data: paket, error: paketError } = await documentDb.from('packages').select('*').eq('id', pId).single(); 
+        if (paketError) { throw paketError; } 
+        console.log("PAKET :", paket); 
+     
+
+        const { data: akun } = await documentDb.from('budget_accounts').select('*').eq('id', paket.budget_account_id).single(); 
+        console.log("AKUN :", akun);
+
+        const { data: items, error: itemsError } = await documentDb.from('package_items').select('*,price_surveys(*)').eq('package_id', pId); 
+        if (itemsError) { throw itemsError; } 
+        console.log("ITEMS :", items);
+
+        const { data: ppk } = await documentDb.from('ppkoms').select('*').eq('opd_id', paket.opd_id).single(); 
+        console.log("PPK :", ppk);
+
+        const { data: bidang } = await documentDb.from('bidangs').select('*').eq('id', paket.bidang_id).single(); 
+        console.log("BIDANG :", bidang);
+
+        const { data: opd } = await documentDb.from('opds').select('*').eq('id', paket.opd_id).single(); 
+        console.log("OPD :", opd);
+
+        const listItems = items || [];
+        const kopHtml = `<div style="text-align:center; margin-bottom:20px;"><img src="${opd?.kop_url || ''}" style="width:100%;max-width:900px;height:auto;"></div>`;
+        const tgl = docFmtDate(new Date());
+        let htmlOutput = "";
+
+        if (slug === 'idkb') {
+            let rows = ""; 
+            listItems.forEach((it, i) => { 
+                rows += `<tr><td style="border:1px solid #000; padding:6px; text-align:center;">${i+1}</td><td style="border:1px solid #000; padding:6px;">${it.item_name}</td><td style="border:1px solid #000; padding:6px; text-align:center;">${it.quantity} ${it.unit}</td></tr>`; 
+            });
+            
+            htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:13pt; text-decoration:underline; margin-bottom:15px;">FORMULIR IDENTIFIKASI KEBUTUHAN BARANG/JASA</div><table style="width:100%; border-collapse:collapse; margin-bottom:15px; font-size:10.5pt;"><tr><td style="width:25%; font-weight:bold; padding:4px;">Nama Paket</td><td>: ${paket.package_name}</td></tr><tr><td style="font-weight:bold; padding:4px;">Nomor RUP</td><td>: ${paket.rup_number || '-'}</td></tr><tr><td style="font-weight:bold; padding:4px;">Program</td><td>: ${paket.program || '-'}</td></tr><tr><td style="font-weight:bold; padding:4px;">Kegiatan</td><td>: ${paket.kegiatan || '-'}</td></tr><tr><td style="font-weight:bold; padding:4px;">Sub Kegiatan</td><td>: ${paket.sub_kegiatan || '-'}</td></tr><tr><td style="font-weight:bold; padding:4px;">Output</td><td>: ${paket.output || '-'}</td></tr><tr><td style="font-weight:bold; padding:4px;">Metode Pengadaan</td><td>: ${paket.procurement_method || '-'}</td></tr><tr><td style="font-weight:bold; padding:4px;">Mata Anggaran</td><td>: ${akun ? `${akun.account_code} - ${akun.account_name}` : '-'}</td></tr><tr><td style="font-weight:bold; padding:4px;">Pagu Dana</td><td>: ${docFmtRp(paket.budget_ceiling)}</td></tr></table><div style="margin-bottom:10px;"><strong>A. IDENTIFIKASI KEBUTUHAN BARANG/JASA</strong></div><table style="width:100%; border-collapse:collapse; font-size:10.5pt;"><thead style="background:#eee;"><tr><th style="border:1px solid #000; padding:6px; text-align:center; width:10%;">No</th><th style="border:1px solid #000; padding:6px;">Komoditas Barang</th><th style="border:1px solid #000; padding:6px; text-align:center; width:25%;">Volume</th></tr></thead><tbody>${rows || `<tr><td colspan="3" style="border:1px solid #000; text-align:center; padding:10px;">Belum ada item belanja</td></tr>`}</tbody></table><div style="margin-top:25px;"><strong>B. SPESIFIKASI TEKNIS MINIMAL</strong></div><table style="width:100%; border-collapse:collapse; margin-top:10px; font-size:10.5pt;"><tr><th style="border:1px solid #000;padding:6px;">No</th><th style="border:1px solid #000;padding:6px;">Spesifikasi Teknis</th></tr>${listItems.map((it,i)=>`<tr><td style="border:1px solid #000;padding:6px;text-align:center;width:50px;">${i+1}</td><td style="border:1px solid #000;padding:6px;"><strong>${it.item_name}</strong><br>${it.specification || '-'}</td></tr>`).join('')}</table><div style="margin-top:25px;"><strong>C. KETERSEDIAAN PRODUK DAN PELAKU USAHA</strong></div><table style="width:100%; border-collapse:collapse; margin-top:10px; font-size:10pt;">${[...new Map(listItems.flatMap(item => item.price_surveys || []).map(ps => [ps.vendor_name, ps])).values()].map((ps,index)=>`<tr><td style="border:1px solid #000; padding:6px; width:40px; text-align:center;">${index + 1}</td><td style="border:1px solid #000; padding:6px;">${ps.vendor_name}</td></tr>`).join('')}</table><div style="margin-top:25px;"><strong>D. PENENTUAN PRIORITAS BARANG/JASA</strong></div><div style="margin-top:10px;margin-left:20px;">Prioritas PDN, UMKM, Lokal Kabupaten Kapuas Hulu</div><table style="width:100%; margin-top:50px; border-collapse:collapse;"><tr><td style="width:50%; text-align:center; vertical-align:top;">Ditetapkan oleh,<br>${ppk?.position || 'PA/KPA/PPK'}<br><br><br><br><br><br><strong>${ppk?.full_name || '-'}</strong><br>NIP. ${ppk?.nip || '-'}</td><td style="width:50%; text-align:center; vertical-align:top;">Disusun oleh,<br>${bidang?.position_name || 'Kepala Bidang'}<br>${bidang?.bidang_name || ''}<br><br><br><br><br><strong>${bidang?.head_name || '-'}</strong><br>NIP. ${bidang?.head_nip || '-'}</td></tr></table><div style="clear:both;"></div>`;
+        
+        } else if (slug === 'penetapan') {
+            // TODO: Tambahkan HTML untuk slug penetapan di sini jika ada
+            htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:13pt; text-decoration:underline;">DOKUMEN PENETAPAN</div>`;
+            
+        } else if (slug === 'spek') {
+            let itemRows = "";
+            listItems.forEach((it, i) => {
+                const hargaSatuan = it.price_surveys?.[0]?.price || 0;
+                itemRows += `
+                <tr>
+                    <td style="border:1px solid #000; padding:6px; text-align:left;">
+                        ${it.item_name}<br>
+                        <span style="font-size:9.5pt; color:#333;">Spesifikasi: ${it.specification || '-'}</span>
+                    </td>
+                    <td style="border:1px solid #000; padding:6px; text-align:center;">${it.quantity}</td>
+                    <td style="border:1px solid #000; padding:6px; text-align:center;">${it.unit}</td>
+                    <td style="border:1px solid #000; padding:6px; text-align:right;">${docFmtRp(hargaSatuan)}</td>
+                </tr>`;
+            });
+
+            htmlOutput = `
+            ${kopHtml}
+            
+            <div style="text-align:center; font-size:14pt; font-weight:bold; text-decoration:underline; margin-bottom:5px;">SPESIFIKASI TEKNIS PAKET E-PURCHASING</div>
+            <div style="text-align:center; font-size:11pt; margin-bottom:20px;">Nomor: SPEK/${paket.rup_number || '........'}/DEMO/2026</div>
+
+            <table style="width:100%; font-size:10.5pt; margin-bottom:25px; border-collapse:collapse;">
+                <tr><td width="220" style="padding:3px;"><strong>Perangkat Daerah</strong></td><td style="padding:3px;">: ${opd?.opd_name || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Program</strong></td><td style="padding:3px;">: ${paket.program || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Kegiatan</strong></td><td style="padding:3px;">: ${paket.kegiatan || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Sub Kegiatan</strong></td><td style="padding:3px;">: ${paket.sub_kegiatan || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>RUP</strong></td><td style="padding:3px;">: ${paket.rup_number || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Nama Paket Pengadaan</strong></td><td style="padding:3px;">: ${paket.package_name}</td></tr>
+                <tr><td style="padding:3px;"><strong>Pagu</strong></td><td style="padding:3px;">: ${docFmtRp(paket.budget_ceiling)}</td></tr>
+                <tr><td style="padding:3px;"><strong>Mata Anggaran Belanja</strong></td><td style="padding:3px;">: ${akun ? `${akun.account_code} - ${akun.account_name}` : '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Sumber Dana</strong></td><td style="padding:3px;">: APBD Kabupaten Kapuas Hulu</td></tr>
+            </table>
+
+            <table style="width:100%; border-collapse:collapse; font-size:10pt; margin-bottom:20px;">
+                <thead style="background:#eee;">
+                    <tr>
+                        <th style="border:1px solid #000; padding:8px; text-align:center; width:5%;">No</th>
+                        <th style="border:1px solid #000; padding:8px; text-align:left; width:25%;">Elemen Spesifikasi</th>
+                        <th style="border:1px solid #000; padding:8px; text-align:left;">Uraian Spesifikasi</th>
+                        <th style="border:1px solid #000; padding:8px; text-align:center; width:10%;">Ket</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;">1.</td>
+                        <td style="border:1px solid #000; padding:8px; vertical-align:top;"><strong>Jenis, Spesifikasi, Kuantitas, Satuan dan Harga</strong></td>
+                        <td style="border:1px solid #000; padding:0; vertical-align:top;">
+                            <table style="width:100%; border-collapse:collapse; font-size:9.5pt; border:none;">
+                                <tr style="background:#f9f9f9;">
+                                    <th style="border-bottom:1px solid #000; border-right:1px solid #000; padding:5px; text-align:left;">Nama Barang dan Spesifikasi</th>
+                                    <th style="border-bottom:1px solid #000; border-right:1px solid #000; padding:5px; text-align:center; width:12%;">Qty</th>
+                                    <th style="border-bottom:1px solid #000; border-right:1px solid #000; padding:5px; text-align:center; width:15%;">Satuan</th>
+                                    <th style="border-bottom:1px solid #000; padding:5px; text-align:right; width:25%;">Harga Satuan</th>
+                                </tr>
+                                ${itemRows || `<tr><td colspan="4" style="padding:10px; text-align:center;">Belum ada item belanja</td></tr>`}
+                            </table>
+                        </td>
+                        <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;"></td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;">2.</td>
+                        <td style="border:1px solid #000; padding:8px; vertical-align:top;"><strong>Tempat</strong></td>
+                        <td style="border:1px solid #000; padding:8px; vertical-align:top; text-align:justify;">Pengiriman sampai ke lokasi yaitu Kantor ${opd?.opd_name || 'Perangkat Daerah'}, Sepanjang Jalan Kenangan. Lokasi pengantaran: Langsung ke tempat/lokasi tujuan.</td>
+                        <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;"></td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;">3.</td>
+                        <td style="border:1px solid #000; padding:8px; vertical-align:top;"><strong>Waktu</strong></td>
+                        <td style="border:1px solid #000; padding:8px; vertical-align:top;">1 Hari Kalender (atau disesuaikan sejak diterbitkannya Surat Pesanan)</td>
+                        <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;"></td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;">4.</td>
+                        <td style="border:1px solid #000; padding:8px; vertical-align:top;"><strong>Tingkat Layanan</strong></td>
+                        <td style="border:1px solid #000; padding:8px; vertical-align:top; text-align:justify;">
+                            Penyedia wajib memenuhi tingkat layanan meliputi ketepatan waktu, kesesuaian spesifikasi, kualitas hasil, ketepatan jumlah, responsivitas, pengemasan dan pengiriman, jaminan/garansi, fleksibilitas layanan, kepatuhan administratif, serta standar keamanan dan kepatuhan. <br><br>
+                            Penyedia juga wajib menindaklanjuti setiap ketidaksesuaian melalui perbaikan atau penggantian tanpa biaya tambahan sesuai ketentuan yang disepakati serta bertanggung jawab penuh atas pengadaan.
+                        </td>
+                        <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p style="font-size:10pt; margin-bottom:30px;">
+                <strong>Link E-Catalog:</strong><br>
+                <a href="https://katalog.inaproc.id" target="_blank" style="color:#0000EE; text-decoration:underline; word-break:break-all;">https://katalog.inaproc.id/search?keyword=nasi&page=1&regionNames=Kab.+Kapuas+Hulu&regionCode=61.06&labels=%2CVerified&sellerTypes=%2CUMKK</a><br>
+                <span style="font-style:italic; font-size:9pt; color:#555;">Diakses tanggal: ${tgl}</span>
+            </p>
+
+            <table style="width:100%; font-size:10.5pt;">
+                <tr>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        &nbsp;
+                    </td>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        Putussibau, ${tgl}<br>
+                        Ditetapkan oleh:<br>
+                        <strong>${ppk?.position || 'Pejabat Pembuat Komitmen (PPKom)'}</strong>
+                        <br><br><br><br><br>
+                        <strong><u>${ppk?.full_name || '-'}</u></strong><br>
+                        NIP. ${ppk?.nip || '-'}
+                    </td>
+                </tr>
+            </table>`;
+         
+        } else if (slug === 'dpp') {
+            let rows = "";
+            listItems.forEach((it, i) => {
+                const hargaSatuan = it.price_surveys?.[0]?.price || 0;
+                rows += `
+                <tr>
+                    <td style="border:1px solid #000; padding:6px; text-align:center;">${i+1}.</td>
+                    <td style="border:1px solid #000; padding:6px;">
+                        <strong>${it.item_name}</strong><br>
+                        <span style="font-size:9.5pt; color:#333;">Spesifikasi: ${it.specification || '-'}</span>
+                    </td>
+                    <td style="border:1px solid #000; padding:6px; text-align:center;">${it.quantity}</td>
+                    <td style="border:1px solid #000; padding:6px; text-align:center;">${it.unit}</td>
+                    <td style="border:1px solid #000; padding:6px; text-align:right;">${docFmtRp(hargaSatuan)}</td>
+                </tr>`;
+            });
+
+            htmlOutput = `
+            ${kopHtml}
+            
+            <div style="text-align:center; font-size:14pt; font-weight:bold; text-decoration:underline; margin-bottom:5px;">DOKUMEN PERSIAPAN PENGADAAN (DPP) E - PURCHASING</div>
+            <div style="text-align:center; font-size:11pt; margin-bottom:5px;">Nomor: DPP/${paket.rup_number || '........'}/DEMO/2026</div>
+            <br>
+
+            <table style="width:100%; font-size:10.5pt; margin-bottom:20px; border-collapse:collapse;">
+                <tr><td width="220" style="padding:3px;"><strong>Tanggal</strong></td><td style="padding:3px;">: ${tgl}</td></tr>
+                <tr><td style="padding:3px;"><strong>Perangkat Daerah</strong></td><td style="padding:3px;">: ${opd?.opd_name || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Program</strong></td><td style="padding:3px;">: ${paket.program || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Kegiatan</strong></td><td style="padding:3px;">: ${paket.kegiatan || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Sub Kegiatan</strong></td><td style="padding:3px;">: ${paket.sub_kegiatan || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>RUP</strong></td><td style="padding:3px;">: ${paket.rup_number || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Nama Paket Pengadaan</strong></td><td style="padding:3px;">: ${paket.package_name}</td></tr>
+                <tr><td style="padding:3px;"><strong>Pagu Dana</strong></td><td style="padding:3px;">: ${docFmtRp(paket.budget_ceiling)}</td></tr>
+                <tr><td style="padding:3px;"><strong>Mata Anggaran Belanja</strong></td><td style="padding:3px;">: ${akun ? `${akun.account_code} - ${akun.account_name}` : '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Sumber Dana</strong></td><td style="padding:3px;">: APBD Kabupaten Kapuas Hulu</td></tr>
+            </table>
+
+            <div style="font-weight:bold; margin-top:15px; margin-bottom:5px;">I. Spesifikasi Teknis</div>
+            <p style="margin:0 0 10px 0; text-align:justify;">Penyusunan spesifikasi teknis telah menguraikan hal-hal antara lain: kesesuaian dengan kebutuhan, karakteristik barang (ukuran, dimensi, komposisi), kinerja, standar yang digunakan (SNI/ISO), pengepakan/pengiriman, aspek layanan (waktu, responsivitas), serta higienitas dan keamanan untuk pengadaan makan minum.</p>
+            
+            <div style="font-weight:bold; font-size:10pt; margin-bottom:5px;">a. Spesifikasi Jenis, Mutu Barang/Bahan/Material, Jumlah, Satuan dan Harga</div>
+            <table style="width:100%; border-collapse:collapse; font-size:10pt; margin-bottom:15px;">
+                <thead style="background:#eee;">
+                    <tr>
+                        <th style="border:1px solid #000; padding:6px; text-align:center; width:5%;">No</th>
+                        <th style="border:1px solid #000; padding:6px; text-align:left;">Nama/Jenis Barang Spesifikasi Mutu/Bahan/Material</th>
+                        <th style="border:1px solid #000; padding:6px; text-align:center; width:8%;">Qty</th>
+                        <th style="border:1px solid #000; padding:6px; text-align:center; width:12%;">Satuan</th>
+                        <th style="border:1px solid #000; padding:6px; text-align:right; width:18%;">Harga Satuan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rows || `<tr><td colspan="5" style="border:1px solid #000; text-align:center; padding:10px;">Belum ada item belanja</td></tr>`}
+                </tbody>
+            </table>
+
+            <div style="font-weight:bold; font-size:10pt; margin-bottom:3px;">b. Justifikasi Teknis Dalam Penggunaan Merek</div>
+            <p style="margin:0 0 10px 20px;">Tidak menggunakan merek tertentu / Menyesuaikan ketersediaan e-Katalog.</p>
+
+            <div style="font-weight:bold; font-size:10pt; margin-bottom:3px;">c. Spesifikasi Waktu</div>
+            <p style="margin:0 0 10px 20px;">Pelaksanaan pekerjaan mulai dari diterbitkannya Surat Pesanan (SP) sampai dengan jadwal penyelesaian yang disepakati.</p>
+
+            <div style="font-weight:bold; font-size:10pt; margin-bottom:3px;">d. Spesifikasi Tempat</div>
+            <p style="margin:0 0 10px 20px;">Pengiriman langsung ke tempat/lokasi tujuan yang ditentukan oleh Perangkat Daerah. Jarak dan akses lokasi diperhitungkan oleh penyedia tanpa biaya tambahan di luar harga satuan e-Katalog.</p>
+
+            <div style="font-weight:bold; font-size:10pt; margin-bottom:3px;">e. Spesifikasi Layanan</div>
+            <p style="margin:0 0 15px 20px; text-align:justify;">Penyedia wajib memenuhi tingkat layanan meliputi ketepatan waktu, kesesuaian spesifikasi, kualitas hasil, ketepatan jumlah, responsivitas, pengemasan, serta menindaklanjuti setiap ketidaksesuaian melalui perbaikan atau penggantian tanpa biaya tambahan.</p>
+
+            <div style="font-weight:bold; margin-top:15px; margin-bottom:5px;">II. Prioritas Penggunaan Produk Dalam Negeri</div>
+            <p style="margin:0 0 15px 0; text-align:justify;">Berdasarkan Peraturan Presiden Nomor 46 Tahun 2025 tentang Perubahan Kedua Atas Peraturan Presiden Nomor 16 Tahun 2018 Tentang Pengadaan Barang/Jasa Pemerintah, PPK memilih barang/jasa pada Katalog Elektronik dengan memprioritaskan Produk Dalam Negeri (PDN) yang memiliki nilai TKDN sesuai dengan ketentuan peraturan perundang-undangan.</p>
+
+            <div style="font-weight:bold; margin-top:15px; margin-bottom:5px;">III. Prioritas Penggunaan Produk dari Penyedia dengan Kualifikasi Usaha Kecil serta Koperasi</div>
+            <p style="margin:0 0 15px 0; text-align:justify;">Berdasarkan Pasal 65 Peraturan Presiden Nomor 46 Tahun 2025, untuk nilai paket pengadaan barang/jasa dengan nilai pagu anggaran sampai dengan Rp15.000.000.000,00 (lima belas miliar rupiah), PPK memilih Penyedia dengan Kualifikasi Usaha Kecil atau Koperasi pada aplikasi Katalog Elektronik.</p>
+
+            <div style="font-weight:bold; margin-top:15px; margin-bottom:5px;">IV. Pengumpulan Referensi Harga</div>
+            <p style="margin:0 0 15px 0; text-align:justify;">PPK/PP mempersiapkan referensi harga yang bersumber dari Katalog Elektronik maupun harga pembanding produk sejenis di luar sistem sebagai dasar acuan untuk melakukan Negosiasi Harga (kecuali untuk produk yang bersifat <i>fixed price</i>).</p>
+
+            <div style="font-weight:bold; margin-top:15px; margin-bottom:5px;">V. Rancangan Kontrak</div>
+            <p style="margin:0 0 15px 0;">Rancangan Kontrak menggunakan Surat Pesanan (SP) sesuai yang tertuang pada aplikasi E-Purchasing.</p>
+
+            <div style="font-weight:bold; margin-top:15px; margin-bottom:5px;">VI. Rencana Metode Pemilihan Penyedia</div>
+            <p style="margin:0 0 15px 0;">Rencana metode pemilihan penyedia Katalog Elektronik menggunakan metode: <strong>Negosiasi Harga</strong>.</p>
+
+            <div style="font-weight:bold; margin-top:15px; margin-bottom:5px;">VII. Penutup</div>
+            <p style="margin:0 0 35px 0; text-align:justify;">Demikian Dokumen Persiapan e-Purchasing ini dibuat untuk dapat diketahui bersama sebagai acuan bagi pelaksanaan proses pengadaan barang/jasa bagi pihak terkait.</p>
+
+            <table style="width:100%; font-size:10.5pt;">
+                <tr>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        &nbsp;
+                    </td>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        Putussibau, ${tgl}<br>
+                        Ditetapkan oleh:<br>
+                        <strong>${ppk?.position || 'Pejabat Pembuat Komitmen (PPKom)'}</strong>
+                        <br><br><br><br><br>
+                        <strong><u>${ppk?.full_name || '-'}</u></strong><br>
+                        NIP. ${ppk?.nip || '-'}
+                    </td>
+                </tr>
+            </table>`;
+         
+        } else {
+            // Berkas Berita Acara Rangkuman Administrasi Umum Lainnya
+            htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:12pt; text-decoration:underline; margin-bottom:15px;">BERITA ACARA ADMINISTRASI ALUR KERJA (SIDEVA-V9)</div><p>Menerangkan dengan sah bahwa dokumen pengadaan instansi untuk paket <strong>${paket.package_name}</strong> dengan alokasi HPS senilai <strong>${docFmtRp(paket.budget_ceiling)}</strong> telah diperiksa melalui sistem otomasi berkas fisik.</p><p>Status Kelayakan administrasi dinyatakan: <strong style="color:green;">MEMENUHI SYARAT (VALID)</strong></p><div style="margin-top:50px; display:flex; justify-content:between;"><div style="width:200px;"><strong>PPKom</strong><br><br><br><br>(........................)</div><div style="width:200px; text-align:right;"><strong>Pejabat Pengadaan</strong><br><br><br><br>(........................)</div></div>`;
+        }
+
+        targetDiv.innerHTML = `<div class="bg-white text-dark p-5 mx-auto text-start shadow-lg" style="width:100%; max-width:760px; min-height:900px; font-family:'Times New Roman',Times,serif; font-size:11pt; line-height:1.5; color:#000;">${htmlOutput}</div>`;
+    } catch (e) { 
+        targetDiv.innerHTML = `<div class="alert alert-danger m-2 small">❌ Gagal memproses draf kertas: ${e.message}</div>`; 
+    }
+}
+
+// ─── STORAGE HANDLING BAWAAN ASLI ANDA ───
+async function loadUploadedDocuments(){
+    if(!packageId) return;
+    const {data, error} = await documentDb.from('package_documents').select('*').eq('package_id',packageId).order('created_at',{ascending:false});
+    if(error) return;
+    documents = data || [];
+    renderUploadedTable();
+}
+
+function renderUploadedTable(){
+    let html='';
+    if(documents.length === 0) {
+        document.getElementById('documentsTable').innerHTML = '<tr><td colspan="5" class="text-center py-3 text-muted">Belum ada file manual yang diunggah ke storage.</td></tr>';
+        return;
+    }
+    documents.forEach(doc=>{
+        html += `<tr><td><span class="badge bg-secondary">${doc.document_type}</span></td><td>${doc.file_name}</td><td>${formatBytes(doc.file_size)}</td><td>${new Date(doc.created_at).toLocaleDateString('id-ID')}</td><td><button class="btn btn-success btn-sm p-1 px-2 me-1" onclick="downloadDocument('${doc.file_path}')"><i class="bi bi-download"></i></button><button class="btn btn-danger btn-sm p-1 px-2" onclick="deleteDocument('${doc.id}','${doc.file_path}')"><i class="bi bi-trash"></i></button></td></tr>`;
+    });
+    document.getElementById('documentsTable').innerHTML=html;
+}
+
+document.getElementById('uploadForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const fileInput = document.getElementById('docFile');
+    const docType = document.getElementById('docType').value;
+    if(!fileInput.files || fileInput.files.length===0) return;
+    
+    const file = fileInput.files[0];
+    const fileExt = file.name.split('.').pop();
+    const filePath = `${packageId}/${docType}_${Date.now()}.${fileExt}`;
+    
+    Swal.showLoading();
+    const { error: uploadError } = await documentDb.storage.from('package-documents').upload(filePath, file);
+    if(uploadError) return Swal.fire('Error', uploadError.message, 'error');
+    
+    await documentDb.from('package_documents').insert({ package_id: packageId, document_type: docType, file_name: file.name, file_size: file.size, file_path: filePath });
+    Swal.fire('Sukses','Berhasil mengunggah berkas','success');
+    fileInput.value = '';
+    loadUploadedDocuments();
+});
+
+async function downloadDocument(path){
+    const {data,error} = await db.storage.from('package-documents').createSignedUrl(path,60);
+    if(error) return Swal.fire('Error',error.message,'error');
+    window.open(data.signedUrl,'_blank');
+}
+
+async function deleteDocument(id,path){
+    const res = await Swal.fire({ title:'Hapus berkas?', text:'File akan dihapus permanen dari storage', icon:'warning', showCancelButton:true });
+    if(!res.isConfirmed) return;
+    await db.storage.from('package-documents').remove([path]);
+    await db.from('package_documents').delete().eq('id',id);
+    loadUploadedDocuments();
+}
+
+function formatBytes(bytes, decimals = 2) {
+    if (!bytes) return '0 Bytes';
+    const k = 1024; const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    initPackageHeader();
+    loadUploadedDocuments();
+});
+</script>
 </body>
 </html>
