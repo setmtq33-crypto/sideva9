@@ -229,11 +229,6 @@ function editItem(id){
         r.item_name || '';
     
     document.getElementById(
-        'specification'
-    ).value =
-        r.specification || '';
-    
-    document.getElementById(
         'quantity'
     ).value =
         r.quantity || 0;
@@ -257,6 +252,7 @@ function editItem(id){
     
         fundingEl.value =
             r.funding_source_id || '';
+    
     }
     
     modal.show();
