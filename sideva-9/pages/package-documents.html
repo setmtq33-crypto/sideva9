@@ -316,7 +316,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 const hargaSatuan = it.price_surveys?.[0]?.price || 0;
                 itemRows += `<tr><td style="border:1px solid #000; padding:6px;">${it.item_name}<br><span style="font-size:9pt; color:#333;">Spesifikasi: ${it.specification || '-'}</span></td><td style="border:1px solid #000; padding:6px; text-align:center;">${it.quantity} ${it.unit}</td><td style="border:1px solid #000; padding:6px; text-align:right;">${docFmtRp(hargaSatuan)}</td></tr>`;
             });
-                <tr>
+                 <tr>
                     <td style="border:1px solid #000; padding:6px; text-align:left;">
                         ${it.item_name}<br>
                         <span style="font-size:9.5pt; color:#333;">Spesifikasi: ${it.specification || '-'}</span>
