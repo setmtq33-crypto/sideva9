@@ -237,49 +237,31 @@ async function renderSidevaDocumentInternal(slug, pId) {
     targetDiv.innerHTML = `<div class="text-center text-white p-5"><div class="spinner-border text-light spinner-border-sm"></div><p class="small mt-2">Menyinkronkan data database...</p></div>`;
     
     try {
-        // 1. Ambil data paket
-        const { data: paket, error: paketError } = await documentDb.from('packages').select('*').eq('id', pId).maybeSingle(); 
+        const { data: paket, error: paketError } = await documentDb.from('packages').select('*').eq('id', pId).single(); 
         if (paketError) { throw paketError; } 
-        if (!paket) { 
-            targetDiv.innerHTML = `<div class="alert alert-danger m-2 small">❌ Paket tidak ditemukan di database.</div>`;
-            return; 
-        }
+        console.log("PAKET :", paket); 
+     
 
-        // 2. AMBIL DATA SUMBER DANA (Fix agar tidak kosong)
-        const { data: fundingSources } = await documentDb
-            .from('package_funding_sources')
-            .select('*')
-            .eq('package_id', pId);
+        const { data: akun } = await documentDb.from('budget_accounts').select('*').eq('id', paket.budget_account_id).single(); 
+        console.log("AKUN :", akun);
 
-        let txtProgram = "-";
-        let txtKegiatan = "-";
-        let txtSubKegiatan = "-";
-
-        if (fundingSources && fundingSources.length > 0) {
-            txtProgram = fundingSources.map(d => d.program || '-').join('<br>');
-            txtKegiatan = fundingSources.map(d => d.kegiatan || '-').join('<br>');
-            txtSubKegiatan = fundingSources.map(d => d.sub_kegiatan || '-').join('<br>');
-        } else {
-            // Fallback ke kolom paket jika tabel relasi kosong
-            txtProgram = paket.program || '-';
-            txtKegiatan = paket.kegiatan || '-';
-            txtSubKegiatan = paket.sub_kegiatan || '-';
-        }
-
-        const { data: akun } = await documentDb.from('budget_accounts').select('*').eq('id', paket.budget_account_id).maybeSingle(); 
         const { data: items, error: itemsError } = await documentDb.from('package_items').select('*,price_surveys(*)').eq('package_id', pId); 
         if (itemsError) { throw itemsError; } 
+        console.log("ITEMS :", items);
 
-        const { data: ppk } = await documentDb.from('ppkoms').select('*').eq('opd_id', paket.opd_id).maybeSingle(); 
-        const { data: bidang } = await documentDb.from('bidangs').select('*').eq('id', paket.bidang_id).maybeSingle(); 
-        const { data: opd } = await documentDb.from('opds').select('*').eq('id', paket.opd_id).maybeSingle(); 
+        const { data: ppk } = await documentDb.from('ppkoms').select('*').eq('opd_id', paket.opd_id).single(); 
+        console.log("PPK :", ppk);
+
+        const { data: bidang } = await documentDb.from('bidangs').select('*').eq('id', paket.bidang_id).single(); 
+        console.log("BIDANG :", bidang);
+
+        const { data: opd } = await documentDb.from('opds').select('*').eq('id', paket.opd_id).single(); 
+        console.log("OPD :", opd);
 
         const listItems = items || [];
         const kopHtml = `<div style="text-align:center; margin-bottom:20px;"><img src="${opd?.kop_url || ''}" style="width:100%;max-width:900px;height:auto;"></div>`;
         const tgl = docFmtDate(new Date());
         let htmlOutput = "";
-
-        // ... (Sisa kode HTML ke bawah tetap sama, tidak perlu diubah)
 
         if (slug === 'idkb') {
             let rows = ""; 
@@ -287,36 +269,18 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 rows += `<tr><td style="border:1px solid #000; padding:6px; text-align:center;">${i+1}</td><td style="border:1px solid #000; padding:6px;">${it.item_name}</td><td style="border:1px solid #000; padding:6px; text-align:center;">${it.quantity} ${it.unit}</td></tr>`; 
             });
             
-           htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:13pt; text-decoration:underline; margin-bottom:15px;">FORMULIR IDENTIFIKASI KEBUTUHAN BARANG/JASA</div>
-            <table style="width:100%; border-collapse:collapse; margin-bottom:15px; font-size:10.5pt;">
-                <tr><td style="width:25%; font-weight:bold; padding:4px;">Nama Paket</td><td>: ${paket.package_name}</td></tr>
-                <tr><td style="font-weight:bold; padding:4px;">Nomor RUP</td><td>: ${paket.rup_number || '-'}</td></tr>
-                <tr><td style="font-weight:bold; padding:4px;">Program</td><td>: ${txtProgram}</td></tr>
-                <tr><td style="font-weight:bold; padding:4px;">Kegiatan</td><td>: ${txtKegiatan}</td></tr>
-                <tr><td style="font-weight:bold; padding:4px;">Sub Kegiatan</td><td>: ${txtSubKegiatan}</td></tr>
-                <tr><td style="font-weight:bold; padding:4px;">Output</td><td>: ${paket.output || '-'}</td></tr>
-                <tr><td style="font-weight:bold; padding:4px;">Metode Pengadaan</td><td>: ${paket.procurement_method || '-'}</td></tr>
-                <tr><td style="font-weight:bold; padding:4px;">Mata Anggaran</td><td>: ${akun ? `${akun.account_code} - ${akun.account_name}` : '-'}</td></tr>
-                <tr><td style="font-weight:bold; padding:4px;">Pagu Dana</td><td>: ${docFmtRp(paket.budget_ceiling)}</td></tr>
-            </table>
-            <div style="margin-bottom:10px;"><strong>A. IDENTIFIKASI KEBUTUHAN BARANG/JASA</strong></div>
-            <table style="width:100%; border-collapse:collapse; font-size:10.5pt;"><thead style="background:#eee;"><tr><th style="border:1px solid #000; padding:6px; text-align:center; width:10%;">No</th><th style="border:1px solid #000; padding:6px;">Komoditas Barang</th><th style="border:1px solid #000; padding:6px; text-align:center; width:25%;">Volume</th></tr></thead><tbody>${rows || `<tr><td colspan="3" style="border:1px solid #000; text-align:center; padding:10px;">Belum ada item belanja</td></tr>`}</tbody></table>
-            <div style="margin-top:25px;"><strong>B. SPESIFIKASI TEKNIS MINIMAL</strong></div>
-            <table style="width:100%; border-collapse:collapse; margin-top:10px; font-size:10.5pt;"><tr><th style="border:1px solid #000;padding:6px;">No</th><th style="border:1px solid #000;padding:6px;">Spesifikasi Teknis</th></tr>${listItems.map((it,i)=>`<tr><td style="border:1px solid #000;padding:6px;text-align:center;width:50px;">${i+1}</td><td style="border:1px solid #000;padding:6px;"><strong>${it.item_name}</strong><br>${it.specification || '-'}</td></tr>`).join('')}</table>
-            <div style="margin-top:50px;">
-                <table style="width:100%; border-collapse:collapse;"><tr><td style="width:50%; text-align:center; vertical-align:top;">Ditetapkan oleh,<br>${ppk?.position || 'PA/KPA/PPK'}<br><br><br><br><br><strong>${ppk?.full_name || '-'}</strong><br>NIP. ${ppk?.nip || '-'}</td><td style="width:50%; text-align:center; vertical-align:top;">Disusun oleh,<br>${bidang?.position_name || 'Kepala Bidang'}<br>${bidang?.bidang_name || ''}<br><br><br><br><br><strong>${bidang?.head_name || '-'}</strong><br>NIP. ${bidang?.head_nip || '-'}</td></tr></table>
-            </div>`;
-         
-        } else if (slug === 'penetapan') {
-            htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:13pt; text-decoration:underline;">DOKUMEN PENETAPAN</div>`;
+            htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:13pt; text-decoration:underline; margin-bottom:15px;">FORMULIR IDENTIFIKASI KEBUTUHAN BARANG/JASA</div><table style="width:100%; border-collapse:collapse; margin-bottom:15px; font-size:10.5pt;"><tr><td style="width:25%; font-weight:bold; padding:4px;">Nama Paket</td><td>: ${paket.package_name}</td></tr><tr><td style="font-weight:bold; padding:4px;">Nomor RUP</td><td>: ${paket.rup_number || '-'}</td></tr><tr><td style="font-weight:bold; padding:4px;">Program</td><td>: ${paket.program || '-'}</td></tr><tr><td style="font-weight:bold; padding:4px;">Kegiatan</td><td>: ${paket.kegiatan || '-'}</td></tr><tr><td style="font-weight:bold; padding:4px;">Sub Kegiatan</td><td>: ${paket.sub_kegiatan || '-'}</td></tr><tr><td style="font-weight:bold; padding:4px;">Output</td><td>: ${paket.output || '-'}</td></tr><tr><td style="font-weight:bold; padding:4px;">Metode Pengadaan</td><td>: ${paket.procurement_method || '-'}</td></tr><tr><td style="font-weight:bold; padding:4px;">Mata Anggaran</td><td>: ${akun ? `${akun.account_code} - ${akun.account_name}` : '-'}</td></tr><tr><td style="font-weight:bold; padding:4px;">Pagu Dana</td><td>: ${docFmtRp(paket.budget_ceiling)}</td></tr></table><div style="margin-bottom:10px;"><strong>A. IDENTIFIKASI KEBUTUHAN BARANG/JASA</strong></div><table style="width:100%; border-collapse:collapse; font-size:10.5pt;"><thead style="background:#eee;"><tr><th style="border:1px solid #000; padding:6px; text-align:center; width:10%;">No</th><th style="border:1px solid #000; padding:6px;">Komoditas Barang</th><th style="border:1px solid #000; padding:6px; text-align:center; width:25%;">Volume</th></tr></thead><tbody>${rows || `<tr><td colspan="3" style="border:1px solid #000; text-align:center; padding:10px;">Belum ada item belanja</td></tr>`}</tbody></table><div style="margin-top:25px;"><strong>B. SPESIFIKASI TEKNIS MINIMAL</strong></div><table style="width:100%; border-collapse:collapse; margin-top:10px; font-size:10.5pt;"><tr><th style="border:1px solid #000;padding:6px;">No</th><th style="border:1px solid #000;padding:6px;">Spesifikasi Teknis</th></tr>${listItems.map((it,i)=>`<tr><td style="border:1px solid #000;padding:6px;text-align:center;width:50px;">${i+1}</td><td style="border:1px solid #000;padding:6px;"><strong>${it.item_name}</strong><br>${it.specification || '-'}</td></tr>`).join('')}</table><div style="margin-top:25px;"><strong>C. KETERSEDIAAN PRODUK DAN PELAKU USAHA</strong></div><table style="width:100%; border-collapse:collapse; margin-top:10px; font-size:10pt;">${[...new Map(listItems.flatMap(item => item.price_surveys || []).map(ps => [ps.vendor_name, ps])).values()].map((ps,index)=>`<tr><td style="border:1px solid #000; padding:6px; width:40px; text-align:center;">${index + 1}</td><td style="border:1px solid #000; padding:6px;">${ps.vendor_name}</td></tr>`).join('')}</table><div style="margin-top:25px;"><strong>D. PENENTUAN PRIORITAS BARANG/JASA</strong></div><div style="margin-top:10px;margin-left:20px;">Prioritas PDN, UMKM, Lokal Kabupaten Kapuas Hulu</div><table style="width:100%; margin-top:50px; border-collapse:collapse;"><tr><td style="width:50%; text-align:center; vertical-align:top;">Ditetapkan oleh,<br>${ppk?.position || 'PA/KPA/PPK'}<br><br><br><br><br><br><strong>${ppk?.full_name || '-'}</strong><br>NIP. ${ppk?.nip || '-'}</td><td style="width:50%; text-align:center; vertical-align:top;">Disusun oleh,<br>${bidang?.position_name || 'Kepala Bidang'}<br>${bidang?.bidang_name || ''}<br><br><br><br><br><strong>${bidang?.head_name || '-'}</strong><br>NIP. ${bidang?.head_nip || '-'}</td></tr></table><div style="clear:both;"></div>`;
         
-         } else if (slug === 'spek') {
+        } else if (slug === 'penetapan') {
+            // TODO: Tambahkan HTML untuk slug penetapan di sini jika ada
+            htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:13pt; text-decoration:underline;">DOKUMEN PENETAPAN</div>`;
+            
+        } else if (slug === 'spek') {
             let itemRows = "";
             listItems.forEach((it, i) => {
                 const hargaSatuan = it.price_surveys?.[0]?.price || 0;
-                itemRows += `<tr><td style="border:1px solid #000; padding:6px;">${it.item_name}<br><span style="font-size:9pt; color:#333;">Spesifikasi: ${it.specification || '-'}</span></td><td style="border:1px solid #000; padding:6px; text-align:center;">${it.quantity} ${it.unit}</td><td style="border:1px solid #000; padding:6px; text-align:right;">${docFmtRp(hargaSatuan)}</td></tr>`;
-            });
-                 <tr>
+                itemRows += `
+                <tr>
                     <td style="border:1px solid #000; padding:6px; text-align:left;">
                         ${it.item_name}<br>
                         <span style="font-size:9.5pt; color:#333;">Spesifikasi: ${it.specification || '-'}</span>
@@ -327,17 +291,23 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 </tr>`;
             });
 
-            htmlOutput = `${kopHtml}<div style="text-align:center; font-size:14pt; font-weight:bold; text-decoration:underline; margin-bottom:15px;">SPESIFIKASI TEKNIS</div>
-            <table style="width:100%; font-size:10.5pt; margin-bottom:20px;">
-                <tr><td width="200">Program</td><td>: ${txtProgram}</td></tr>
-                <tr><td>Kegiatan</td><td>: ${txtKegiatan}</td></tr>
-                <tr><td>Sub Kegiatan</td><td>: ${txtSubKegiatan}</td></tr>
-                <tr><td>Nama Paket</td><td>: ${paket.package_name}</td></tr>
+            htmlOutput = `
+            ${kopHtml}
+            
+            <div style="text-align:center; font-size:14pt; font-weight:bold; text-decoration:underline; margin-bottom:5px;">SPESIFIKASI TEKNIS PAKET E-PURCHASING</div>
+            <div style="text-align:center; font-size:11pt; margin-bottom:20px;">Nomor: SPEK/${paket.rup_number || '........'}/DEMO/2026</div>
+
+            <table style="width:100%; font-size:10.5pt; margin-bottom:25px; border-collapse:collapse;">
+                <tr><td width="220" style="padding:3px;"><strong>Perangkat Daerah</strong></td><td style="padding:3px;">: ${opd?.opd_name || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Program</strong></td><td style="padding:3px;">: ${paket.program || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Kegiatan</strong></td><td style="padding:3px;">: ${paket.kegiatan || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Sub Kegiatan</strong></td><td style="padding:3px;">: ${paket.sub_kegiatan || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>RUP</strong></td><td style="padding:3px;">: ${paket.rup_number || '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Nama Paket Pengadaan</strong></td><td style="padding:3px;">: ${paket.package_name}</td></tr>
+                <tr><td style="padding:3px;"><strong>Pagu</strong></td><td style="padding:3px;">: ${docFmtRp(paket.budget_ceiling)}</td></tr>
+                <tr><td style="padding:3px;"><strong>Mata Anggaran Belanja</strong></td><td style="padding:3px;">: ${akun ? `${akun.account_code} - ${akun.account_name}` : '-'}</td></tr>
+                <tr><td style="padding:3px;"><strong>Sumber Dana</strong></td><td style="padding:3px;">: APBD Kabupaten Kapuas Hulu</td></tr>
             </table>
-            <table style="width:100%; border-collapse:collapse; font-size:10pt;">
-                <tr style="background:#eee;"><th style="border:1px solid #000; padding:6px;">Nama Barang</th><th style="border:1px solid #000; padding:6px;">Qty</th><th style="border:1px solid #000; padding:6px;">Harga</th></tr>
-                ${itemRows}
-            </table>`;
 
             <table style="width:100%; border-collapse:collapse; font-size:10pt; margin-bottom:20px;">
                 <thead style="background:#eee;">
