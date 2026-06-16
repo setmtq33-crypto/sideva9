@@ -1,0 +1,506 @@
+<html lang="id"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pusat Bantuan - SIDEVA v9</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../css/app.css">
+  <style>
+    .welcome-banner{border-radius:20px;overflow:hidden}
+    .help-card{border-radius:16px;border:1px solid var(--bs-border-color-translucent);box-shadow:0 4px 14px rgba(0,0,0,.04);transition:all .2s}
+    .help-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+    .help-nav-card{border-radius:16px;border:1px solid var(--bs-border-color-translucent)}
+    .icon-wrap{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:12px;font-size:1.25rem;flex-shrink:0}
+    .screenshot-placeholder{background:var(--bs-tertiary-bg);border:2px dashed var(--bs-border-color);border-radius:12px;padding:2rem 1rem;text-align:center;color:var(--bs-secondary-color);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:140px}
+    .help-menu .list-group-item{border:0;padding:.65rem .9rem;border-radius:10px;margin-bottom:3px;font-size:.92rem;display:flex;align-items:center}
+    .help-menu .list-group-item.active,.help-menu .list-group-item:hover{background:var(--bs-primary-bg-subtle);color:var(--bs-primary-text-emphasis);font-weight:500}
+    .help-section{scroll-margin-top:100px}
+    .badge-soft{background:var(--bs-primary-bg-subtle);color:var(--bs-primary);font-weight:500}
+    .step-workflow{position:relative;padding-left:2.5rem;border-left:2px solid var(--bs-border-color)}
+    .step-workflow .step-num{position:absolute;left:-14px;top:-2px;width:26px;height:26px;border-radius:50%;background:var(--bs-primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700}
+    [data-bs-theme="dark"] .help-card{box-shadow:0 4px 20px rgba(0,0,0,.3);background:var(--bs-body-bg)}
+    [data-bs-theme="dark"] .screenshot-placeholder{background:rgba(255,255,255,.03)}
+    @media (max-width:991.98px){.sticky-lg-top{position:relative!important;top:0!important}}
+    @media print{#sidebar-container,#topbar-container,#footbar-container,.help-nav-card,.btn-print-hide{display:none!important}.main-content{margin:0!important;padding:0!important}.help-card{box-shadow:none!important;border:1px solid #ddd!important;page-break-inside:avoid}}
+  </style>
+</head>
+<body>
+<div class="wrapper">
+  <nav id="sidebar-container" class="adaptive-sidebar"></nav>
+  <div class="main-content" id="main-content-area">
+    <div id="topbar-container" class="topbar"></div>
+    <div class="content-body">
+      <div class="container-fluid p-3 p-md-4">
+        
+        <!-- Banner -->
+        <div class="card border-0 welcome-banner text-white mb-4" style="background:linear-gradient(135deg,#2563eb 0%,#1e40af 50%,#0ea5e9 100%)">
+          <div class="card-body p-4 p-lg-5">
+            <div class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between gap-3">
+              <div>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <span class="badge bg-white text-primary px-3 py-2 rounded-pill"><i class="bi bi-life-preserver me-1"></i> SIDEVA v9</span>
+                  <span class="badge bg-white bg-opacity-25 text-white px-3 py-2 rounded-pill">Help Center</span>
+                </div>
+                <h1 class="fw-bold mb-2" style="font-size:clamp(1.5rem,3vw,2.2rem)">Pusat Bantuan SIDEVA v9</h1>
+                <p class="mb-0 opacity-90" style="max-width:620px">Panduan lengkap penggunaan modul Dashboard, Paket, HPS, hingga Workflow 9 tahap. Cari topik, salin link, atau cetak untuk tim Anda.</p>
+              </div>
+              <div class="d-flex gap-2 btn-print-hide">
+                <button id="btnCopyLink" class="btn btn-light"><i class="bi bi-link-45deg me-1"></i>Salin Link</button>
+                <button id="btnPrint" class="btn btn-outline-light"><i class="bi bi-printer me-1"></i>Cetak Panduan</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <!-- Sidebar Internal -->
+          <div class="col-lg-3">
+            <div class="card help-nav-card sticky-lg-top" style="top:90px">
+              <div class="card-body p-3">
+                <div class="input-group mb-3">
+                  <span class="input-group-text bg-transparent"><i class="bi bi-search"></i></span>
+                  <input id="helpSearch" type="search" class="form-control" placeholder="Cari modul...">
+                </div>
+                <div class="list-group list-group-flush help-menu" id="helpMenu">
+                  <a href="#dashboard" class="list-group-item active"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
+                  <a href="#paket" class="list-group-item"><i class="bi bi-box-seam me-2"></i>Paket</a>
+                  <a href="#items" class="list-group-item"><i class="bi bi-list-check me-2"></i>Items</a>
+                  <a href="#survei" class="list-group-item"><i class="bi bi-graph-up-arrow me-2"></i>Survei Harga</a>
+                  <a href="#dokumen" class="list-group-item"><i class="bi bi-folder2-open me-2"></i>Dokumen</a>
+                  <a href="#hps" class="list-group-item"><i class="bi bi-calculator me-2"></i>HPS</a>
+                  <a href="#ready" class="list-group-item"><i class="bi bi-check2-circle me-2"></i>Ready Proc</a>
+                  <a href="#audit" class="list-group-item"><i class="bi bi-shield-check me-2"></i>Audit Logs</a>
+                  <a href="#users" class="list-group-item"><i class="bi bi-people me-2"></i>Users</a>
+                  <a href="#opd" class="list-group-item"><i class="bi bi-building me-2"></i>OPD</a>
+                  <a href="#import" class="list-group-item"><i class="bi bi-upload me-2"></i>Import RUP</a>
+                  <a href="#workflow" class="list-group-item"><i class="bi bi-diagram-3 me-2"></i>Workflow 9 Tahap</a>
+                  <a href="#auth" class="list-group-item"><i class="bi bi-key me-2"></i>Autentikasi</a>
+                  <a href="#superadmin" class="list-group-item"><i class="bi bi-stars me-2"></i>Super Admin</a>
+                  <a href="#faq" class="list-group-item"><i class="bi bi-question-circle me-2"></i>FAQ</a>
+                </div>
+                <hr>
+                <div class="small text-muted"><i class="bi bi-lightbulb me-1"></i>Tips: klik modul untuk lompat cepat. Gunakan pencarian di atas.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Konten -->
+          <div class="col-lg-9">
+            <div id="helpContent">
+
+              <!-- DASHBOARD -->
+              <section id="dashboard" class="help-section mb-4">
+                <div class="card help-card">
+                  <div class="card-body p-4 p-lg-5">
+                    <div class="d-flex gap-3">
+                      <div class="icon-wrap bg-primary-subtle text-primary"><i class="bi bi-speedometer2"></i></div>
+                      <div class="flex-grow-1">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                          <h4 class="fw-bold mb-0">Dashboard</h4>
+                          <span class="badge-soft badge rounded-pill px-2">pages/dashboard.html</span>
+                        </div>
+                        <p class="text-secondary">Pusat komando untuk monitoring seluruh paket. Desain sama persis seperti yang Anda lihat saat login.</p>
+                        
+                        <div class="row g-3 mt-2">
+                          <div class="col-md-6">
+                            <h6 class="fw-semibold"><i class="bi bi-bar-chart me-1 text-primary"></i>5 KPI Utama</h6>
+                            <ul class="small mb-0">
+                              <li>Total Paket</li>
+                              <li>Total Nilai Pagu</li>
+                              <li>Paket Siap Procurement</li>
+                              <li>Dalam Proses</li>
+                              <li>Paket Selesai</li>
+                            </ul>
+                          </div>
+                          <div class="col-md-6">
+                            <h6 class="fw-semibold"><i class="bi bi-pie-chart me-1 text-primary"></i>2 Grafik Interaktif</h6>
+                            <ul class="small mb-0">
+                              <li>Tren nilai paket per bulan</li>
+                              <li>Distribusi status paket</li>
+                            </ul>
+                          </div>
+                        <div class="mt-3">
+                          <h6 class="fw-semibold">Tabel Status 9 Tahap</h6>
+                          <p class="small text-secondary mb-2">Memetakan bottleneck: dari DRAFT sampai PROCUREMENT. Klik angka untuk filter tabel bawah.</p>
+                          <h6 class="fw-semibold">Rekap OPD &amp; Monitoring Paket</h6>
+                          <p class="small text-secondary mb-0">Super Admin melihat semua OPD. Admin OPD hanya melihat OPD-nya. Ada quick search, filter status, dan export.</p>
+                        </div>
+                        <div class="screenshot-placeholder mt-3">
+                          <i class="bi bi-layout-wtf fs-1"></i>
+                          <span class="mt-2 small">Pratinjau: KPI Cards + 2 Grafik + Tabel 9 Tahap</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div></section>
+
+              <!-- PAKET -->
+              <section id="paket" class="help-section mb-4">
+                <div class="card help-card">
+                  <div class="card-body p-4">
+                    <div class="d-flex gap-3">
+                      <div class="icon-wrap bg-success-subtle text-success"><i class="bi bi-box-seam"></i></div>
+                      <div>
+                        <h5 class="fw-bold">Paket <span class="badge-soft">packages.html</span></h5>
+                        <p class="text-secondary">Kelola master paket pengadaan. Ini adalah pintu masuk semua proses.</p>
+                        <p class="mb-2"><strong>Field utama:</strong> <code>package_name</code>, <code>budget_ceiling</code>, <code>package_status</code>, <code>opd_id</code>, <code>fiscal_year</code>, <code>package_type</code></p>
+                        <ul class="small">
+                          <li>Tambah paket manual atau dari Import RUP</li>
+                          <li>Edit hanya bisa saat status DRAFT / INPUT_ITEM</li>
+                          <li>Hapus = soft delete, tercatat di Audit Logs</li>
+                        </ul>
+                        <div class="alert alert-info py-2 small mb-0"><i class="bi bi-info-circle me-1"></i>Pastikan nama paket sama dengan RUP SIRUP agar sinkronisasi lancar.</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- ITEMS -->
+              <section id="items" class="help-section mb-4">
+                <div class="card help-card">
+                  <div class="card-body p-4">
+                    <div class="d-flex gap-3">
+                      <div class="icon-wrap bg-warning-subtle text-warning"><i class="bi bi-list-check"></i></div>
+                      <div>
+                        <h5 class="fw-bold">Items <span class="badge-soft">package-items.html</span></h5>
+                        <p class="text-secondary">Input rincian barang/jasa untuk setiap paket.</p>
+                        <ul class="small">
+                          <li>Nama item, spesifikasi teknis, qty, satuan, sumber anggaran</li>
+                          <li>Bisa import dari Excel template</li>
+                          <li>Total items otomatis menjumlah ke pagu paket</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- SURVEI -->
+              <section id="survei" class="help-section mb-4">
+                <div class="card help-card">
+                  <div class="card-body p-4">
+                    <div class="d-flex gap-3">
+                      <div class="icon-wrap bg-info-subtle text-info"><i class="bi bi-graph-up-arrow"></i></div>
+                      <div>
+                        <h5 class="fw-bold">Survei Harga <span class="badge-soft">price-surveys.html</span></h5>
+                        <p class="text-secondary">Kumpulkan harga pasar sebagai dasar HPS yang akuntabel.</p>
+                        <ul class="small">
+                          <li>Minimal 2-3 vendor per item</li>
+                          <li>Simpan bukti: link e-commerce, quotation PDF, screenshot</li>
+                          <li>Sistem rekomendasikan harga wajar (median/terendah)</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- DOKUMEN -->
+              <section id="dokumen" class="help-section mb-4">
+                <div class="card help-card">
+                  <div class="card-body p-4">
+                    <div class="d-flex gap-3">
+                      <div class="icon-wrap bg-secondary-subtle text-secondary"><i class="bi bi-folder2-open"></i></div>
+                      <div>
+                        <h5 class="fw-bold">Dokumen <span class="badge-soft">package-documents.html</span></h5>
+                        <p class="text-secondary">Upload dan kelola dokumen pendukung.</p>
+                        <p class="small mb-1"><strong>Wajib:</strong> KAK, DPP/Spesifikasi, RAB, Justifikasi</p>
+                        <p class="small mb-0">Disimpan di Supabase Storage dengan versioning otomatis. Preview PDF langsung di browser.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- HPS -->
+              <section id="hps" class="help-section mb-4">
+                <div class="card help-card">
+                  <div class="card-body p-4">
+                    <div class="d-flex gap-3">
+                      <div class="icon-wrap bg-danger-subtle text-danger"><i class="bi bi-calculator"></i></div>
+                      <div>
+                        <h5 class="fw-bold">HPS <span class="badge-soft">hps.html</span></h5>
+                        <p class="text-secondary">Hitung Harga Perkiraan Sendiri otomatis dari Items + Survei.</p>
+                        <ul class="small">
+                          <li>Klik "Generate HPS" → sistem tarik harga survei terbaik</li>
+                          <li>Tambah overhead, pajak, profit sesuai aturan</li>
+                          <li>Export PDF HPS yang sudah ditandatangani digital</li>
+                          <li>Setelah APPROVAL, HPS dikunci (locked)</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- READY -->
+              <section id="ready" class="help-section mb-4">
+                <div class="card help-card">
+                  <div class="card-body p-4">
+                    <div class="d-flex gap-3">
+                      <div class="icon-wrap bg-primary-subtle text-primary"><i class="bi bi-check2-circle"></i></div>
+                      <div>
+                        <h5 class="fw-bold">Ready Procurement <span class="badge-soft">procurement-ready.html</span></h5>
+                        <p class="text-secondary mb-0">Filter otomatis semua paket dengan status <code>READY_PROCUREMENT</code>. Halaman ini adalah checklist terakhir sebelum kirim ke Pokja/LPSE. Pastikan dokumen lengkap, HPS locked, dan pagu sesuai.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- AUDIT -->
+              <section id="audit" class="help-section mb-4">
+                <div class="card help-card">
+                  <div class="card-body p-4">
+                    <div class="d-flex gap-3">
+                      <div class="icon-wrap bg-dark-subtle text-dark"><i class="bi bi-shield-check"></i></div>
+                      <div>
+                        <h5 class="fw-bold">Audit Logs <span class="badge-soft">audit-logs.html</span></h5>
+                        <p class="text-secondary">Jejak digital lengkap: siapa mengubah apa dan kapan.</p>
+                        <p class="small mb-0">Mencatat: user_id, action (CREATE/UPDATE/DELETE), table, old_value → new_value, timestamp. Tidak bisa dihapus. Gunakan filter tanggal dan paket.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- USERS -->
+              <section id="users" class="help-section mb-4">
+                <div class="card help-card">
+                  <div class="card-body p-4">
+                    <div class="d-flex gap-3">
+                      <div class="icon-wrap bg-success-subtle text-success"><i class="bi bi-people"></i></div>
+                      <div>
+                        <h5 class="fw-bold">Users <span class="badge-soft">users.html</span></h5>
+                        <p class="text-secondary">Manajemen pengguna berbasis role.</p>
+                        <ul class="small mb-0">
+                          <li><strong>super_admin:</strong> semua OPD</li>
+                          <li><strong>admin_opd:</strong> kelola 1 OPD</li>
+                          <li><strong>ppk:</strong> approve paket</li>
+                          <li><strong>viewer:</strong> read-only</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- OPD -->
+              <section id="opd" class="help-section mb-4">
+                <div class="card help-card">
+                  <div class="card-body p-4">
+                    <div class="d-flex gap-3">
+                      <div class="icon-wrap bg-info-subtle text-info"><i class="bi bi-building"></i></div>
+                      <div>
+                        <h5 class="fw-bold">OPD <span class="badge-soft">opds.html</span></h5>
+                        <p class="text-secondary mb-0">Master data Organisasi Perangkat Daerah. Dipakai di semua dropdown paket, dashboard, dan filter. Hanya Super Admin yang bisa tambah/edit.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- IMPORT -->
+              <section id="import" class="help-section mb-4">
+                <div class="card help-card">
+                  <div class="card-body p-4">
+                    <div class="d-flex gap-3">
+                      <div class="icon-wrap bg-warning-subtle text-warning"><i class="bi bi-upload"></i></div>
+                      <div>
+                        <h5 class="fw-bold">Import RUP <span class="badge-soft">rup-import.html</span></h5>
+                        <p class="text-secondary">Upload Excel hasil ekspor SIRUP LKPP.</p>
+                        <ul class="small mb-0">
+                          <li>Sistem mapping otomatis: kode RUP, nama paket, pagu, sumber dana</li>
+                          <li>Validasi duplikasi berdasarkan kode RUP + tahun</li>
+                          <li>Setelah import, lanjutkan lengkapi Items &amp; Survei</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- WORKFLOW -->
+              <section id="workflow" class="help-section mb-4">
+                <div class="card help-card">
+                  <div class="card-body p-4 p-lg-5">
+                    <div class="d-flex gap-3">
+                      <div class="icon-wrap bg-primary-subtle text-primary"><i class="bi bi-diagram-3"></i></div>
+                      <div class="w-100">
+                        <h4 class="fw-bold">Workflow 9 Tahap</h4>
+                        <p class="text-secondary">Alur resmi SIDEVA. Tidak bisa loncat tahap.</p>
+                        <div class="mt-4">
+                          <div class="step-workflow mb-4"><div class="step-num">1</div><strong>DRAFT</strong><div class="small text-secondary">Paket dibuat, data dasar diisi</div></div>
+                          <div class="step-workflow mb-4"><div class="step-num">2</div><strong>INPUT_ITEMS</strong><div class="small text-secondary">Rincian barang/jasa diinput</div></div>
+                          <div class="step-workflow mb-4"><div class="step-num">3</div><strong>SURVEY</strong><div class="small text-secondary">Kumpul harga pasar minimal 2 vendor</div></div>
+                          <div class="step-workflow mb-4"><div class="step-num">4</div><strong>HPS_DRAFT</strong><div class="small text-secondary">Hitung HPS otomatis</div></div>
+                          <div class="step-workflow mb-4"><div class="step-num">5</div><strong>DOC_PREP</strong><div class="small text-secondary">Upload KAK, DPP, RAB</div></div>
+                          <div class="step-workflow mb-4"><div class="step-num">6</div><strong>REVIEW</strong><div class="small text-secondary">Verifikasi Admin OPD</div></div>
+                          <div class="step-workflow mb-4"><div class="step-num">7</div><strong>APPROVAL</strong><div class="small text-secondary">PPK menyetujui &amp; lock HPS</div></div>
+                          <div class="step-workflow mb-4"><div class="step-num">8</div><strong>READY_PROCUREMENT</strong><div class="small text-secondary">Paket lengkap, siap ke Pokja</div></div>
+                          <div class="step-workflow"><div class="step-num">9</div><strong>PROCUREMENT</strong><div class="small text-secondary">Tayang di LPSE / proses tender</div></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- AUTH -->
+              <section id="auth" class="help-section mb-4">
+                <div class="card help-card">
+                  <div class="card-body p-4">
+                    <div class="d-flex gap-3">
+                      <div class="icon-wrap bg-success-subtle text-success"><i class="bi bi-key"></i></div>
+                      <div>
+                        <h5 class="fw-bold">Autentikasi <span class="badge-soft">auth.js</span></h5>
+                        <p class="text-secondary">Login menggunakan Supabase Auth.</p>
+                        <ul class="small mb-0">
+                          <li>Email + password, session disimpan 8 jam</li>
+                          <li>Auto-refresh token, logout otomatis saat expired</li>
+                          <li>Role dibaca dari tabel users, bukan dari JWT saja</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- SUPERADMIN -->
+              <section id="superadmin" class="help-section mb-4">
+                <div class="card help-card">
+                  <div class="card-body p-4">
+                    <div class="d-flex gap-3">
+                      <div class="icon-wrap bg-dark-subtle text-dark"><i class="bi bi-stars"></i></div>
+                      <div>
+                        <h5 class="fw-bold">Super Admin</h5>
+                        <p class="text-secondary">Fitur khusus untuk administrator sistem.</p>
+                        <p class="small mb-0">Selector OPD di topbar menyimpan pilihan ke <code>localStorage['selected-opd-id']</code>. Semua halaman (Dashboard, Paket, HPS) otomatis memfilter berdasarkan OPD terpilih. Kosongkan pilihan untuk melihat semua OPD.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- FAQ -->
+              <section id="faq" class="help-section mb-4">
+                <div class="card help-card">
+                  <div class="card-body p-4 p-lg-5">
+                    <div class="d-flex gap-3 mb-3">
+                      <div class="icon-wrap bg-primary-subtle text-primary"><i class="bi bi-question-circle"></i></div>
+                      <div>
+                        <h4 class="fw-bold mb-1">FAQ</h4>
+                        <p class="text-secondary mb-0">Pertanyaan yang paling sering ditanyakan.</p>
+                      </div>
+                    </div>
+                    <div class="accordion" id="faqAcc">
+                      <div class="accordion-item">
+                        <h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#f1">Kenapa paket saya tidak muncul di Ready Proc?</button></h2>
+                        <div id="f1" class="accordion-collapse collapse show" data-bs-parent="#faqAcc"><div class="accordion-body small">Pastikan status sudah <strong>READY_PROCUREMENT</strong>. Cek: (1) Items lengkap, (2) Survei minimal 2 vendor, (3) HPS sudah generate, (4) Dokumen KAK &amp; DPP terupload, (5) sudah di-Approve PPK.</div></div>
+                      </div>
+                      <div class="accordion-item">
+                        <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#f2">Bagaimana ubah HPS setelah di-approve?</button></h2>
+                        <div id="f2" class="accordion-collapse collapse" data-bs-parent="#faqAcc"><div class="accordion-body small">HPS yang sudah APPROVAL terkunci. Minta PPK untuk "Reject to Review" agar status kembali ke REVIEW. Perubahan tercatat di Audit Logs.</div></div>
+                      </div>
+                      <div class="accordion-item">
+                        <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#f3">Bisa import RUP lintas OPD sekaligus?</button></h2>
+                        <div id="f3" class="accordion-collapse collapse" data-bs-parent="#faqAcc"><div class="accordion-body small">Bisa, khusus Super Admin. File Excel harus ada kolom <code>opd_code</code>. Sistem akan mapping otomatis. Admin OPD hanya bisa import untuk OPD-nya sendiri.</div></div>
+                      </div>
+                      <div class="accordion-item">
+                        <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#f4">Saya lupa password</button></h2>
+                        <div id="f4" class="accordion-collapse collapse" data-bs-parent="#faqAcc"><div class="accordion-body small">Klik "Lupa Password" di halaman login atau hubungi Admin OPD. Admin dapat melakukan reset via menu Users.</div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <div class="d-flex gap-2 justify-content-end btn-print-hide">
+                <button id="btnCopyLink2" class="btn btn-outline-primary"><i class="bi bi-link-45deg"></i> Salin Link Halaman Ini</button>
+                <a href="data:text/html;base64,PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImlkIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9IlVURi04Ij4KPG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCwgaW5pdGlhbC1zY2FsZT0xLCB2aWV3cG9ydC1maXQ9Y292ZXIiPgo8bWV0YSBuYW1lPSJkZXNjcmlwdGlvbiIgY29udGVudD0iRGFzaGJvYXJkIFRlcnBhZHUgU0lERVZBOSDigJMgbW9uaXRvcmluZyBwYWtldCwgYW5nZ2FyYW4sIEhQUywgZGFuIGVmaXNpZW5zaSBwZW5nYWRhYW4gcmVhbC10aW1lLiI+CjxsaW5rIHJlbD0iY2Fub25pY2FsIiBocmVmPSJodHRwczovL3NpZGV2YTkuYXBwL3BhZ2VzL2Rhc2hib2FyZC5odG1sIj4KPG1ldGEgbmFtZT0idGhlbWUtY29sb3IiIGNvbnRlbnQ9IiMxZTNjNzIiPgo8bGluayByZWw9Im1hbmlmZXN0IiBocmVmPSIuLi9tYW5pZmVzdC5qc29uIj4KPGxpbmsgcmVsPSJhcHBsZS10b3VjaC1pY29uIiBocmVmPSIuLi9XaGF0c0FwcCBJbWFnZSAyMDI2LTA2LTE1IGF0IDE5LjQyLjQ2LmpwZWciPgo8dGl0bGU+RGFzaGJvYXJkIFNJREVWQSB2OTwvdGl0bGU+Cgo8c2NyaXB0PgogICAgZG9jdW1lbnQuZG9jdW1lbnRFbGVtZW50LnNldEF0dHJpYnV0ZSgnZGF0YS1icy10aGVtZScsIGxvY2FsU3RvcmFnZS5nZXRJdGVtKCd0aGVtZS1tb2RlJykgfHwgJ2xpZ2h0Jyk7Cjwvc2NyaXB0PgoKPGxpbmsgaHJlZj0iaHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L25wbS9ib290c3RyYXBANS4zLjMvZGlzdC9jc3MvYm9vdHN0cmFwLm1pbi5jc3MiIHJlbD0ic3R5bGVzaGVldCI+CjxsaW5rIGhyZWY9Imh0dHBzOi8vY2RuLmpzZGVsaXZyLm5ldC9ucG0vYm9vdHN0cmFwLWljb25zQDEuMTEuMy9mb250L2Jvb3RzdHJhcC1pY29ucy5jc3MiIHJlbD0ic3R5bGVzaGVldCI+CjxsaW5rIHJlbD0ic3R5bGVzaGVldCIgaHJlZj0iaHR0cHM6Ly9jZG5qcy5jbG91ZGZsYXJlLmNvbS9hamF4L2xpYnMvZm9udC1hd2Vzb21lLzYuNC4wL2Nzcy9hbGwubWluLmNzcyI+Cgo8c2NyaXB0IHNyYz0iaHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L25wbS9ib290c3RyYXBANS4zLjMvZGlzdC9qcy9ib290c3RyYXAuYnVuZGxlLm1pbi5qcyI+PC9zY3JpcHQ+CjxzY3JpcHQgc3JjPSJodHRwczovL2Nkbi5qc2RlbGl2ci5uZXQvbnBtL0BzdXBhYmFzZS9zdXBhYmFzZS1qc0AyIj48L3NjcmlwdD4KPHNjcmlwdCBzcmM9Imh0dHBzOi8vY2RuLmpzZGVsaXZyLm5ldC9ucG0vY2hhcnQuanMiPjwvc2NyaXB0PgoKPHNjcmlwdCBzcmM9Ii4uL2pzL2NvbmZpZy5qcyI+PC9zY3JpcHQ+CjxzY3JpcHQgc3JjPSIuLi9qcy9zdXBhYmFzZS5qcyI+PC9zY3JpcHQ+CjxzY3JpcHQgc3JjPSIuLi9qcy9hdXRoLmpzIj48L3NjcmlwdD4KPHNjcmlwdCBzcmM9Ii4uL2pzL3dvcmtmbG93LmpzIj48L3NjcmlwdD4KIAo8bGluayByZWw9InN0eWxlc2hlZXQiIGhyZWY9Ii4uL2Nzcy9hcHAuY3NzIj4KCjxzdHlsZT4KYm9keSB7CiAgICBiYWNrZ3JvdW5kLWNvbG9yOiB2YXIoLS1icy1ib2R5LWJnKTsKICAgIGNvbG9yOiB2YXIoLS1icy1ib2R5LWNvbG9yKTsKICAgIGZvbnQtZmFtaWx5OiAnU2Vnb2UgVUknLCBzeXN0ZW0tdWksIC1hcHBsZS1zeXN0ZW0sIHNhbnMtc2VyaWY7CiAgICB0cmFuc2l0aW9uOiBiYWNrZ3JvdW5kLWNvbG9yIDAuM3MgZWFzZSwgY29sb3IgMC4zcyBlYXNlOwogICAgb3ZlcmZsb3cteDogaGlkZGVuOwp9CgoKCi5jYXJkIHsKICAgIGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWJzLWJvcmRlci1jb2xvci10cmFuc2x1Y2VudCkgIWltcG9ydGFudDsKICAgIGJvcmRlci1yYWRpdXM6IDE2cHggIWltcG9ydGFudDsKICAgIGJhY2tncm91bmQtY29sb3I6IHZhcigtLWJzLWNhcmQtYmcsIHZhcigtLWJzLXN1cmZhY2UtYmcsICNmZmZmZmYpKTsKICAgIGJveC1zaGFkb3c6IDAgNHB4IDIwcHggcmdiYSgwLCAwLCAwLCAwLjAyKTsKICAgIHRyYW5zaXRpb246IHRyYW5zZm9ybSAwLjJzIGVhc2UsIGJveC1zaGFkb3cgMC4ycyBlYXNlLCBiYWNrZ3JvdW5kLWNvbG9yIDAuM3MgZWFzZTsKfQoKW2RhdGEtYnMtdGhlbWU9ImRhcmsiXSAuY2FyZCB7CiAgICBiYWNrZ3JvdW5kLWNvbG9yOiAjMWUyOTNiICFpbXBvcnRhbnQ7CiAgICBib3gtc2hhZG93OiAwIDRweCAyMHB4IHJnYmEoMCwgMCwgMCwgMC4yKTsKfQoKLmNhcmQ6aG92ZXIgewogICAgdHJhbnNmb3JtOiB0cmFuc2xhdGVZKC0ycHgpOwogICAgYm94LXNoYWRvdzogMCA4cHggMjVweCByZ2JhKDMwLCA2MCwgMTE0LCAwLjA4KTsKfQoKLmNhcmQtaGVhZGVyIHsKICAgIGJhY2tncm91bmQ6IHRyYW5zcGFyZW50ICFpbXBvcnRhbnQ7CiAgICBib3JkZXItYm90dG9tOiAxcHggc29saWQgdmFyKC0tYnMtYm9yZGVyLWNvbG9yKSAhaW1wb3J0YW50OwogICAgcGFkZGluZzogMThweCAyNHB4ICFpbXBvcnRhbnQ7CiAgICBmb250LXdlaWdodDogNzAwICFpbXBvcnRhbnQ7CiAgICBjb2xvcjogdmFyKC0tYnMtaGVhZGluZy1jb2xvcikgIWltcG9ydGFudDsKICAgIGZvbnQtc2l6ZTogMXJlbTsKICAgIGRpc3BsYXk6IGZsZXg7CiAgICBhbGlnbi1pdGVtczogY2VudGVyOwogICAgZ2FwOiA4cHg7Cn0KCi5iYW5uZXItZ3JhZGllbnQgewogICAgYmFja2dyb3VuZDogbGluZWFyLWdyYWRpZW50KDEzNWRlZywgIzFlM2M3MiAwJSwgIzJhNTI5OCAxMDAlKTsKICAgIGNvbG9yOiAjZmZmZmZmICFpbXBvcnRhbnQ7CiAgICBib3JkZXI6IG5vbmUgIWltcG9ydGFudDsKfQoKLmtwaS1jYXJkIHsKICAgIHBvc2l0aW9uOiByZWxhdGl2ZTsKICAgIG92ZXJmbG93OiBoaWRkZW47Cn0KLmtwaS1jYXJkOjpiZWZvcmUgewogICAgY29udGVudDogJyc7CiAgICBwb3NpdGlvbjogYWJzb2x1dGU7CiAgICB0b3A6IDA7CiAgICBsZWZ0OiAwOwogICAgd2lkdGg6IDRweDsKICAgIGhlaWdodDogMTAwJTsKICAgIGJhY2tncm91bmQ6IHZhcigtLWJzLXNlY29uZGFyeS1jb2xvcik7Cn0KLmtwaS1jYXJkLmtwaS1wcmltYXJ5OjpiZWZvcmUgeyBiYWNrZ3JvdW5kOiAjM2I4MmY2OyB9Ci5rcGktY2FyZC5rcGktc3VjY2Vzczo6YmVmb3JlIHsgYmFja2dyb3VuZDogIzEwYjk4MTsgfQoua3BpLWNhcmQua3BpLWluZm86OmJlZm9yZSB7IGJhY2tncm91bmQ6ICMwNmI2ZDQ7IH0KCi5rcGkgewogICAgZm9udC1zaXplOiAxLjc1cmVtOwogICAgZm9udC13ZWlnaHQ6IDgwMDsKICAgIGxldHRlci1zcGFjaW5nOiAtMXB4OwogICAgY29sb3I6IHZhcigtLWJzLWhlYWRpbmctY29sb3IpOwogICAgbWFyZ2luLXRvcDogNHB4Owp9CgouYWN0aW9uLWdyaWQtaXRlbSB7CiAgICBkaXNwbGF5OiBmbGV4OwogICAgYWxpZ24taXRlbXM6IGNlbnRlcjsKICAgIGdhcDogMTJweDsKICAgIHBhZGRpbmc6IDE0cHggMTZweDsKICAgIGJhY2tncm91bmQ6IHZhcigtLWJzLXRlcnRpYXJ5LWJnKTsKICAgIGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWJzLWJvcmRlci1jb2xvcik7CiAgICBib3JkZXItcmFkaXVzOiAxMnB4OwogICAgdGV4dC1kZWNvcmF0aW9uOiBub25lOwogICAgY29sb3I6IHZhcigtLWJzLWJvZHktY29sb3IpOwogICAgZm9udC13ZWlnaHQ6IDYwMDsKICAgIGZvbnQtc2l6ZTogMC44OHJlbTsKICAgIHRyYW5zaXRpb246IGFsbCAwLjJzIGVhc2U7Cn0KCi5hY3Rpb24tZ3JpZC1pdGVtOmhvdmVyIHsKICAgIGJhY2tncm91bmQ6IHZhcigtLWJzLXNlY29uZGFyeS1iZyk7CiAgICBib3JkZXItY29sb3I6ICMzYjgyZjY7CiAgICBjb2xvcjogIzNiODJmNjsKICAgIHRyYW5zZm9ybTogdHJhbnNsYXRlWSgtMXB4KTsKfQoKLmFjdGlvbi1ncmlkLWl0ZW0gaSB7CiAgICBmb250LXNpemU6IDEuMXJlbTsKICAgIHdpZHRoOiAzMnB4OwogICAgaGVpZ2h0OiAzMnB4OwogICAgZGlzcGxheTogZmxleDsKICAgIGFsaWduLWl0ZW1zOiBjZW50ZXI7CiAgICBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjsKICAgIGJvcmRlci1yYWRpdXM6IDhweDsKICAgIGJhY2tncm91bmQ6IHZhcigtLWJzLWNhcmQtYmcpOwogICAgYm94LXNoYWRvdzogMCAycHggNnB4IHJnYmEoMCwwLDAsMC4wMik7Cn0KCi50YWJsZSB0aCB7CiAgICBiYWNrZ3JvdW5kLWNvbG9yOiB2YXIoLS1icy10ZXJ0aWFyeS1iZykgIWltcG9ydGFudDsKICAgIGNvbG9yOiB2YXIoLS1icy1zZWNvbmRhcnktY29sb3IpOwogICAgZm9udC1zaXplOiAwLjc1cmVtOwogICAgdGV4dC10cmFuc2Zvcm06IHVwcGVyY2FzZTsKICAgIGxldHRlci1zcGFjaW5nOiAwLjVweDsKICAgIGZvbnQtd2VpZ2h0OiA3MDA7CiAgICBwYWRkaW5nOiAxNHB4IDI0cHggIWltcG9ydGFudDsKICAgIGJvcmRlci1ib3R0b206IDFweCBzb2xpZCB2YXIoLS1icy1ib3JkZXItY29sb3IpICFpbXBvcnRhbnQ7Cn0KLnRhYmxlIHRkIHsKICAgIHBhZGRpbmc6IDE2cHggMjRweCAhaW1wb3J0YW50OwogICAgY29sb3I6IHZhcigtLWJzLWJvZHktY29sb3IpOwogICAgZm9udC1zaXplOiAwLjlyZW07CiAgICBib3JkZXItYm90dG9tOiAxcHggc29saWQgdmFyKC0tYnMtYm9yZGVyLWNvbG9yKSAhaW1wb3J0YW50Owp9CgouYmFkZ2Utc3RhdHVzIHsKICAgIHBhZGRpbmc6IDZweCAxMnB4OwogICAgYm9yZGVyLXJhZGl1czogMjBweDsKICAgIGZvbnQtc2l6ZTogMC43NXJlbTsKICAgIGZvbnQtd2VpZ2h0OiA3MDA7CiAgICBkaXNwbGF5OiBpbmxpbmUtYmxvY2s7Cn0KCkBtZWRpYSAobWF4LXdpZHRoOiA5OTEuOThweCkgewogICAgLm1haW4tY29udGVudCB7IG1hcmdpbi1sZWZ0OiAwICFpbXBvcnRhbnQ7IH0KfQo8L3N0eWxlPgo8L2hlYWQ+Cjxib2R5PgoKPGRpdiBjbGFzcz0id3JhcHBlciI+CiAgICA8bmF2IGlkPSJzaWRlYmFyLWNvbnRhaW5lciIgY2xhc3M9ImFkYXB0aXZlLXNpZGViYXIiPjwvbmF2PgoKICAgIDxkaXYgY2xhc3M9Im1haW4tY29udGVudCIgaWQ9Im1haW4tY29udGVudC1hcmVhIj4KICAgICAgICA8ZGl2IGlkPSJ0b3BiYXItY29udGFpbmVyIiBjbGFzcz0idG9wYmFyIj48L2Rpdj4KICAgICAgICAgCiAgICAgICAgPGRpdiBjbGFzcz0iY29udGVudC1ib2R5Ij4KICAgICAgICAgICAgPGRpdiBjbGFzcz0iY29udGFpbmVyLWZsdWlkIHAtMyBwLW1kLTQiPgoKICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9InJvdyBtYi00Ij4KICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtbWQtMTIiPgogICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjYXJkIGJhbm5lci1ncmFkaWVudCBwLTMgc2hhZG93LXNtIj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNhcmQtYm9keSI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3M9ImJhZGdlIGJnLXdoaXRlIHRleHQtcHJpbWFyeSBtYi0yIGZ3LWJvbGQiIHN0eWxlPSJmb250LXNpemU6IDAuNzVyZW07Ij5Qb3J0YWwgUHVzYXQgS2VuZGFsaTwvc3Bhbj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8aDQgY2xhc3M9Im1iLTEiPkRhc2hib2FyZCBUZXJwYWR1IFNJREVWQTk8L2g0PgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgaWQ9IndlbGNvbWVUZXh0IiBjbGFzcz0idGV4dC13aGl0ZS01MCBzbWFsbCI+TWVuZ2FtYmlsIGRhdGEgcHJvZmlsIGxvZyBtYXN1ay4uLjwvZGl2PgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICAgICAgPC9kaXY+CgogICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0icm93IG1iLTQgZy0zIj4KICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wteGwtMiBjb2wtbWQtNCBjb2wtNiI+CiAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNhcmQgaC0xMDAga3BpLWNhcmQiPjxkaXYgY2xhc3M9ImNhcmQtYm9keSI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8c21hbGwgY2xhc3M9InRleHQtbXV0ZWQgdGV4dC11cHBlcmNhc2UgZnctYm9sZCBkLWJsb2NrIiBzdHlsZT0iZm9udC1zaXplOjAuN3JlbTsgbGV0dGVyLXNwYWNpbmc6IDAuNXB4OyI+SnVtbGFoIFBha2V0PC9zbWFsbD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgaWQ9InRvdGFsUGFja2FnZXMiIGNsYXNzPSJrcGkiPjA8L2Rpdj4KICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+PC9kaXY+CiAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0iY29sLXhsLTMgY29sLW1kLTQgY29sLTYiPgogICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjYXJkIGgtMTAwIGtwaS1jYXJkIGtwaS1wcmltYXJ5Ij48ZGl2IGNsYXNzPSJjYXJkLWJvZHkiPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPHNtYWxsIGNsYXNzPSJ0ZXh0LW11dGVkIHRleHQtdXBwZXJjYXNlIGZ3LWJvbGQgZC1ibG9jayIgc3R5bGU9ImZvbnQtc2l6ZTowLjdyZW07IGxldHRlci1zcGFjaW5nOiAwLjVweDsiPlRvdGFsIFBhZ3U8L3NtYWxsPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBpZD0idG90YWxCdWRnZXQiIGNsYXNzPSJrcGkgdGV4dC10cnVuY2F0ZSB0ZXh0LXByaW1hcnkiPlJwMDwvZGl2PgogICAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj48L2Rpdj4KICAgICAgICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wteGwtMyBjb2wtbWQtNCBjb2wtNiI+CiAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNhcmQgaC0xMDAga3BpLWNhcmQiPjxkaXYgY2xhc3M9ImNhcmQtYm9keSI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8c21hbGwgY2xhc3M9InRleHQtbXV0ZWQgdGV4dC11cHBlcmNhc2UgZnctYm9sZCBkLWJsb2NrIiBzdHlsZT0iZm9udC1zaXplOjAuN3JlbTsgbGV0dGVyLXNwYWNpbmc6IDAuNXB4OyI+VG90YWwgSFBTPC9zbWFsbD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgaWQ9InRvdGFsSHBzIiBjbGFzcz0ia3BpIHRleHQtdHJ1bmNhdGUiPlJwMDwvZGl2PgogICAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj48L2Rpdj4KICAgICAgICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wteGwtMiBjb2wtbWQtNiBjb2wtNiI+CiAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNhcmQgaC0xMDAga3BpLWNhcmQga3BpLXN1Y2Nlc3MiPjxkaXYgY2xhc3M9ImNhcmQtYm9keSI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8c21hbGwgY2xhc3M9InRleHQtbXV0ZWQgdGV4dC11cHBlcmNhc2UgZnctYm9sZCBkLWJsb2NrIiBzdHlsZT0iZm9udC1zaXplOjAuN3JlbTsgbGV0dGVyLXNwYWNpbmc6IDAuNXB4OyI+RWZpc2llbnNpPC9zbWFsbD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgaWQ9ImVmZmljaWVuY3kiIGNsYXNzPSJrcGkgdGV4dC1zdWNjZXNzIHRleHQtdHJ1bmNhdGUiPlJwMDwvZGl2PgogICAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj48L2Rpdj4KICAgICAgICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wteGwtMiBjb2wtbWQtNiBjb2wtMTIiPgogICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjYXJkIGgtMTAwIGtwaS1jYXJkIGtwaS1pbmZvIj48ZGl2IGNsYXNzPSJjYXJkLWJvZHkiPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPHNtYWxsIGNsYXNzPSJ0ZXh0LW11dGVkIHRleHQtdXBwZXJjYXNlIGZ3LWJvbGQgZC1ibG9jayIgc3R5bGU9ImZvbnQtc2l6ZTowLjdyZW07IGxldHRlci1zcGFjaW5nOiAwLjVweDsiPlJlYWR5IFByb2N1cmU8L3NtYWxsPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBpZD0icmVhZHlQcm9jdXJlbWVudCIgY2xhc3M9ImtwaSB0ZXh0LWluZm8iPjA8L2Rpdj4KICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+PC9kaXY+CiAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICA8L2Rpdj4KCiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJyb3cgbWItNCBnLTQiPgogICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNvbC1sZy04Ij4KICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0iY2FyZCBoLTEwMCI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjYXJkLWhlYWRlciI+PGkgY2xhc3M9ImZhLXNvbGlkIGZhLWNoYXJ0LWNvbHVtbiB0ZXh0LXByaW1hcnkiPjwvaT4gR3JhZmlrIFBlcmJhbmRpbmdhbiBQYWd1IHZzIEhQUzwvZGl2PgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0iY2FyZC1ib2R5IHAtMyBwLW1kLTQiIHN0eWxlPSJwb3NpdGlvbjogcmVsYXRpdmU7IGhlaWdodDozMjBweDsiPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxjYW52YXMgaWQ9ImNoYXJ0UGFndUhwcyI+PC9jYW52YXM+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0iY29sLWxnLTQiPgogICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjYXJkIGgtMTAwIj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNhcmQtaGVhZGVyIj48aSBjbGFzcz0iZmEtc29saWQgZmEtY2hhcnQtcGllIHRleHQtd2FybmluZyI+PC9pPiBEaXN0cmlidXNpIFN0YXR1cyBBbHVyIEtlcmphPC9kaXY+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjYXJkLWJvZHkgcC0zIHAtbWQtNCIgc3R5bGU9InBvc2l0aW9uOiByZWxhdGl2ZTsgaGVpZ2h0OjMyMHB4OyI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPGNhbnZhcyBpZD0iY2hhcnRTdGF0dXNQaWUiPjwvY2FudmFzPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICAgICAgPC9kaXY+CgogICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0icm93IG1iLTQgZy00Ij4KICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtbWQtNiI+CiAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNhcmQgaC0xMDAiPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0iY2FyZC1oZWFkZXIiPjxpIGNsYXNzPSJmYS1zb2xpZCBmYS1jaGFydC1saW5lIHRleHQtc3VjY2VzcyI+PC9pPiBUYWJlbCBTdGF0dXMgQWx1ciBLZXJqYTwvZGl2PgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0iY2FyZC1ib2R5IHAtMCIgc3R5bGU9Im1heC1oZWlnaHQ6IDM2MHB4OyBvdmVyZmxvdy15OmF1dG87Ij4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8dGFibGUgY2xhc3M9InRhYmxlIHRhYmxlLWhvdmVyIGFsaWduLW1pZGRsZSBtYi0wIj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPHRib2R5IGlkPSJzdGF0dXNUYWJsZSI+PC90Ym9keT4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3RhYmxlPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICAgICAgICAgIDwvZGl2PgoKICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtbWQtNiI+CiAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNhcmQgaC0xMDAiPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0iY2FyZC1oZWFkZXIiPjxpIGNsYXNzPSJmYS1zb2xpZCBmYS1ib2x0IHRleHQtZGFuZ2VyIj48L2k+IE5hdmlnYXNpIEFrc2VzICYgQWtzaSBDZXBhdDwvZGl2PgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0iY2FyZC1ib2R5IHAtMyBwLW1kLTQiIHN0eWxlPSJtYXgtaGVpZ2h0OiAzNjBweDsgb3ZlcmZsb3cteTphdXRvOyI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0icm93IGctMiBnLW1kLTMiPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtNiI+PGEgaHJlZj0icGFja2FnZXMuaHRtbCIgY2xhc3M9ImFjdGlvbi1ncmlkLWl0ZW0iPjxpIGNsYXNzPSJmYS1zb2xpZCBmYS1ib3ggdGV4dC1wcmltYXJ5Ij48L2k+IFBhY2thZ2VzPC9hPjwvZGl2PgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtNiI+PGEgaHJlZj0icGFja2FnZS1pdGVtcy5odG1sIiBjbGFzcz0iYWN0aW9uLWdyaWQtaXRlbSI+PGkgY2xhc3M9ImZhLXNvbGlkIGZhLWxpc3QtY2hlY2sgdGV4dC1zZWNvbmRhcnkiPjwvaT4gSXRlbXM8L2E+PC9kaXY+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNvbC02Ij48YSBocmVmPSJwcmljZS1zdXJ2ZXlzLmh0bWwiIGNsYXNzPSJhY3Rpb24tZ3JpZC1pdGVtIj48aSBjbGFzcz0iZmEtc29saWQgZmEtbWFnbmlmeWluZy1nbGFzcyB0ZXh0LXNlY29uZGFyeSI+PC9pPiBTdXJ2ZXlzPC9hPjwvZGl2PgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtNiI+PGEgaHJlZj0icGFja2FnZS1kb2N1bWVudHMuaHRtbCIgY2xhc3M9ImFjdGlvbi1ncmlkLWl0ZW0iPjxpIGNsYXNzPSJmYS1zb2xpZCBmYS1maWxlLWludm9pY2UgdGV4dC1zZWNvbmRhcnkiPjwvaT4gRG9jdW1lbnRzPC9hPjwvZGl2PgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtNiI+PGEgaHJlZj0iaHBzLmh0bWwiIGNsYXNzPSJhY3Rpb24tZ3JpZC1pdGVtIj48aSBjbGFzcz0iZmEtc29saWQgZmEtY2FsY3VsYXRvciB0ZXh0LXNlY29uZGFyeSI+PC9pPiBIUFMgRW5naW5lPC9hPjwvZGl2PgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtNiI+PGEgaHJlZj0icHJvY3VyZW1lbnQtcmVhZHkuaHRtbCIgY2xhc3M9ImFjdGlvbi1ncmlkLWl0ZW0gZnctYm9sZCB0ZXh0LXN1Y2Nlc3MiIHN0eWxlPSJiYWNrZ3JvdW5kOiByZ2JhKDIxLCAxMjgsIDYxLCAwLjA4KTsgYm9yZGVyLWNvbG9yOiByZ2JhKDIxLCAxMjgsIDYxLCAwLjIpOyI+PGkgY2xhc3M9ImZhLXNvbGlkIGZhLWNpcmNsZS1jaGVjayB0ZXh0LXN1Y2Nlc3MiPjwvaT4gUmVhZHkgUHJvYzwvYT48L2Rpdj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0iY29sLTYiPjxhIGhyZWY9ImF1ZGl0LWxvZ3MuaHRtbCIgY2xhc3M9ImFjdGlvbi1ncmlkLWl0ZW0iPjxpIGNsYXNzPSJmYS1zb2xpZCBmYS1jbG9jay1yb3RhdGUtbGVmdCB0ZXh0LW11dGVkIj48L2k+IEF1ZGl0IExvZ3M8L2E+PC9kaXY+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNvbC02Ij48YSBocmVmPSJ1c2Vycy5odG1sIiBjbGFzcz0iYWN0aW9uLWdyaWQtaXRlbSI+PGkgY2xhc3M9ImZhLXNvbGlkIGZhLXVzZXItZ2VhciB0ZXh0LW11dGVkIj48L2k+IFVzZXJzPC9hPjwvZGl2PgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtNiI+PGEgaHJlZj0ib3Bkcy5odG1sIiBjbGFzcz0iYWN0aW9uLWdyaWQtaXRlbSI+PGkgY2xhc3M9ImZhLXNvbGlkIGZhLWJ1aWxkaW5nLWZsYWcgdGV4dC1wcmltYXJ5Ij48L2k+IFNldCBPUEQ8L2E+PC9kaXY+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNvbC02Ij48YSBocmVmPSJydXAtaW1wb3J0Lmh0bWwiIGNsYXNzPSJhY3Rpb24tZ3JpZC1pdGVtIGZ3LWJvbGQgdGV4dC13YXJuaW5nIiBzdHlsZT0iYmFja2dyb3VuZDogcmdiYSgyMTcsIDExOSwgNiwgMC4wOCk7IGJvcmRlci1jb2xvcjogcmdiYSgyMTcsIDExOSwgNiwgMC4yKTsiPjxpIGNsYXNzPSJmYS1zb2xpZCBmYS1jbG91ZC1hcnJvdy11cCB0ZXh0LXdhcm5pbmciPjwvaT4gSW1wb3J0IFJVUDwvYT48L2Rpdj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgICAgIDwvZGl2PgoKICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9InJvdyBtYi00Ij4KICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtbWQtMTIiPgogICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjYXJkIj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNhcmQtaGVhZGVyIj48aSBjbGFzcz0iZmEtc29saWQgZmEtYnVpbGRpbmcgdGV4dC1tdXRlZCI+PC9pPiBSZWthcGl0dWxhc2kgQWxva2FzaSBQYWd1IEFuZ2dhcmFuIHBlciBPUEQ8L2Rpdj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNhcmQtYm9keSBwLTAiPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9InRhYmxlLXJlc3BvbnNpdmUiPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8dGFibGUgY2xhc3M9InRhYmxlIHRhYmxlLWhvdmVyIGFsaWduLW1pZGRsZSBtYi0wIj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDx0aGVhZD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8dHI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDx0aD5OYW1hIE9yZ2FuaXNhc2kgUGVyYW5na2F0IERhZXJhaCAoT1BEKTwvdGg+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDx0aCBzdHlsZT0id2lkdGg6IDE1MHB4OyI+SnVtbGFoIFBha2V0PC90aD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPHRoIHN0eWxlPSJ3aWR0aDogMjUwcHg7Ij5Ub3RhbCBQYWd1IEFuZ2dhcmFuPC90aD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3RyPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC90aGVhZD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDx0Ym9keSBpZD0ib3BkU3VtbWFyeVRhYmxlIj48L3Rib2R5PgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3RhYmxlPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICAgICAgPC9kaXY+CgogICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0icm93Ij4KICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtbWQtMTIiPgogICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjYXJkIj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNhcmQtaGVhZGVyIj48aSBjbGFzcz0iZmEtc29saWQgZmEtZm9sZGVyLW9wZW4gdGV4dC1tdXRlZCI+PC9pPiBNb25pdG9yaW5nIEFudHJlYW4gTG9nIFBha2V0IFBlbmdhZGFhbiBUZXJiYXJ1PC9kaXY+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjYXJkLWJvZHkgcC0wIj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJ0YWJsZS1yZXNwb25zaXZlIj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPHRhYmxlIGNsYXNzPSJ0YWJsZSB0YWJsZS1ob3ZlciBhbGlnbi1taWRkbGUgbWItMCI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8dGhlYWQ+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPHRyPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8dGg+TmFtYSBQYWtldCBLb250cmFrIEtlcmphPC90aD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPHRoIHN0eWxlPSJ3aWR0aDogMjIwcHg7Ij5OaWxhaSBQYWd1IEFuZ2dhcmFuPC90aD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPHRoIHN0eWxlPSJ3aWR0aDogMjIwcHg7Ij5TdGF0dXMgQWx1ciBLZXJqYTwvdGg+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC90cj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvdGhlYWQ+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8dGJvZHkgaWQ9InJlY2VudFBhY2thZ2VzIj48L3Rib2R5PgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3RhYmxlPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICAgICAgPC9kaXY+CgogICAgICAgICAgICA8L2Rpdj4KICAgICAgICA8L2Rpdj4KCiAgICAgICAgPGRpdiBpZD0iZm9vdGJhci1jb250YWluZXIiPjwvZGl2PgogICAgPC9kaXY+CjwvZGl2PgoKPHNjcmlwdD4KY29uc3QgZGFzaGJvYXJkRGIgPSB3aW5kb3cuc3VwYWJhc2VDbGllbnQ7CgpmdW5jdGlvbiBydXBpYWgodil7CiByZXR1cm4gbmV3IEludGwuTnVtYmVyRm9ybWF0KCdpZC1JRCcsewogc3R5bGU6J2N1cnJlbmN5JywKIGN1cnJlbmN5OidJRFInLAogbWF4aW11bUZyYWN0aW9uRGlnaXRzOjAKIH0pLmZvcm1hdCh2fHwwKTsKfQoKLy8gPT09PT09IEdBTlRJIEZVTkdTSSBpbml0KCkgTEFNQSBBTkRBIERFTkdBTiBJTkkgPT09PT09CmFzeW5jIGZ1bmN0aW9uIGluaXQoKXsKICB0cnkgewogICAgY29uc3QgcHJvZmlsZSA9IGF3YWl0IGdldFByb2ZpbGUoKTsKCiAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnd2VsY29tZVRleHQnKS5pbm5lckhUTUwgPQogICAgYFNpc3RlbSBtZW5kZXRla3NpIGlkZW50aWZpa2FzaSBtYXN1ayBzZWJhZ2FpOiA8Yj4ke3Byb2ZpbGUuZnVsbF9uYW1lfTwvYj4gZGVuZ2FuIGxldmVsIHN0YXR1cyBha3NlcyA8Yj4oJHtwcm9maWxlLnJvbGV9KTwvYj5gOwoKICAgIC8vIFNpbmtyb25pc2FzaSBzaW5rcm9uIHRla3MgbmFtYSBwcm9maWwga2Uga29tcG9uZW4gdG9wYmFyIHNldGVsYWggamVkYSBsYXlvdXQgcmVuZGVyaW5nCiAgICBzZXRUaW1lb3V0KCgpID0+IHsKICAgICAgICBjb25zdCB0b3BiYXJVc2VyRWwgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgndXNlck5hbWUnKTsKICAgICAgICBpZiAodG9wYmFyVXNlckVsKSB0b3BiYXJVc2VyRWwuaW5uZXJUZXh0ID0gcHJvZmlsZS5mdWxsX25hbWU7CiAgICB9LCA1MDApOwoKICAgIC8vIEVLU0VLVVNJIFBFTUFOVEFVQU4gRUxFTUVOIERST1BET1dOIFNFQ0FSQSBSRUtVUlNJRgogICAgaW5qZWN0U3VwZXJBZG1pblNlbGVjdG9yKHByb2ZpbGUpOwoKICAgIC8vIEphbGFua2FuIHBlbXVhdGFuIGRhdGEgYmF3YWFuIGRhc2hib2FyZCBBbmRhCiAgICBhd2FpdCBsb2FkS1BJKCk7CiAgICBhd2FpdCBsb2FkU3RhdHVzKCk7CiAgICBhd2FpdCBsb2FkT3BkU3VtbWFyeSgpOwogICAgYXdhaXQgbG9hZFJlY2VudFBhY2thZ2VzKCk7CiAgfSBjYXRjaCAoZXJyb3IpIHsKICAgIGNvbnNvbGUuZXJyb3IoIkdhZ2FsIG1lbXVhdCBpbmlzaWFsaXNhc2kgYXdhbCBkYXNoYm9hcmQ6IiwgZXJyb3IpOwogIH0KfQoKLy8gPT09PT09IFRBTUJBSEtBTiBGVU5HU0kgQU5USUdBR0FMIElOSSBURVBBVCBESSBCQVdBSCBGVU5HU0kgaW5pdCgpID09PT09PQpmdW5jdGlvbiBpbmplY3RTdXBlckFkbWluU2VsZWN0b3IocHJvZmlsZSkgewogICAgaWYgKCFwcm9maWxlIHx8ICFwcm9maWxlLnJvbGUpIHJldHVybjsKICAgIAogICAgLy8gTm9ybWFsaXNhc2kgdGVrcyBzdHJpbmcgcm9sZSAoTWVuZ2FtYW5rYW4gZm9ybWF0ICdTVVBFUl9BRE1JTicgYXRhdSAnc3VwZXJfYWRtaW4nKQogICAgY29uc3Qgbm9ybWFsaXplZFJvbGUgPSBwcm9maWxlLnJvbGUudG9Mb3dlckNhc2UoKS5yZXBsYWNlKC9bXmEtejAtOV0vZywgJycpOwogICAgCiAgICBpZiAobm9ybWFsaXplZFJvbGUgPT09ICdzdXBlcmFkbWluJykgewogICAgICAgIGxldCBhdHRlbXB0cyA9IDA7CiAgICAgICAgCiAgICAgICAgLy8gQnVhdCBsb29wIHBlbWFudGF1IERPTSB1bnR1ayBtZW5hbmdrYXAgbW9tZW4gdGVwYXQga2V0aWthIGxvYWRMYXlvdXQoKSBzZWxlc2FpIG1lbmVtcGVsa2FuIHRvcGJhcgogICAgICAgIGNvbnN0IHdhdGNoVG9wYmFyRE9NID0gc2V0SW50ZXJ2YWwoYXN5bmMgKCkgPT4gewogICAgICAgICAgICBhdHRlbXB0cysrOwogICAgICAgICAgICBjb25zdCBjb250YWluZXIgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnc3VwZXJBZG1pbk9wZFNlbGVjdG9yQ29udGFpbmVyJyk7CiAgICAgICAgICAgIGNvbnN0IHNlbGVjdG9yID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2dsb2JhbE9wZFNlbGVjdG9yJyk7CiAgICAgICAgICAgIAogICAgICAgICAgICAvLyBKaWthIGNvbnRhaW5lciBIVE1MIHRvcGJhciBzdWRhaCB0ZXJkZXRla3NpIGVrc2lzIGRpIGhhbGFtYW4KICAgICAgICAgICAgaWYgKGNvbnRhaW5lciAmJiBzZWxlY3RvcikgewogICAgICAgICAgICAgICAgY2xlYXJJbnRlcnZhbCh3YXRjaFRvcGJhckRPTSk7IC8vIEhlbnRpa2FuIGxvb3AgcGVtYW50YXVhbiBzZWNlcGF0bnlhCiAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgIHRyeSB7CiAgICAgICAgICAgICAgICAgICAgLy8gVGFyaWsga29sZWtzaSBkYWZ0YXIgZGF0YSBPUEQgYWt0aWYgZGFyaSBTdXBhYmFzZQogICAgICAgICAgICAgICAgICAgIGNvbnN0IHsgZGF0YTogb3BkcywgZXJyb3IgfSA9IGF3YWl0IHdpbmRvdy5zdXBhYmFzZUNsaWVudAogICAgICAgICAgICAgICAgICAgICAgICAuZnJvbSgnb3BkcycpCiAgICAgICAgICAgICAgICAgICAgICAgIC5zZWxlY3QoJ2lkLCBuYW1lJykKICAgICAgICAgICAgICAgICAgICAgICAgLm9yZGVyKCduYW1lJywgeyBhc2NlbmRpbmc6IHRydWUgfSk7CiAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgaWYgKCFlcnJvciAmJiBvcGRzKSB7CiAgICAgICAgICAgICAgICAgICAgICAgIC8vIEJlcnNpaGthbiByZW5kZXIgYWdhciBvcHNpIHRpZGFrIGJlcnR1bXB1ayBkdXBsaWthdAogICAgICAgICAgICAgICAgICAgICAgICBzZWxlY3Rvci5pbm5lckhUTUwgPSAnPG9wdGlvbiB2YWx1ZT0iQUxMIj4tLSBTZW11YSBPUEQgKEtvbnNvbGlkYXNpKSAtLTwvb3B0aW9uPic7CiAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICBvcGRzLmZvckVhY2gob3BkID0+IHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbnN0IG9wdCA9IGRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoJ29wdGlvbicpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgb3B0LnZhbHVlID0gb3BkLmlkOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgb3B0LmlubmVyVGV4dCA9IG9wZC5uYW1lOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgc2VsZWN0b3IuYXBwZW5kQ2hpbGQob3B0KTsKICAgICAgICAgICAgICAgICAgICAgICAgfSk7CiAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAvLyBTZXQgbmlsYWkga2UgcGlsaWhhbiB0ZXJha2hpciB5YW5nIHRlcnNpbXBhbiBkaSBsb2NhbFN0b3JhZ2UKICAgICAgICAgICAgICAgICAgICAgICAgY29uc3Qgc2F2ZWRPcGRJZCA9IGxvY2FsU3RvcmFnZS5nZXRJdGVtKCdzZWxlY3RlZC1vcGQtaWQnKSB8fCAnQUxMJzsKICAgICAgICAgICAgICAgICAgICAgICAgc2VsZWN0b3IudmFsdWUgPSBzYXZlZE9wZElkOwogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgLy8gTGlzdGVuZXIgcGVuZGV0ZWtzaSBwZXJnYW50aWFuIHBpbGloYW4gT1BEIG9sZWggU3VwZXIgQWRtaW4KICAgICAgICAgICAgICAgICAgICAgICAgc2VsZWN0b3IuYWRkRXZlbnRMaXN0ZW5lcignY2hhbmdlJywgKGUpID0+IHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGxvY2FsU3RvcmFnZS5zZXRJdGVtKCdzZWxlY3RlZC1vcGQtaWQnLCBlLnRhcmdldC52YWx1ZSk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICB3aW5kb3cubG9jYXRpb24ucmVsb2FkKCk7IC8vIFJlZnJlc2ggaGFsYW1hbiBhZ2FyIHF1ZXJ5IGZpbHRlciB0ZXJwaWN1IHVsYW5nCiAgICAgICAgICAgICAgICAgICAgICAgIH0pOwogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgLy8gUEFLU0EgVEFNUElMS0FOIERJIExBWUFSOiBMZXBhcyBrZWxhcyBwZW55ZW1idW55aSBkLW5vbmUKICAgICAgICAgICAgICAgICAgICAgICAgY29udGFpbmVyLmNsYXNzTGlzdC5yZW1vdmUoJ2Qtbm9uZScpOwogICAgICAgICAgICAgICAgICAgICAgICBjb25zb2xlLmxvZygiU0lERVZBIEVOR0lORTogRHJvcGRvd24gU2VsZWN0b3IgT1BEIEJlcmhhc2lsIERpaW5qZWtzaSEiKTsKICAgICAgICAgICAgICAgICAgICB9IGVsc2UgewogICAgICAgICAgICAgICAgICAgICAgICBjb25zb2xlLmVycm9yKCJTSURFVkEgRU5HSU5FOiBHYWdhbCBtZW1iYWNhIHRhYmVsIG9wZHMgZGFyaSBkYXRhYmFzZToiLCBlcnJvcik7CiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgfSBjYXRjaCAoZGJFcnIpIHsKICAgICAgICAgICAgICAgICAgICBjb25zb2xlLmVycm9yKCJTSURFVkEgRU5HSU5FOiBUZXJqYWRpIGtlbmRhbGEgaW50ZXJuYWwgZGF0YWJhc2U6IiwgZGJFcnIpOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgICAgIAogICAgICAgICAgICAvLyBQZW5nYW1hbiBiYXRhcyBhdGFzIHR1bmdndSBtYWtzaW1hbCAxMCBkZXRpawogICAgICAgICAgICBpZiAoYXR0ZW1wdHMgPiAxMDApIHsKICAgICAgICAgICAgICAgIGNsZWFySW50ZXJ2YWwod2F0Y2hUb3BiYXJET00pOwogICAgICAgICAgICAgICAgY29uc29sZS5lcnJvcigiU0lERVZBIEVOR0lORTogV2FrdHUgdHVuZ2d1IGhhYmlzLCBlbGVtZW4gdG9wYmFyIHRpZGFrIGRpdGVtdWthbi4iKTsKICAgICAgICAgICAgfQogICAgICAgIH0sIDEwMCk7IC8vIFBlcmlrc2EgdWxhbmcgRE9NIHNldGlhcCAxMDAgbWlsaWRldGlrCiAgICB9Cn0KCi8vIElOVEVHUkFTSSBTRUxFQ1RPUiBPUEQgR0xPQkFMIFBBREEgUVVFUlkgS1BJCmFzeW5jIGZ1bmN0aW9uIGxvYWRLUEkoKXsKIGNvbnN0IHNlbGVjdGVkT3BkID0gbG9jYWxTdG9yYWdlLmdldEl0ZW0oJ3NlbGVjdGVkLW9wZC1pZCcpIHx8ICdBTEwnOwogCiBsZXQgcGFja2FnZVF1ZXJ5ID0gZGFzaGJvYXJkRGIuZnJvbSgncGFja2FnZXMnKS5zZWxlY3QoJyonKTsKIGxldCBocHNRdWVyeSA9IGRhc2hib2FyZERiLmZyb20oJ3BhY2thZ2VfaHBzJykuc2VsZWN0KCcqJyk7CiAKIC8vIEppa2Egc3VwZXIgYWRtaW4gbWVuYXJnZXRrYW4gT1BEIHNwZXNpZmlrLCBwYWtzYSBwZW55YXJpbmdhbiBkYXRhCiBpZiAoc2VsZWN0ZWRPcGQgIT09ICdBTEwnKSB7CiAgICAgcGFja2FnZVF1ZXJ5ID0gcGFja2FnZVF1ZXJ5LmVxKCdvcGRfaWQnLCBzZWxlY3RlZE9wZCk7CiAgICAgaHBzUXVlcnkgPSBocHNRdWVyeS5lcSgnb3BkX2lkJywgc2VsZWN0ZWRPcGQpOwogfQoKIGNvbnN0IHtkYXRhOnBhY2thZ2VzfSA9IGF3YWl0IHBhY2thZ2VRdWVyeTsKIGNvbnN0IHtkYXRhOmhwc30gPSBhd2FpdCBocHNRdWVyeTsKCiBjb25zdCB0b3RhbFBhY2thZ2VzID0gKHBhY2thZ2VzfHxbXSkubGVuZ3RoOwogY29uc3QgcmVhZHlQcm9jdXJlbWVudCA9IChwYWNrYWdlc3x8W10pLmZpbHRlcih4ID0+IHgucGFja2FnZV9zdGF0dXMgPT09ICdSRUFEWV9QUk9DVVJFTUVOVCcpLmxlbmd0aDsKCiBjb25zdCB0b3RhbEJ1ZGdldCA9IChwYWNrYWdlc3x8W10pLnJlZHVjZSgoYSxiKT0+IGEgKyBOdW1iZXIoYi5idWRnZXRfY2VpbGluZ3x8MCksMCk7CiBjb25zdCB0b3RhbEhwcyA9IChocHN8fFtdKS5yZWR1Y2UoKGEsYik9PiBhICsgTnVtYmVyKGIudG90YWxfaHBzfHwwKSwwKTsKCiBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgndG90YWxQYWNrYWdlcycpLmlubmVyVGV4dCA9IHRvdGFsUGFja2FnZXM7CiBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgndG90YWxCdWRnZXQnKS5pbm5lclRleHQgPSBydXBpYWgodG90YWxCdWRnZXQpOwogZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3RvdGFsSHBzJykuaW5uZXJUZXh0ID0gcnVwaWFoKHRvdGFsSHBzKTsKIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdlZmZpY2llbmN5JykuaW5uZXJUZXh0ID0gcnVwaWFoKHRvdGFsQnVkZ2V0LXRvdGFsSHBzKTsKIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdyZWFkeVByb2N1cmVtZW50JykuaW5uZXJUZXh0ID0gcmVhZHlQcm9jdXJlbWVudDsKfQoKLy8gSU5URUdSQVNJIFNFTEVDVE9SIE9QRCBHTE9CQUwgUEFEQSBUQUJFTCBTVEFUVVMgQUxVUiBLRVJKQQphc3luYyBmdW5jdGlvbiBsb2FkU3RhdHVzKCl7CiBjb25zdCBzdGF0dXNlcz1bJ0RSQUZUJywnRFBQX0NPTVBMRVRFJywnSVRFTVNfQ09NUExFVEUnLCdTVVJWRVlfQ09NUExFVEUnLCdET0NVTUVOVF9DT01QTEVURScsJ0hQU19DT01QTEVURScsJ0JBSFBFX0RSQUZUJywnQkFIUEVfQ09NUExFVEUnLCdSRUFEWV9QUk9DVVJFTUVOVCddOwogY29uc3Qgc2VsZWN0ZWRPcGQgPSBsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgnc2VsZWN0ZWQtb3BkLWlkJykgfHwgJ0FMTCc7CgogbGV0IHN0YXR1c1F1ZXJ5ID0gZGFzaGJvYXJkRGIuZnJvbSgncGFja2FnZXMnKS5zZWxlY3QoJ3BhY2thZ2Vfc3RhdHVzJyk7CiBpZiAoc2VsZWN0ZWRPcGQgIT09ICdBTEwnKSB7CiAgICAgc3RhdHVzUXVlcnkgPSBzdGF0dXNRdWVyeS5lcSgnb3BkX2lkJywgc2VsZWN0ZWRPcGQpOwogfQoKIGNvbnN0IHtkYXRhfSA9IGF3YWl0IHN0YXR1c1F1ZXJ5OwogbGV0IGh0bWw9Jyc7Cgogc3RhdHVzZXMuZm9yRWFjaChzdGF0dXM9PnsKICAgY29uc3QgY291bnQgPSAoZGF0YXx8W10pLmZpbHRlcih4PT4geC5wYWNrYWdlX3N0YXR1cz09PXN0YXR1cykubGVuZ3RoOwogICAKICAgbGV0IGJhZGdlU3R5bGUgPSAiYmFja2dyb3VuZC1jb2xvcjogdmFyKC0tYnMtc2Vjb25kYXJ5LWJnKTsgY29sb3I6IHZhcigtLWJzLXNlY29uZGFyeS1jb2xvcik7IjsKICAgaWYoc3RhdHVzID09PSAnRFJBRlQnKSBiYWRnZVN0eWxlID0gImJhY2tncm91bmQtY29sb3I6IHJnYmEoMjE3LCAxMTksIDYsIDAuMTUpOyBjb2xvcjogI2Q5NzcwNjsiOwogICBpZihzdGF0dXMgPT09ICdSRUFEWV9QUk9DVVJFTUVOVCcpIGJhZGdlU3R5bGUgPSAiYmFja2dyb3VuZC1jb2xvcjogcmdiYSgyMSwgMTI4LCA2MSwgMC4xNSk7IGNvbG9yOiAjMTU4MDNkOyI7CiAgIGlmKHN0YXR1cyA9PT0gJ0hQU19DT01QTEVURScpIGJhZGdlU3R5bGUgPSAiYmFja2dyb3VuZC1jb2xvcjogcmdiYSgzLCAxMDUsIDE2MSwgMC4xNSk7IGNvbG9yOiAjMDM2OWExOyI7CgogICBodG1sICs9IGAKICAgPHRyPgogICAgIDx0ZCBjbGFzcz0iZnctc2VtaWJvbGQgdGV4dC1zZWNvbmRhcnkiPjxpIGNsYXNzPSJmYS1yZWd1bGFyIGZhLWNpcmNsZS1kb3QgbWUtMiBzbWFsbCBvcGFjaXR5LTUwIj48L2k+JHtzdGF0dXN9PC90ZD4KICAgICA8dGQ+PHNwYW4gY2xhc3M9ImJhZGdlLXN0YXR1cyBmdy1ib2xkIiBzdHlsZT0iJHtiYWRnZVN0eWxlfSI+JHtjb3VudH0gUGFrZXQ8L3NwYW4+PC90ZD4KICAgPC90cj5gOwogfSk7CgogZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3N0YXR1c1RhYmxlJykuaW5uZXJIVE1MPWh0bWw7Cn0KCmFzeW5jIGZ1bmN0aW9uIGxvYWRPcGRTdW1tYXJ5KCl7CiBjb25zdCB7IGRhdGEgfSA9IGF3YWl0IGRhc2hib2FyZERiLmZyb20oJ2Rhc2hib2FyZF9vcGRfc3VtbWFyeScpLnNlbGVjdCgnKicpOwogbGV0IGh0bWw9Jyc7CgogKGRhdGF8fFtdKS5mb3JFYWNoKHJvdz0+ewogICBodG1sICs9IGAKICAgPHRyPgogICAgIDx0ZCBjbGFzcz0iZnctYm9sZCI+PGkgY2xhc3M9ImZhLXNvbGlkIGZhLWJ1aWxkaW5nLXVzZXIgbWUtMiBvcGFjaXR5LTUwIj48L2k+JHtyb3cubmFtZX08L3RkPgogICAgIDx0ZCBjbGFzcz0iZnctc2VtaWJvbGQgdGV4dC1zZWNvbmRhcnkiPiR7cm93LnRvdGFsX3BhY2thZ2VzfSBQYWtldDwvdGQ+CiAgICAgPHRkIGNsYXNzPSJmdy1ib2xkIHRleHQtcHJpbWFyeSI+JHtydXBpYWgocm93LnRvdGFsX2J1ZGdldCl9PC90ZD4KICAgPC90cj5gOwogfSk7CgogZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ29wZFN1bW1hcnlUYWJsZScpLmlubmVySFRNTCA9IGh0bWw7Cn0KCi8vIElOVEVHUkFTSSBTRUxFQ1RPUiBPUEQgR0xPQkFMIFBBREEgTU9OSVRPUklORyBBTlRSSUFOIExPRyBQQUtFVCBURVJCQVJVCmFzeW5jIGZ1bmN0aW9uIGxvYWRSZWNlbnRQYWNrYWdlcygpewogY29uc3Qgc2VsZWN0ZWRPcGQgPSBsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgnc2VsZWN0ZWQtb3BkLWlkJykgfHwgJ0FMTCc7CiAKIGxldCByZWNlbnRRdWVyeSA9IGRhc2hib2FyZERiLmZyb20oJ3BhY2thZ2VzJykuc2VsZWN0KCcqJykub3JkZXIoJ2NyZWF0ZWRfYXQnLHthc2NlbmRpbmc6ZmFsc2V9KS5saW1pdCgxMCk7CiBpZiAoc2VsZWN0ZWRPcGQgIT09ICdBTEwnKSB7CiAgICAgcmVjZW50UXVlcnkgPSByZWNlbnRRdWVyeS5lcSgnb3BkX2lkJywgc2VsZWN0ZWRPcGQpOwogfQoKIGNvbnN0IHtkYXRhfSA9IGF3YWl0IHJlY2VudFF1ZXJ5OwogbGV0IGh0bWw9Jyc7CgogKGRhdGF8fFtdKS5mb3JFYWNoKHBrZz0+ewogICBsZXQgYmFkZ2VDbGFzcyA9ICJiZy1zZWNvbmRhcnkgdGV4dC13aGl0ZSI7CiAgIGlmKHBrZy5wYWNrYWdlX3N0YXR1cyA9PT0gJ1JFQURZX1BST0NVUkVNRU5UJykgYmFkZ2VDbGFzcyA9ICJiZy1zdWNjZXNzIHRleHQtd2hpdGUiOwogICBpZihwa2cucGFja2FnZV9zdGF0dXMgPT09ICdEUkFGVCcpIGJhZGdlQ2xhc3MgPSAiYmctd2FybmluZyB0ZXh0LWRhcmsiOwoKIGh0bWwgKz0gYAogPHRyPgogICA8dGQgY2xhc3M9ImZ3LXNlbWlib2xkIj48aSBjbGFzcz0iZmEtcmVndWxhciBmYS1maWxlLWxpbmVzIG1lLTIgb3BhY2l0eS01MCI+PC9pPiR7cGtnLnBhY2thZ2VfbmFtZX08L3RkPgogICA8dGQgY2xhc3M9ImZ3LWJvbGQiPiR7cnVwaWFoKHBrZy5idWRnZXRfY2VpbGluZyl9PC90ZD4KICAgPHRkPjxzcGFuIGNsYXNzPSJiYWRnZSAke2JhZGdlQ2xhc3N9IGZ3LWJvbGQgcHgtMiBweS0xLjUiIHN0eWxlPSJmb250LXNpemU6MC43NXJlbTsiPiR7cGtnLnBhY2thZ2Vfc3RhdHVzfHwnRFJBRlQnfTwvc3Bhbj48L3RkPgogPC90cj5gOwogfSk7CgogZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3JlY2VudFBhY2thZ2VzJykuaW5uZXJIVE1MPWh0bWw7Cn0KCmluaXQoKTsKPC9zY3JpcHQ+Cgo8c2NyaXB0IHNyYz0iLi4vanMvbGF5b3V0LmpzIj48L3NjcmlwdD4KPHNjcmlwdD4KLy8gTWVtdWF0IGxheW91dCBzZWNhcmEgYW1hbiB0ZXJwcm90ZWtzaQp0cnkgewogICAgbG9hZExheW91dCgpOwp9IGNhdGNoIChlcnJvcikgewogICAgY29uc29sZS5lcnJvcigiTGF5b3V0IFNhZmFyaSBFbmdpbmUgRmFsbGJhY2sgQWN0aXZlOiAiLCBlcnJvcik7Cn0KPC9zY3JpcHQ+CiAKPC9ib2R5Pgo8L2h0bWw+Cg==" class="btn btn-primary"><i class="bi bi-speedometer2 me-1"></i> Kembali ke Dashboard</a>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    <div id="footbar-container"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/layout.js"></script>
+<script>try{loadLayout();}catch(e){}</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const menu = document.querySelectorAll('#helpMenu a');
+  const sections = document.querySelectorAll('.help-section');
+  
+  function setActive(hash){
+    menu.forEach(a=>a.classList.toggle('active', a.getAttribute('href')===hash));
+  }
+  
+  menu.forEach(a=>{
+    a.addEventListener('click', e=>{
+      e.preventDefault();
+      const id = a.getAttribute('href');
+      document.querySelector(id)?.scrollIntoView({behavior:'smooth', block:'start'});
+      history.replaceState(null,'',id);
+      setActive(id);
+    });
+  });
+
+  // Search filter
+  const search = document.getElementById('helpSearch');
+  search?.addEventListener('input', e=>{
+    const q = e.target.value.toLowerCase();
+    menu.forEach(a=>{
+      const txt = a.textContent.toLowerCase();
+      a.style.display = txt.includes(q) ? '' : 'none';
+    });
+  });
+
+  // Copy link
+  function copyLink(){
+    const url = window.location.origin + window.location.pathname + (location.hash || '#dashboard');
+    navigator.clipboard.writeText(url).then(()=>{
+      toast('Link bantuan disalin!');
+    });
+  }
+  document.getElementById('btnCopyLink')?.addEventListener('click', copyLink);
+  document.getElementById('btnCopyLink2')?.addEventListener('click', copyLink);
+  document.getElementById('btnPrint')?.addEventListener('click', ()=>window.print());
+
+  // Observer for active menu on scroll
+  const observer = new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        const id = '#'+entry.target.id;
+        setActive(id);
+        history.replaceState(null,'',id);
+      }
+    });
+  },{rootMargin:'-40% 0px -55% 0px', threshold:0});
+  sections.forEach(s=>observer.observe(s));
+
+  // Initial hash
+  if(location.hash){ setActive(location.hash); }
+  else { setActive('#dashboard'); }
+
+  function toast(msg){
+    const t = document.createElement('div');
+    t.className = 'position-fixed bottom-0 end-0 m-3 alert alert-success shadow';
+    t.style.zIndex = 1080;
+    t.innerHTML = '<i class="bi bi-check-circle me-2"></i>'+msg;
+    document.body.appendChild(t);
+    setTimeout(()=>t.remove(), 2200);
+  }
+});
+</script>
+<script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
+
+</div></body></html>
