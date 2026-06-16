@@ -572,15 +572,18 @@ async function loadFundingDropdowns(row, data = {}) {
     
 
 async function savePackage(){
-        if(profile.role !== "SUPER_ADMIN" && !await canCreatePackage()){
-        alert('Anda tidak memiliki hak membuat paket');
+    if(
+        profile.role !== "SUPER_ADMIN" &&
+        !await canCreatePackage()
+    ){
+        alert("Anda tidak memiliki hak membuat paket");
         return;
     }
 
     const opdId =
         profile.role === "SUPER_ADMIN"
-        ? currentOpdId
-        : profile.opd_id;
+            ? currentOpdId
+            : profile.opd_id;
 
     if(!opdId){
         alert("Pilih OPD terlebih dahulu");
@@ -635,39 +638,120 @@ async function savePackage(){
             document.getElementById("output").value || null,
 
         dpp_date:
-            dppDateValue
-                ? dppDateValue
-                : null
+            dppDateValue || null
     };
 
-    let query =
-        editingPackageId
-            ? db
+    let packageId = editingPackageId;
+
+    if(editingPackageId){
+
+        const { error } =
+            await db
                 .from("packages")
                 .update(payload)
-                .eq("id", editingPackageId)
+                .eq("id", editingPackageId);
 
-            : db
-                .from("packages")
-                .insert(payload);
+        if(error){
+            alert(error.message);
+            return;
+        }
 
-    const { error } = await query;
+    } else {
 
-    if(error){
-
-        console.error(
-            "ERROR PACKAGE:",
+        const {
+            data,
             error
+        } = await db
+            .from("packages")
+            .insert(payload)
+            .select()
+            .single();
+
+        if(error){
+            alert(error.message);
+            return;
+        }
+
+        packageId = data.id;
+    }
+
+    await db
+        .from("package_funding_sources")
+        .delete()
+        .eq("package_id", packageId);
+
+    const fundingRows =
+        document.querySelectorAll(
+            ".funding-row"
         );
 
-        alert(
-            "CODE: " + error.code +
-            "\nMESSAGE: " + error.message +
-            "\nDETAILS: " + error.details +
-            "\nHINT: " + error.hint
-        );
+    const fundingPayload = [];
 
-        return;
+    fundingRows.forEach(row => {
+
+        fundingPayload.push({
+
+            tenant_id:
+                profile.tenant_id,
+
+            package_id:
+                packageId,
+
+            bidang_id:
+                row.querySelector(
+                    ".funding-bidang"
+                )?.value || null,
+
+            budget_account_id:
+                row.querySelector(
+                    ".funding-mak"
+                )?.value || null,
+
+            program:
+                row.querySelector(
+                    ".funding-program"
+                )?.value || null,
+
+            kegiatan:
+                row.querySelector(
+                    ".funding-kegiatan"
+                )?.value || null,
+
+            sub_kegiatan:
+                row.querySelector(
+                    ".funding-sub"
+                )?.value || null,
+
+            allocated_budget:
+                Number(
+                    row.querySelector(
+                        ".funding-budget"
+                    )?.value || 0
+                )
+        });
+
+    });
+
+    if(fundingPayload.length){
+
+        const {
+            error: fundingError
+        } = await db
+            .from(
+                "package_funding_sources"
+            )
+            .insert(
+                fundingPayload
+            );
+
+        if(fundingError){
+
+            alert(
+                fundingError.message
+            );
+
+            return;
+        }
     }
 
     alert(
