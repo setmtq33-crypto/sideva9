@@ -854,29 +854,111 @@ async function loadPackages() {
 }
 
 async function editPackage(id){
-    const { data, error } = await db.from("packages").select("*").eq("id", id).single();
+        const {
+        data: pkg,
+        error
+    } = await db
+        .from("packages")
+        .select("*")
+        .eq("id", id)
+        .single();
+
     if(error){
         alert(error.message);
         return;
     }
-    
-    editingPackageId = id;
-    document.getElementById("formTitle").innerHTML = `<i class="fa-solid fa-pen-to-square me-2"></i>Ubah / Edit Data Paket`;
-    document.getElementById("saveBtn").innerHTML = `<i class="fa-solid fa-floppy-disk me-2"></i>Perbarui Paket`;
 
-    document.getElementById("rupNumber").value = data.rup_number || "";
-    document.getElementById("packageName").value = data.package_name || "";
-    document.getElementById("program").value = data.program || "";
-    document.getElementById("kegiatan").value = data.kegiatan || "";
-    document.getElementById("subKegiatan").value = data.sub_kegiatan || "";
-    document.getElementById("budget").value = data.budget_ceiling || "";
-    document.getElementById("method").value = data.procurement_method || "ECATALOG";
-    document.getElementById("bidangSelect").value = data.bidang_id || "";
-    document.getElementById("makSelect").value = data.budget_account_id || "";
-    document.getElementById("output").value = data.output || "";
-    document.getElementById("dppDate").value = data.dpp_date || "";
-    
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    editingPackageId = id;
+
+    document.getElementById("formTitle").innerHTML =
+        `<i class="fa-solid fa-pen-to-square me-2"></i>Ubah / Edit Data Paket`;
+
+    document.getElementById("saveBtn").innerHTML =
+        `<i class="fa-solid fa-floppy-disk me-2"></i>Perbarui Paket`;
+
+    document.getElementById("rupNumber").value =
+        pkg.rup_number ?? "";
+
+    document.getElementById("packageName").value =
+        pkg.package_name ?? "";
+
+    document.getElementById("program").value =
+        pkg.program ?? "";
+
+    document.getElementById("kegiatan").value =
+        pkg.kegiatan ?? "";
+
+    document.getElementById("subKegiatan").value =
+        pkg.sub_kegiatan ?? "";
+
+    document.getElementById("budget").value =
+        Number(pkg.budget_ceiling || 0);
+
+    document.getElementById("method").value =
+        pkg.procurement_method || "ECATALOG";
+
+    document.getElementById("bidangSelect").value =
+        pkg.bidang_id || "";
+
+    document.getElementById("makSelect").value =
+        pkg.budget_account_id || "";
+
+    document.getElementById("output").value =
+        pkg.output || "";
+
+    document.getElementById("dppDate").value =
+        pkg.dpp_date || "";
+
+    /*
+    ==================================
+    LOAD FUNDING SOURCES
+    ==================================
+    */
+
+    document.getElementById(
+        "fundingContainer"
+    ).innerHTML = "";
+
+    const {
+        data: fundingRows,
+        error: fundingError
+    } = await db
+        .from("package_funding_sources")
+        .select("*")
+        .eq("package_id", id)
+        .order("created_at");
+
+    if(!fundingError && fundingRows){
+
+        for(const row of fundingRows){
+
+            await addFundingRow({
+
+                bidang_id:
+                    row.bidang_id,
+
+                budget_account_id:
+                    row.budget_account_id,
+
+                program:
+                    row.program,
+
+                kegiatan:
+                    row.kegiatan,
+
+                sub_kegiatan:
+                    row.sub_kegiatan,
+
+                allocated_budget:
+                    row.allocated_budget
+            });
+        }
+    }
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
 }
 
 async function deletePackage(id){
