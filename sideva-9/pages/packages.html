@@ -856,7 +856,9 @@ async function loadPackages() {
         }
 
     });
-
+    console.log("PACKAGES", data);
+    console.log("FUNDING", fundingData);
+    console.log("FUNDING MAP", fundingMap);
     /*
     ==================================
     RENDER PACKAGE
@@ -864,6 +866,11 @@ async function loadPackages() {
     */
 
     data.forEach(pkg => {
+        console.log(
+            "PACKAGE",
+            pkg.id,
+            fundingMap[pkg.id]
+        );
 
         const funding =
             fundingMap[pkg.id];
