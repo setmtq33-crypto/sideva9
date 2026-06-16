@@ -605,8 +605,17 @@ async function savePackage(){
     let query = editingPackageId ? db.from("packages").update(payload).eq("id", editingPackageId) : db.from("packages").insert(payload);
     const { error } = await query;
 
-    if(error){
-        alert(error.message);
+    if (error) {
+
+        console.error("ERROR PACKAGE:", error);
+    
+        alert(
+            "CODE: " + error.code +
+            "\nMESSAGE: " + error.message +
+            "\nDETAILS: " + error.details +
+            "\nHINT: " + error.hint
+        );
+    
         return;
     }
 
