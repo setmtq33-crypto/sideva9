@@ -784,331 +784,112 @@ async function loadPackages() {
             ? currentOpdId
             : profile.opd_id;
 
-    if(opdId){
-
-        query =
-            query.eq(
-                "opd_id",
-                opdId
-            );
+    if (opdId) {
+        query = query.eq("opd_id", opdId);
     }
 
-    const {
-        data,
-        error
-    } = await query;
+    const { data, error } = await query;
 
-    const container =
-        document.getElementById(
-            "packageList"
-        );
-
+    const container = document.getElementById("packageList");
     container.innerHTML = "";
 
-    if(error){
-
+    if (error) {
         console.error(error);
-
-        container.innerHTML =
-            error.message;
-
+        container.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
         return;
     }
 
-    if(!data || data.length === 0){
-
+    if (!data || data.length === 0) {
         container.innerHTML = `
             <div class="alert alert-light border">
                 Belum ada paket.
             </div>
         `;
-
         return;
     }
 
-    /*
-    ==================================
-    LOAD FUNDING SOURCES
-    ==================================
-    */
-
-    const {
-        data: fundingData
-    } = await db
-        .from(
-            "package_funding_sources"
-        )
+    /* LOAD FUNDING SOURCES */
+    const { data: fundingData } = await db
+        .from("package_funding_sources")
         .select("*");
 
     const fundingMap = {};
-
     (fundingData || []).forEach(row => {
-    
-        if(!fundingMap[row.package_id]){
-    
+        if (!fundingMap[row.package_id]) {
             fundingMap[row.package_id] = [];
-    
         }
-    
         fundingMap[row.package_id].push(row);
-    
     });
-    console.log("PACKAGES", data);
-    console.log("FUNDING", fundingData);
-    console.log("FUNDING MAP", fundingMap);
-    /*
-    ==================================
-    RENDER PACKAGE
-    ==================================
-    */
 
+    /* RENDER PACKAGE */
     data.forEach(pkg => {
-        console.log(
-            "PACKAGE",
-            pkg.id,
-            fundingMap[pkg.id]
-        );
-
-        const fundingList =
-            fundingMap[pkg.id] || [];
+        const fundingList = fundingMap[pkg.id] || [];
+        
+        // Mengambil data funding pertama untuk referensi MAK
+        const firstFunding = fundingList[0] || {};
 
         container.innerHTML += `
-
-        <div class="card-package p-4">
-
+        <div class="card-package p-4 mb-3">
             <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
-
                 <div>
-
-                    <h5 class="fw-bold text-dark mb-1">
-                        ${pkg.package_name || '-'}
-                    </h5>
-
+                    <h5 class="fw-bold text-dark mb-1">${pkg.package_name || '-'}</h5>
                     <div class="text-secondary small fw-medium">
-
-                        <i class="fa-solid fa-hashtag me-1"></i>
-
-                        No. RUP:
-
-                        <span class="text-primary">
-                            ${pkg.rup_number || '-'}
-                        </span>
-
+                        <i class="fa-solid fa-hashtag me-1"></i> No. RUP:
+                        <span class="text-primary">${pkg.rup_number || '-'}</span>
                         <span class="ms-3 text-muted">
-
-                            <i class="fa-solid fa-code-branch me-1"></i>
-
-                            Metode:
-
-                            ${pkg.procurement_method || '-'}
-
+                            <i class="fa-solid fa-code-branch me-1"></i> Metode: ${pkg.procurement_method || '-'}
                         </span>
-
                     </div>
-
                 </div>
-
                 <div class="badge-pagu shadow-sm">
-
-                    <span class="text-muted small fw-normal">
-                        Pagu:
-                    </span>
-
-                    Rp ${Number(
-                        pkg.budget_ceiling || 0
-                    ).toLocaleString('id-ID')}
-
+                    <span class="text-muted small fw-normal">Pagu:</span>
+                    Rp ${Number(pkg.budget_ceiling || 0).toLocaleString('id-ID')}
                 </div>
-
             </div>
 
             <div class="row mb-3">
-
                 <div class="col-md-6">
-
-                    ${fundingList.length
-                        ? fundingList.map(item => 
-                    
+                    ${fundingList.length 
+                        ? fundingList.map(item => `
                             <div class="meta-info-text">
-                                <i class="fa-solid fa-layer-group"></i>
-                                <strong>Prog:</strong>
-                                ${item.program || '-'}
+                                <i class="fa-solid fa-layer-group"></i> <strong>Prog:</strong> ${item.program || '-'}
                             </div>
-                    
                             <div class="meta-info-text">
-                                <i class="fa-solid fa-bars-progress"></i>
-                                <strong>Keg:</strong>
-                                ${item.kegiatan || '-'}
+                                <i class="fa-solid fa-bars-progress"></i> <strong>Keg:</strong> ${item.kegiatan || '-'}
                             </div>
-                    
                             <div class="meta-info-text">
-                                <i class="fa-solid fa-circle-nodes"></i>
-                                <strong>Sub:</strong>
-                                ${item.sub_kegiatan || '-'}
+                                <i class="fa-solid fa-circle-nodes"></i> <strong>Sub:</strong> ${item.sub_kegiatan || '-'}
                             </div>
-                    
                             <hr class="my-2">
-                    
-                        ).join('')
-                        : 
-                            <div class="meta-info-text">
-                                <strong>Prog:</strong> -
-                            </div>
-                    
-                            <div class="meta-info-text">
-                                <strong>Keg:</strong> -
-                            </div>
-                    
-                            <div class="meta-info-text">
-                                <strong>Sub:</strong> -
-                            </div>
-                        
+                        `).join('') 
+                        : `
+                            <div class="meta-info-text"><strong>Prog/Keg/Sub:</strong> -</div>
+                        `
                     }
-
                 </div>
-
                 <div class="col-md-6">
-
                     <div class="meta-info-text">
-
-                        <i class="fa-solid fa-wallet"></i>
-
-                        <strong>MAK:</strong>
-
-                        ${funding?.budget_account_id || '-'}
-
+                        <i class="fa-solid fa-wallet"></i> <strong>MAK:</strong> ${firstFunding.budget_account_id || '-'}
                     </div>
-
                     <div class="meta-info-text">
-
-                        <i class="fa-solid fa-bullseye"></i>
-
-                        <strong>Output:</strong>
-
-                        ${pkg.output || '-'}
-
+                        <i class="fa-solid fa-bullseye"></i> <strong>Output:</strong> ${pkg.output || '-'}
                     </div>
-
                     <div class="meta-info-text">
-
-                        <i class="fa-solid fa-calendar-day"></i>
-
-                        <strong>Tgl DPP:</strong>
-
-                        ${pkg.dpp_date || '-'}
-
+                        <i class="fa-solid fa-calendar-day"></i> <strong>Tgl DPP:</strong> ${pkg.dpp_date || '-'}
                     </div>
-
                 </div>
-
             </div>
 
             <hr>
-
             <div class="d-flex gap-1 flex-wrap">
-
-                <a
-                    href="package-items.html?package_id=${pkg.id}"
-                    class="btn btn-primary btn-sm">
-                
-                    <i class="fa-solid fa-basket-shopping"></i>
-                    Rincian Belanja
-                
-                </a>
-                
-                <a
-                    href="price-surveys.html?package_id=${pkg.id}"
-                    class="btn btn-info btn-sm text-white">
-                
-                    <i class="fa-solid fa-magnifying-glass-dollar"></i>
-                    Survey Harga
-                
-                </a>
-                
-                <a
-                    href="dpp.html?package_id=${pkg.id}"
-                    class="btn btn-outline-info btn-sm">
-                
-                    <i class="fa-solid fa-file-lines"></i>
-                    DPP
-                
-                </a>
-                
-                <button
-                    class="btn btn-outline-dark btn-sm"
-                    onclick="generateDppPdf('${pkg.id}')">
-                
-                    <i class="fa-solid fa-file-pdf"></i>
-                    DPP PDF
-                
-                </button>
-                
-                <a
-                    href="documents.html?package_id=${pkg.id}"
-                    class="btn btn-secondary btn-sm">
-                
-                    <i class="fa-solid fa-folder"></i>
-                    Dokumen
-                
-                </a>
-                
-                <a
-                    href="hps.html?package_id=${pkg.id}"
-                    class="btn btn-success btn-sm">
-                
-                    <i class="fa-solid fa-calculator"></i>
-                    HPS
-                
-                </a>
-                
-                <a
-                    href="bahpe.html?package_id=${pkg.id}"
-                    class="btn btn-outline-success btn-sm">
-                
-                    <i class="fa-solid fa-file-signature"></i>
-                    BAHPE
-                
-                </a>
-                
-                <a
-                    href="review.html?package_id=${pkg.id}"
-                    class="btn btn-outline-warning btn-sm">
-                
-                    Review
-                
-                </a>
-                
-                <button
-                    class="btn btn-outline-dark btn-sm"
-                    onclick="generateReviewPdf('${pkg.id}')">
-                
-                    <i class="fa-solid fa-file-pdf"></i>
-                    Review PDF
-                
-                </button>
-                
-                <button
-                    onclick="editPackage('${pkg.id}')"
-                    class="btn btn-warning btn-sm">
-                
-                    <i class="fa-solid fa-pen"></i>
-                    Edit
-                
-                </button>
-                
-                <button
-                    onclick="deletePackage('${pkg.id}')"
-                    class="btn btn-danger btn-sm">
-                
-                    <i class="fa-solid fa-trash"></i>
-                    Hapus
-                
-                </button>
-
+                <a href="package-items.html?package_id=${pkg.id}" class="btn btn-primary btn-sm"><i class="fa-solid fa-basket-shopping"></i> Rincian</a>
+                <a href="price-surveys.html?package_id=${pkg.id}" class="btn btn-info btn-sm text-white"><i class="fa-solid fa-magnifying-glass-dollar"></i> Survey</a>
+                <a href="dpp.html?package_id=${pkg.id}" class="btn btn-outline-info btn-sm">DPP</a>
+                <button class="btn btn-outline-dark btn-sm" onclick="generateDppPdf('${pkg.id}')">PDF</button>
+                <button class="btn btn-warning btn-sm" onclick="editPackage('${pkg.id}')">Edit</button>
+                <button class="btn btn-danger btn-sm" onclick="deletePackage('${pkg.id}')">Hapus</button>
             </div>
-
         </div>
-
         `;
     });
 }
