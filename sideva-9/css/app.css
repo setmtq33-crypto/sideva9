@@ -18,7 +18,8 @@ body {
     display: flex;
     width: 100%;
     min-height: 100vh;
-    align-items: stretch; /* Memastikan sidebar dan konten sama tinggi */
+    align-items: stretch;
+    gap: 0; /* Tambahkan ini untuk memastikan tidak ada celah antar flex item */
 }
 
 /* SIDEBAR - presisi */
