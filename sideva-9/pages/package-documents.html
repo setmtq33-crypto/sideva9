@@ -237,32 +237,42 @@ async function renderSidevaDocumentInternal(slug, pId) {
     targetDiv.innerHTML = `<div class="text-center text-white p-5"><div class="spinner-border text-light spinner-border-sm"></div><p class="small mt-2">Menyinkronkan data database...</p></div>`;
     
     try {
-        // 1. Ambil data paket (Gunakan maybeSingle agar lebih aman)
+        // 1. Ambil data paket
         const { data: paket, error: paketError } = await documentDb.from('packages').select('*').eq('id', pId).maybeSingle(); 
         if (paketError) { throw paketError; } 
         if (!paket) { 
             targetDiv.innerHTML = `<div class="alert alert-danger m-2 small">❌ Paket tidak ditemukan di database.</div>`;
             return; 
         }
-        console.log("PAKET :", paket); 
-     
-        // 2. Ubah semua .single() di bawah ini menjadi .maybeSingle()
-        const { data: akun } = await documentDb.from('budget_accounts').select('*').eq('id', paket.budget_account_id).maybeSingle(); 
-        console.log("AKUN :", akun);
 
+        // 2. AMBIL DATA SUMBER DANA (Fix agar tidak kosong)
+        const { data: fundingSources } = await documentDb
+            .from('package_funding_sources')
+            .select('*')
+            .eq('package_id', pId);
+
+        let txtProgram = "-";
+        let txtKegiatan = "-";
+        let txtSubKegiatan = "-";
+
+        if (fundingSources && fundingSources.length > 0) {
+            txtProgram = fundingSources.map(d => d.program || '-').join('<br>');
+            txtKegiatan = fundingSources.map(d => d.kegiatan || '-').join('<br>');
+            txtSubKegiatan = fundingSources.map(d => d.sub_kegiatan || '-').join('<br>');
+        } else {
+            // Fallback ke kolom paket jika tabel relasi kosong
+            txtProgram = paket.program || '-';
+            txtKegiatan = paket.kegiatan || '-';
+            txtSubKegiatan = paket.sub_kegiatan || '-';
+        }
+
+        const { data: akun } = await documentDb.from('budget_accounts').select('*').eq('id', paket.budget_account_id).maybeSingle(); 
         const { data: items, error: itemsError } = await documentDb.from('package_items').select('*,price_surveys(*)').eq('package_id', pId); 
         if (itemsError) { throw itemsError; } 
-        console.log("ITEMS :", items);
 
-        // Di sinilah letak error 406 Anda sebelumnya:
         const { data: ppk } = await documentDb.from('ppkoms').select('*').eq('opd_id', paket.opd_id).maybeSingle(); 
-        console.log("PPK :", ppk);
-
         const { data: bidang } = await documentDb.from('bidangs').select('*').eq('id', paket.bidang_id).maybeSingle(); 
-        console.log("BIDANG :", bidang);
-
         const { data: opd } = await documentDb.from('opds').select('*').eq('id', paket.opd_id).maybeSingle(); 
-        console.log("OPD :", opd);
 
         const listItems = items || [];
         const kopHtml = `<div style="text-align:center; margin-bottom:20px;"><img src="${opd?.kop_url || ''}" style="width:100%;max-width:900px;height:auto;"></div>`;
