@@ -881,13 +881,52 @@ async function loadPackages() {
             </div>
 
             <hr>
-            <div class="d-flex gap-1 flex-wrap">
-                <a href="package-items.html?package_id=${pkg.id}" class="btn btn-primary btn-sm"><i class="fa-solid fa-basket-shopping"></i> Rincian</a>
-                <a href="price-surveys.html?package_id=${pkg.id}" class="btn btn-info btn-sm text-white"><i class="fa-solid fa-magnifying-glass-dollar"></i> Survey</a>
-                <a href="dpp.html?package_id=${pkg.id}" class="btn btn-outline-info btn-sm">DPP</a>
-                <button class="btn btn-outline-dark btn-sm" onclick="generateDppPdf('${pkg.id}')">PDF</button>
-                <button class="btn btn-warning btn-sm" onclick="editPackage('${pkg.id}')">Edit</button>
-                <button class="btn btn-danger btn-sm" onclick="deletePackage('${pkg.id}')">Hapus</button>
+            <div class="d-flex gap-2 flex-wrap mb-2">
+                <button class="btn btn-sm btn-primary" onclick="openItems('${pkg.id}')">
+                    <i class="fa-solid fa-basket-shopping"></i> Rincian Belanja
+                </button>
+            
+                <button class="btn btn-sm btn-info text-white" onclick="openSurvey('${pkg.id}')">
+                    <i class="fa-solid fa-magnifying-glass-dollar"></i> Survey Harga
+                </button>
+            
+                <button class="btn btn-sm btn-outline-info" onclick="openDpp('${pkg.id}')">
+                    <i class="fa-solid fa-file-shield"></i> DPP
+                </button>
+            
+                <button class="btn btn-sm btn-outline-dark" onclick="location.href='dpp-document.html?id=${pkg.id}'">
+                    <i class="fa-solid fa-file-pdf"></i> DPP PDF
+                </button>
+            
+                <button class="btn btn-sm btn-secondary" onclick="openDocs('${pkg.id}')">
+                    <i class="fa-solid fa-folder"></i> Dokumen
+                </button>
+            
+                ${(profile.role === 'SUPER_ADMIN' || canSeeHps(profile.role)) ? `
+                    <button class="btn btn-sm btn-success" onclick="openHps('${pkg.id}')">
+                        <i class="fa-solid fa-calculator"></i> HPS
+                    </button>
+                    <button class="btn btn-sm btn-outline-success" onclick="openBahpe('${pkg.id}')">
+                        <i class="fa-solid fa-file-contract"></i> BAHPE
+                    </button>
+                ` : ""}
+            
+                <button class="btn btn-sm btn-outline-warning" onclick="location.href='review.html?id=${pkg.id}'">
+                    Review
+                </button>
+            
+                <button class="btn btn-sm btn-outline-dark" onclick="location.href='review-document.html?id=${pkg.id}'">
+                    <i class="fa-solid fa-file-pdf"></i> Review PDF
+                </button>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-warning" onclick="editPackage('${pkg.id}')">
+                    <i class="fa-solid fa-pen-to-square"></i> Edit
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="deletePackage('${pkg.id}')">
+                    <i class="fa-solid fa-trash-can"></i> Hapus
+                </button>
             </div>
         </div>
         `;
