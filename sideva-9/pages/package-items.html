@@ -56,6 +56,7 @@ body{background:#f5f6fa}
 <th>Spesifikasi</th>
 <th>Qty</th>
 <th>Satuan</th>
+<th>Funding</th>
 <th>Harga</th>
 <th>Total</th>
 <th>Aksi</th>
@@ -76,7 +77,12 @@ body{background:#f5f6fa}
 <div class="modal-body">
 <input type="hidden" id="itemId">
 <div class="mb-2"><label>Nama Item</label><input id="itemName" class="form-control"></div>
-<div class="mb-2"><label>Spesifikasi</label><textarea id="specification" class="form-control"></textarea></div>
+<div class="mb-2">
+<label>Sumber Pendanaan</label>
+<select id="fundingSourceId" class="form-select">
+<option value="">Pilih Sumber Pendanaan</option>
+</select>
+</div>
 <div class="row">
 <div class="col-md-4"><input id="quantity" type="number" class="form-control" placeholder="Qty"></div>
 <div class="col-md-4"><input id="unit" class="form-control" placeholder="Satuan"></div>
@@ -101,6 +107,7 @@ let profile=null;
 let packageId=null;
 let packageData=null;
 let items=[];
+let fundingSources=[];
 
 function rupiah(v){
  return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(v||0);
@@ -110,6 +117,7 @@ async function init(){
  profile = await getProfile();
  packageId = new URLSearchParams(location.search).get('id');
  await loadPackage();
+ await loadFundingSources();
  await loadItems();
 }
 
@@ -119,6 +127,40 @@ async function loadPackage(){
  packageData=data;
  document.getElementById('packageName').innerText=data.package_name;
  document.getElementById('budgetCeiling').innerText=rupiah(data.budget_ceiling);
+}
+
+async function loadFundingSources(){
+
+     const {data,error}=await itemDb
+     .from('package_funding_sources')
+     .select('*')
+     .eq('package_id',packageId);
+    
+     if(error){
+       console.error(error);
+       return;
+     }
+    
+     fundingSources=data||[];
+    
+     const select=
+     document.getElementById(
+       'fundingSourceId'
+     );
+    
+     select.innerHTML=
+     '<option value="">Pilih Sumber Pendanaan</option>';
+    
+     fundingSources.forEach(f=>{
+    
+       select.innerHTML+=`
+       <option value="${f.id}">
+         ${f.program}
+       </option>
+       `;
+    
+     });
+
 }
 
 async function loadItems(){
@@ -138,7 +180,15 @@ function render(rows){
    <td>${r.specification||''}</td>
    <td>${r.quantity||0}</td>
    <td>${r.unit||''}</td>
-   <td>${rupiah(r.estimated_price)}</td>
+   <td>
+    ${
+     fundingSources.find(
+      f=>f.id===r.funding_source_id
+     )?.program || '-'
+    }
+    </td>
+    
+    <td>${rupiah(r.estimated_price)}</td>
    <td>${rupiah(rowTotal)}</td>
    <td>
    <button class="btn btn-warning btn-sm" onclick="editItem('${r.id}')">Edit</button>
@@ -165,6 +215,8 @@ function editItem(id){
  quantity.value=r.quantity||0;
  unit.value=r.unit||'';
  estimatedPrice.value=r.estimated_price||0;
+    fundingSourceId.value=
+    r.funding_source_id||'';
  modal.show();
 }
 
@@ -177,7 +229,14 @@ async function saveItem(){
   specification:specification.value,
   quantity:Number(quantity.value||0),
   unit:unit.value,
-  estimated_price:Number(estimatedPrice.value||0)
+  estimated_price:Number(
+     estimatedPrice.value||0
+    ),
+    
+    funding_source_id:
+    document.getElementById(
+     'fundingSourceId'
+    ).value || null
  };
  let res;
  if(itemId.value){
