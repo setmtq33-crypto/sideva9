@@ -843,18 +843,15 @@ async function loadPackages() {
     const fundingMap = {};
 
     (fundingData || []).forEach(row => {
-
-        if(
-            !fundingMap[
-                row.package_id
-            ]
-        ){
-
-            fundingMap[
-                row.package_id
-            ] = row;
+    
+        if(!fundingMap[row.package_id]){
+    
+            fundingMap[row.package_id] = [];
+    
         }
-
+    
+        fundingMap[row.package_id].push(row);
+    
     });
     console.log("PACKAGES", data);
     console.log("FUNDING", fundingData);
@@ -872,8 +869,8 @@ async function loadPackages() {
             fundingMap[pkg.id]
         );
 
-        const funding =
-            fundingMap[pkg.id];
+        const fundingList =
+            fundingMap[pkg.id] || [];
 
         container.innerHTML += `
 
@@ -929,35 +926,44 @@ async function loadPackages() {
 
                 <div class="col-md-6">
 
-                    <div class="meta-info-text">
-
-                        <i class="fa-solid fa-layer-group"></i>
-
-                        <strong>Prog:</strong>
-
-                        ${funding?.program || '-'}
-
-                    </div>
-
-                    <div class="meta-info-text">
-
-                        <i class="fa-solid fa-bars-progress"></i>
-
-                        <strong>Keg:</strong>
-
-                        ${funding?.kegiatan || '-'}
-
-                    </div>
-
-                    <div class="meta-info-text">
-
-                        <i class="fa-solid fa-circle-nodes"></i>
-
-                        <strong>Sub:</strong>
-
-                        ${funding?.sub_kegiatan || '-'}
-
-                    </div>
+                    ${fundingList.length
+                        ? fundingList.map(item => 
+                    
+                            <div class="meta-info-text">
+                                <i class="fa-solid fa-layer-group"></i>
+                                <strong>Prog:</strong>
+                                ${item.program || '-'}
+                            </div>
+                    
+                            <div class="meta-info-text">
+                                <i class="fa-solid fa-bars-progress"></i>
+                                <strong>Keg:</strong>
+                                ${item.kegiatan || '-'}
+                            </div>
+                    
+                            <div class="meta-info-text">
+                                <i class="fa-solid fa-circle-nodes"></i>
+                                <strong>Sub:</strong>
+                                ${item.sub_kegiatan || '-'}
+                            </div>
+                    
+                            <hr class="my-2">
+                    
+                        ).join('')
+                        : 
+                            <div class="meta-info-text">
+                                <strong>Prog:</strong> -
+                            </div>
+                    
+                            <div class="meta-info-text">
+                                <strong>Keg:</strong> -
+                            </div>
+                    
+                            <div class="meta-info-text">
+                                <strong>Sub:</strong> -
+                            </div>
+                        
+                    }
 
                 </div>
 
@@ -1001,36 +1007,102 @@ async function loadPackages() {
 
             <div class="d-flex gap-1 flex-wrap">
 
-                <button
-                    class="btn btn-sm btn-primary"
-                    onclick="openItems('${pkg.id}')">
-
+                <a
+                    href="package-items.html?package_id=${pkg.id}"
+                    class="btn btn-primary btn-sm">
+                
+                    <i class="fa-solid fa-basket-shopping"></i>
                     Rincian Belanja
-
-                </button>
-
-                <button
-                    class="btn btn-sm btn-info text-white"
-                    onclick="openSurvey('${pkg.id}')">
-
+                
+                </a>
+                
+                <a
+                    href="price-surveys.html?package_id=${pkg.id}"
+                    class="btn btn-info btn-sm text-white">
+                
+                    <i class="fa-solid fa-magnifying-glass-dollar"></i>
                     Survey Harga
-
-                </button>
-
+                
+                </a>
+                
+                <a
+                    href="dpp.html?package_id=${pkg.id}"
+                    class="btn btn-outline-info btn-sm">
+                
+                    <i class="fa-solid fa-file-lines"></i>
+                    DPP
+                
+                </a>
+                
                 <button
-                    class="btn btn-sm btn-warning"
-                    onclick="editPackage('${pkg.id}')">
-
+                    class="btn btn-outline-dark btn-sm"
+                    onclick="generateDppPdf('${pkg.id}')">
+                
+                    <i class="fa-solid fa-file-pdf"></i>
+                    DPP PDF
+                
+                </button>
+                
+                <a
+                    href="documents.html?package_id=${pkg.id}"
+                    class="btn btn-secondary btn-sm">
+                
+                    <i class="fa-solid fa-folder"></i>
+                    Dokumen
+                
+                </a>
+                
+                <a
+                    href="hps.html?package_id=${pkg.id}"
+                    class="btn btn-success btn-sm">
+                
+                    <i class="fa-solid fa-calculator"></i>
+                    HPS
+                
+                </a>
+                
+                <a
+                    href="bahpe.html?package_id=${pkg.id}"
+                    class="btn btn-outline-success btn-sm">
+                
+                    <i class="fa-solid fa-file-signature"></i>
+                    BAHPE
+                
+                </a>
+                
+                <a
+                    href="review.html?package_id=${pkg.id}"
+                    class="btn btn-outline-warning btn-sm">
+                
+                    Review
+                
+                </a>
+                
+                <button
+                    class="btn btn-outline-dark btn-sm"
+                    onclick="generateReviewPdf('${pkg.id}')">
+                
+                    <i class="fa-solid fa-file-pdf"></i>
+                    Review PDF
+                
+                </button>
+                
+                <button
+                    onclick="editPackage('${pkg.id}')"
+                    class="btn btn-warning btn-sm">
+                
+                    <i class="fa-solid fa-pen"></i>
                     Edit
-
+                
                 </button>
-
+                
                 <button
-                    class="btn btn-sm btn-danger"
-                    onclick="deletePackage('${pkg.id}')">
-
+                    onclick="deletePackage('${pkg.id}')"
+                    class="btn btn-danger btn-sm">
+                
+                    <i class="fa-solid fa-trash"></i>
                     Hapus
-
+                
                 </button>
 
             </div>
