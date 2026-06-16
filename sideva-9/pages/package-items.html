@@ -202,22 +202,64 @@ function render(rows){
 }
 
 function openAddModal(){
- itemId.value=''; itemName.value=''; specification.value=''; quantity.value=''; unit.value=''; estimatedPrice.value='';
- modal.show();
+    itemId.value=''; document.getElementById('itemName').value='';
+    document.getElementById('specification').value='';
+    document.getElementById('quantity').value='';
+    document.getElementById('unit').value='';
+    document.getElementById('estimatedPrice').value='';; unit.value=''; estimatedPrice.value='';
+    modal.show();
 }
 
 function editItem(id){
- const r=items.find(x=>x.id===id);
- if(!r) return;
- itemId.value=r.id;
- itemName.value=r.item_name||'';
- specification.value=r.specification||'';
- quantity.value=r.quantity||0;
- unit.value=r.unit||'';
- estimatedPrice.value=r.estimated_price||0;
-    fundingSourceId.value=
-    r.funding_source_id||'';
- modal.show();
+     const r =
+        items.find(
+            x => x.id === id
+        );
+    
+    if(!r) return;
+    
+    document.getElementById(
+        'itemId'
+    ).value =
+        r.id;
+    
+    document.getElementById(
+        'itemName'
+    ).value =
+        r.item_name || '';
+    
+    document.getElementById(
+        'specification'
+    ).value =
+        r.specification || '';
+    
+    document.getElementById(
+        'quantity'
+    ).value =
+        r.quantity || 0;
+    
+    document.getElementById(
+        'unit'
+    ).value =
+        r.unit || '';
+    
+    document.getElementById(
+        'estimatedPrice'
+    ).value =
+        r.estimated_price || 0;
+    
+    const fundingEl =
+        document.getElementById(
+            'fundingSourceId'
+        );
+    
+    if(fundingEl){
+    
+        fundingEl.value =
+            r.funding_source_id || '';
+    }
+    
+    modal.show();
 }
 
 async function saveItem(){
