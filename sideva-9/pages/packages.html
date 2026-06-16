@@ -119,6 +119,10 @@
         .required {
             color: red;
         }
+        textarea.form-control {
+            resize: vertical; 
+            min-height: 80px; 
+        }
     </style>
 </head>
 <body>
@@ -169,17 +173,17 @@
 
             <div class="col-md-4">
                 <label class="form-label">Program Kerja</label>
-                <input type="text" id="program" class="form-control" placeholder="Input detail nama program">
+                <textarea id="program" class="form-control" rows="2" placeholder="Input detail nama program"></textarea>
             </div>
-
+            
             <div class="col-md-4">
                 <label class="form-label">Kegiatan</label>
-                <input type="text" id="kegiatan" class="form-control" placeholder="Input detail nama kegiatan">
+                <textarea id="kegiatan" class="form-control" rows="2" placeholder="Input detail nama kegiatan"></textarea>
             </div>
-
+            
             <div class="col-md-4">
                 <label class="form-label">Sub Kegiatan</label>
-                <input type="text" id="subKegiatan" class="form-control" placeholder="Input detail sub kegiatan">
+                <textarea id="subKegiatan" class="form-control" rows="2" placeholder="Input detail sub kegiatan"></textarea>
             </div>
 
             <div class="col-md-12">
