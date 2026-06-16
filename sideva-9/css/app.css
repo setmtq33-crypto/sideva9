@@ -14,15 +14,26 @@ body {
   overflow-x: hidden;
 }
 
-.wrapper { display: flex; min-height: 100dvh; }
+.wrapper {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    align-items: stretch; /* Memastikan sidebar dan konten sama tinggi */
+}
 
 /* SIDEBAR - presisi */
-#sidebar-container { width: var(--sidebar-width); flex-shrink: 0; }
+#sidebar-container {
+    width: 256px; /* Atau menggunakan var(--sidebar-width) */
+    min-width: 256px;
+    background-color: #343a40; /* Contoh warna, sesuaikan dengan milik Anda */
+    transition: all 0.3s;
+}
 .adaptive-sidebar {
   width: var(--sidebar-width);
   height: 100dvh;
-  position: fixed;
-  top: 0; left: 0;
+  position: fixed; /* Sidebar melayang di atas */
+  top: 0; 
+  left: 0;
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
   background: #090d16;
@@ -30,11 +41,11 @@ body {
   transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
 }
 
-/* MAIN CONTENT - sinkron dengan sidebar */
+/* --- BAGIAN 2: MAIN CONTENT --- */
 .main-content {
   flex-grow: 1;
-  width: 100%;
-  margin-left: var(--sidebar-width);
+  /* width: 100%;  <-- HAPUS INI karena width 100% + margin-left = jebol/lebar berlebih */
+  margin-left: var(--sidebar-width); /* Ini sudah benar jika sidebar-nya FIXED */
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
