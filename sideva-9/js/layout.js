@@ -1,78 +1,49 @@
-// js/layout.js
-
 async function loadLayout() {
     const sidebarContainer = document.getElementById('sidebar-container');
     const topbarContainer = document.getElementById('topbar-container');
 
-    if (sidebarContainer) sidebarContainer.innerHTML = '';
-    if (topbarContainer) topbarContainer.innerHTML = '';
-
-    // 1. Ambil File Template Sidebar
-    try {
-        const sidebarResponse = await fetch('/components/sidebar.html');
-        if (sidebarResponse.ok) {
-            sidebarContainer.innerHTML = await sidebarResponse.text();
-        }
-    } catch (err) {
-        console.error("Gagal memuat komponen sidebar:", err);
+    if (sidebarContainer) {
+        try {
+            const res = await fetch('/components/sidebar.html');
+            if (res.ok) sidebarContainer.innerHTML = await res.text();
+        } catch (err) { console.error("Gagal memuat sidebar:", err); }
     }
 
-    // 2. Ambil File Template Topbar
-    try {
-        const topbarResponse = await fetch('/components/topbar.html');
-        if (topbarResponse.ok) {
-            topbarContainer.innerHTML = await topbarResponse.text();
-        }
-    } catch (err) {
-        console.error("Gagal memuat komponen topbar:", err);
+    if (topbarContainer) {
+        try {
+            const res = await fetch('/components/topbar.html');
+            if (res.ok) topbarContainer.innerHTML = await res.text();
+        } catch (err) { console.error("Gagal memuat topbar:", err); }
     }
 
-    // 3. Ambil Informasi Profil Log Masuk Pengguna
-    try {
-        const profile = await getProfile();
-        if (profile) {
-            const userName = document.getElementById('userName');
-            if (userName) userName.innerText = profile.full_name;
+    const profile = await getProfile();
+    if (profile) {
+        const userName = document.getElementById('userName');
+        if (userName) userName.innerText = profile.full_name;
+        
+        if (profile.role === 'SUPER_ADMIN') {
+            const opdContainer = document.getElementById('globalOpdContainer');
+            const opdSelect = document.getElementById('globalOpdSelect');
             
-            // === LOGIKA UTAMA: INJEKSI SELECTOR OPD GLOBAL (KHUSUS SUPER_ADMIN) ===
-            if (profile.role === 'SUPER_ADMIN') {
-                const container = document.getElementById('superAdminOpdSelectorContainer');
-                const selector = document.getElementById('globalOpdSelector');
+            if (opdContainer && opdSelect) {
+                opdContainer.style.display = 'block';
+                const { data } = await supabaseClient.from('opds').select('id, name').order('name');
+                
+                let savedOpdId = localStorage.getItem('global_opd_id');
+                // Jika belum ada yang dipilih, pilih OPD urutan pertama sebagai default
+                if (!savedOpdId && data && data.length > 0) {
+                    savedOpdId = data[0].id;
+                    localStorage.setItem('global_opd_id', savedOpdId);
+                }
 
-                if (container && selector) {
-                    // Ambil daftar data OPD dari database Supabase Anda
-                    const { data: opds, error } = await window.supabaseClient
-                        .from('opds')
-                        .select('id, name')
-                        .order('name', { ascending: true });
-
-                    if (!error && opds) {
-                        // Susun daftar opsi pilihan
-                        let optionsHtml = '<option value="ALL">-- Semua OPD (Konsolidasi) --</option>';
-                        optionsHtml += opds.map(opd => 
-                            `<option value="${opd.id}">${opd.name}</option>`
-                        ).join('');
-                        
-                        selector.innerHTML = optionsHtml;
-
-                        // Set ke nilai yang terakhir kali dipilih pengguna
-                        const savedOpdId = localStorage.getItem('selected-opd-id') || 'ALL';
-                        selector.value = savedOpdId;
-
-                        // Pasang fungsi penangkap perubahan dropdown
-                        selector.addEventListener('change', (e) => {
-                            localStorage.setItem('selected-opd-id', e.target.value);
-                            window.location.reload(); // Muat ulang halaman agar query data ter-refresh
-                        });
-
-                        // Tampilkan kontainer selector ke layar dengan melepas class d-none
-                        container.classList.remove('d-none');
-                    }
+                if (data) {
+                    opdSelect.innerHTML = data.map(o => 
+                        `<option value="${o.id}" ${o.id === savedOpdId ? 'selected' : ''}>${o.name}</option>`
+                    ).join('');
                 }
             }
-
-            // 4. Logika Menyembunyikan Menu Sidebar Berdasarkan Hak Akses Role
-            const role = profile.role;
+        } else {
+            // Logika hide menu untuk role selain SUPER_ADMIN
             const menuConfigs = {
                 'ADMIN_OPD': ['menuOpds'],
                 'PPTK': ['menuUsers', 'menuOpds', 'menuAudit', 'menuHps'],
@@ -81,47 +52,40 @@ async function loadLayout() {
                 'VIEWER': ['menuUsers', 'menuOpds', 'menuAudit']
             };
 
-            if (menuConfigs[role]) {
-                menuConfigs[role].forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) el.style.display = 'none';
-                });
-            }
+            const hiddenMenus = menuConfigs[profile.role] || [];
+            hiddenMenus.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
         }
-    } catch (profErr) {
-        console.error("Gagal melakukan konfigurasi komponen profil pada layout:", profErr);
     }
 }
 window.loadLayout = loadLayout;
 
-// Helper global untuk membaca data ter-filter di semua halaman
-window.getActiveOpdIdForRead = function(profile) {
-    if (!profile) return null;
-    if (profile.role === 'SUPER_ADMIN') {
-        const selected = localStorage.getItem('selected-opd-id') || 'ALL';
-        return selected === 'ALL' ? null : selected;
+// Fungsi terpicu otomatis saat dropdown topbar diubah
+window.handleGlobalOpdChange = function() {
+    const opdSelect = document.getElementById('globalOpdSelect');
+    if (opdSelect) {
+        localStorage.setItem('global_opd_id', opdSelect.value);
+        // Reload halaman untuk mereset seluruh kueri database berdasarkan OPD baru
+        window.location.reload(); 
     }
-    return profile.opd_id;
 }
 
-// Helper global untuk menyimpan data pengadaan baru secara valid
-window.getActiveOpdIdForWrite = function(profile) {
+// === FUNGSI KUNCI (Gunakan ini di SEMUA file .html Anda) ===
+// Fungsi ini menentukan ID OPD mana yang sedang aktif saat ini
+window.getActiveOpdId = function(profile) {
     if (!profile) return null;
     if (profile.role === 'SUPER_ADMIN') {
-        const selected = localStorage.getItem('selected-opd-id') || 'ALL';
-        if (selected === 'ALL') {
-            alert("⚠️ AKSI DITOLAK!\nSilakan tentukan salah satu OPD spesifik pada bagian Topbar atas sebelum menambah atau memproses data.");
-            return null;
-        }
-        return selected;
+        return localStorage.getItem('global_opd_id');
     }
-    return profile.opd_id;
+    return profile.opd_id; // Ambil dari asal instansi jika bukan Super Admin
 }
 
 function toggleAppTheme() {
     const body = document.body;
     body.classList.toggle('dark-mode');
     const isDark = body.classList.contains('dark-mode');
-    localStorage.setItem('theme-mode', isDark ? 'dark' : 'light');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
 }
 window.toggleAppTheme = toggleAppTheme;
