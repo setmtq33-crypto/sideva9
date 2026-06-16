@@ -211,6 +211,21 @@
                 <textarea id="output" rows="3" class="form-control" placeholder="Tulis rincian deskripsi output capaian pekerjaan..."></textarea>
             </div>
 
+            <hr>
+
+            <h5>Sumber Pendanaan</h5>
+            
+            <div id="fundingContainer"></div>
+            
+            <button
+            type="button"
+            class="btn btn-outline-primary"
+            onclick="addFundingRow()">
+            
+            + Tambah Sumber Dana
+            
+            </button>
+
             <div class="col-12 mt-4">
                 <button class="btn btn-primary px-4 shadow-sm" id="saveBtn">
                     <i class="fa-solid fa-floppy-disk me-2"></i>Simpan Paket
@@ -299,6 +314,139 @@ async function loadMak(){
         select.innerHTML += `<option value="${row.id}">${row.account_code} - ${row.account_name}</option>`;
     });
 }
+
+function addFundingRow(data = {}) {
+
+    const container =
+        document.getElementById("fundingContainer");
+
+    const row = document.createElement("div");
+
+    row.className =
+        "row g-2 border rounded p-2 mb-2 funding-row";
+
+    row.innerHTML = `
+        <div class="col-md-2">
+            <select class="form-select funding-bidang">
+                <option value="">Bidang</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <input
+                type="text"
+                class="form-control funding-program"
+                placeholder="Program"
+                value="${data.program || ''}">
+        </div>
+
+        <div class="col-md-2">
+            <input
+                type="text"
+                class="form-control funding-kegiatan"
+                placeholder="Kegiatan"
+                value="${data.kegiatan || ''}">
+        </div>
+
+        <div class="col-md-2">
+            <input
+                type="text"
+                class="form-control funding-sub"
+                placeholder="Sub Kegiatan"
+                value="${data.sub_kegiatan || ''}">
+        </div>
+
+        <div class="col-md-2">
+            <select class="form-select funding-mak">
+                <option value="">MAK</option>
+            </select>
+        </div>
+
+        <div class="col-md-1">
+            <input
+                type="number"
+                class="form-control funding-budget"
+                placeholder="Nilai"
+                value="${data.allocated_budget || 0}">
+        </div>
+
+        <div class="col-md-1">
+            <button
+                type="button"
+                class="btn btn-danger"
+                onclick="this.closest('.funding-row').remove()">
+
+                X
+
+            </button>
+        </div>
+    `;
+
+    container.appendChild(row);
+
+    loadFundingDropdowns(row, data);
+}
+
+async function loadFundingDropdowns(row, data = {}) {
+
+    const bidangSelect =
+        row.querySelector(".funding-bidang");
+
+    const makSelect =
+        row.querySelector(".funding-mak");
+
+    const opdId =
+        profile.role === "SUPER_ADMIN"
+        ? currentOpdId
+        : profile.opd_id;
+
+    const { data: bidangs } =
+        await db
+            .from("bidangs")
+            .select("*")
+            .eq("opd_id", opdId)
+            .order("bidang_name");
+
+    bidangSelect.innerHTML =
+        '<option value="">Bidang</option>';
+
+    (bidangs || []).forEach(item => {
+
+        bidangSelect.innerHTML += `
+            <option value="${item.id}">
+                ${item.bidang_name}
+            </option>
+        `;
+    });
+
+    if(data.bidang_id)
+        bidangSelect.value = data.bidang_id;
+
+    const { data: maks } =
+        await db
+            .from("budget_accounts")
+            .select("*")
+            .order("account_code");
+
+    makSelect.innerHTML =
+        '<option value="">MAK</option>';
+
+    (maks || []).forEach(item => {
+
+        makSelect.innerHTML += `
+            <option value="${item.id}">
+                ${item.account_code}
+                -
+                ${item.account_name}
+            </option>
+        `;
+    });
+
+    if(data.budget_account_id)
+        makSelect.value =
+            data.budget_account_id;
+}
+    
 
 async function savePackage(){
     // ATURAN MAIN: SUPER_ADMIN bypass verifikasi canCreatePackage()
