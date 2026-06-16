@@ -29,18 +29,18 @@ async function loadLayout() {
         const userName = document.getElementById('userName');
         if (userName) userName.innerText = profile.full_name;
         
-        // Logika hide menu berdasarkan role
-        const role = profile.role;
-        const menuConfigs = {
-            'ADMIN_OPD': ['menuOpds'],
-            'PPTK': ['menuUsers', 'menuOpds', 'menuAudit', 'menuHps'],
-            'PPK': ['menuUsers', 'menuOpds', 'menuAudit', 'menuSurvey', 'menuDocuments', 'menuBidangs', 'menuAccounts'],
-            'PBJ': ['menuUsers', 'menuOpds', 'menuAudit', 'menuSurvey', 'menuDocuments', 'menuHps', 'menuBidangs', 'menuAccounts'],
-            'VIEWER': ['menuUsers', 'menuOpds', 'menuAudit']
-        };
+        // LOGIKA BARU: Jika SUPER_ADMIN, jangan sembunyikan apapun
+        if (profile.role !== 'SUPER_ADMIN') {
+            const menuConfigs = {
+                'ADMIN_OPD': ['menuOpds'],
+                'PPTK': ['menuUsers', 'menuOpds', 'menuAudit', 'menuHps'],
+                'PPK': ['menuUsers', 'menuOpds', 'menuAudit', 'menuSurvey', 'menuDocuments', 'menuBidangs', 'menuAccounts'],
+                'PBJ': ['menuUsers', 'menuOpds', 'menuAudit', 'menuSurvey', 'menuDocuments', 'menuHps', 'menuBidangs', 'menuAccounts'],
+                'VIEWER': ['menuUsers', 'menuOpds', 'menuAudit']
+            };
 
-        if (menuConfigs[role]) {
-            menuConfigs[role].forEach(id => {
+            const hiddenMenus = menuConfigs[profile.role] || [];
+            hiddenMenus.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.style.display = 'none';
             });
