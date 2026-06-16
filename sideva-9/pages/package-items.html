@@ -83,6 +83,14 @@ body{background:#f5f6fa}
 <option value="">Pilih Sumber Pendanaan</option>
 </select>
 </div>
+<div class="mb-2">
+<label>Spesifikasi</label>
+<textarea
+id="specification"
+class="form-control"
+rows="3"></textarea>
+</div>
+
 <div class="row">
 <div class="col-md-4"><input id="quantity" type="number" class="form-control" placeholder="Qty"></div>
 <div class="col-md-4"><input id="unit" class="form-control" placeholder="Satuan"></div>
@@ -202,11 +210,39 @@ function render(rows){
 }
 
 function openAddModal(){
-    itemId.value=''; document.getElementById('itemName').value='';
-    document.getElementById('specification').value='';
-    document.getElementById('quantity').value='';
-    document.getElementById('unit').value='';
-    document.getElementById('estimatedPrice').value='';; unit.value=''; estimatedPrice.value='';
+    document.getElementById(
+        'itemId'
+    ).value = '';
+    
+    document.getElementById(
+        'itemName'
+    ).value = '';
+    
+    document.getElementById(
+        'specification'
+    ).value = '';
+    
+    document.getElementById(
+        'quantity'
+    ).value = '';
+    
+    document.getElementById(
+        'unit'
+    ).value = '';
+    
+    document.getElementById(
+        'estimatedPrice'
+    ).value = '';
+    
+    const fundingEl =
+        document.getElementById(
+            'fundingSourceId'
+        );
+    
+    if(fundingEl){
+        fundingEl.value = '';
+    }
+    
     modal.show();
 }
 
@@ -227,6 +263,10 @@ function editItem(id){
         'itemName'
     ).value =
         r.item_name || '';
+    document.getElementById(
+    'specification'
+    ).value =
+    r.specification || '';
     
     document.getElementById(
         'quantity'
@@ -259,33 +299,99 @@ function editItem(id){
 }
 
 async function saveItem(){
- const payload={
-  tenant_id:profile.tenant_id,
-  opd_id:profile.opd_id,
-  package_id:packageId,
-  item_name:itemName.value,
-  specification:specification.value,
-  quantity:Number(quantity.value||0),
-  unit:unit.value,
-  estimated_price:Number(
-     estimatedPrice.value||0
-    ),
+     const id =
+        document.getElementById(
+            'itemId'
+        ).value;
     
-    funding_source_id:
-    document.getElementById(
-     'fundingSourceId'
-    ).value || null
- };
- let res;
- if(itemId.value){
-   res=await itemDb.from('package_items').update(payload).eq('id',itemId.value);
- }else{
-   res=await itemDb.from('package_items').insert(payload);
- }
- if(res.error) return Swal.fire('Error',res.error.message,'error');
- modal.hide();
- await loadItems();
- await updatePackageStatus(packageId);
+    const payload = {
+    
+        tenant_id:
+            currentPackage.tenant_id,
+    
+        opd_id:
+            currentPackage.opd_id,
+    
+        package_id:
+            packageId,
+    
+        item_name:
+            document.getElementById(
+                'itemName'
+            ).value,
+    
+        specification:
+            document.getElementById(
+                'specification'
+            ).value,
+    
+        quantity:
+            Number(
+                document.getElementById(
+                    'quantity'
+                ).value || 0
+            ),
+    
+        unit:
+            document.getElementById(
+                'unit'
+            ).value,
+    
+        estimated_price:
+            Number(
+                document.getElementById(
+                    'estimatedPrice'
+                ).value || 0
+            ),
+    
+        funding_source_id:
+            document.getElementById(
+                'fundingSourceId'
+            ).value || null
+    
+    };
+    
+    let result;
+    
+    if(id){
+    
+        result =
+            await itemDb
+                .from('package_items')
+                .update(payload)
+                .eq('id', id);
+    
+    } else {
+    
+        result =
+            await itemDb
+                .from('package_items')
+                .insert(payload);
+    
+    }
+    
+    if(result.error){
+    
+        console.error(
+            result.error
+        );
+    
+        alert(
+            result.error.message
+        );
+    
+        return;
+    }
+    
+    modal.hide();
+    
+    await loadItems();
+    
+    alert(
+        id
+        ? 'Item berhasil diperbarui'
+        : 'Item berhasil disimpan'
+    );
 }
 
 async function deleteItem(id){
