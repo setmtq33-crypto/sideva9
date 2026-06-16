@@ -754,15 +754,20 @@ async function savePackage(){
         }
     }
 
+    const isUpdate =
+    !!editingPackageId;
+    
     alert(
-        editingPackageId
-            ? "Paket berhasil diperbarui"
-            : "Paket berhasil disimpan"
+    isUpdate
+    ? “Paket berhasil diperbarui”
+    : “Paket berhasil disimpan”
     );
-
-    clearForm();
-
+    
     await loadPackages();
+    
+    if(!isUpdate){
+    clearForm();
+    }
 }
 
 async function loadPackages() {
@@ -976,8 +981,13 @@ async function deletePackage(id){
 
 function clearForm(){
     editingPackageId = null;
-    document.getElementById("formTitle").innerHTML = `<i class="fa-solid fa-folder-plus me-2"></i>Tambah Paket Baru`;
-    document.getElementById("saveBtn").innerHTML = `<i class="fa-solid fa-floppy-disk me-2"></i>Simpan Paket`;
+
+    document.getElementById("formTitle").innerHTML =
+        `<i class="fa-solid fa-folder-plus me-2"></i>Tambah Paket Baru`;
+
+    document.getElementById("saveBtn").innerHTML =
+        `<i class="fa-solid fa-floppy-disk me-2"></i>Simpan Paket`;
+
     document.getElementById("rupNumber").value = "";
     document.getElementById("packageName").value = "";
     document.getElementById("program").value = "";
@@ -986,6 +996,16 @@ function clearForm(){
     document.getElementById("budget").value = "";
     document.getElementById("output").value = "";
     document.getElementById("dppDate").value = "";
+
+    document.getElementById("method").value =
+        "ECATALOG";
+
+    document.getElementById("bidangSelect").value = "";
+    document.getElementById("makSelect").value = "";
+
+    document.getElementById(
+        "fundingContainer"
+    ).innerHTML = "";
 }
 
 function canSeeHps(role){ return ['SUPER_ADMIN', 'ADMIN_OPD', 'PPK'].includes(role); }
