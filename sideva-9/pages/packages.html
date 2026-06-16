@@ -572,55 +572,112 @@ async function loadFundingDropdowns(row, data = {}) {
     
 
 async function savePackage(){
-    // ATURAN MAIN: SUPER_ADMIN bypass verifikasi canCreatePackage()
-    if(profile.role !== "SUPER_ADMIN" && !await canCreatePackage()){
+        if(profile.role !== "SUPER_ADMIN" && !await canCreatePackage()){
         alert('Anda tidak memiliki hak membuat paket');
         return;
     }
 
-    const opdId = profile.role === "SUPER_ADMIN" ? currentOpdId : profile.opd_id;
+    const opdId =
+        profile.role === "SUPER_ADMIN"
+        ? currentOpdId
+        : profile.opd_id;
+
     if(!opdId){
         alert("Pilih OPD terlebih dahulu");
         return;
     }
 
+    const dppDateValue =
+        document.getElementById("dppDate").value;
+
     const payload = {
+
         tenant_id: profile.tenant_id,
+
         opd_id: opdId,
-        package_name: document.getElementById("packageName").value,
-        fiscal_year: new Date().getFullYear(),
-        procurement_method: document.getElementById("method").value,
-        budget_ceiling: Number(document.getElementById("budget").value || 0),
-        created_by: profile.id,
-        rup_number: document.getElementById("rupNumber").value,
-        bidang_id: document.getElementById("bidangSelect").value,
-        program: document.getElementById("program").value,
-        kegiatan: document.getElementById("kegiatan").value,
-        sub_kegiatan: document.getElementById("subKegiatan").value,
-        budget_account_id: document.getElementById("makSelect").value,
-        output: document.getElementById("output").value,
-        dpp_date: document.getElementById("dppDate").value
+
+        package_name:
+            document.getElementById("packageName").value,
+
+        fiscal_year:
+            new Date().getFullYear(),
+
+        procurement_method:
+            document.getElementById("method").value,
+
+        budget_ceiling:
+            Number(
+                document.getElementById("budget").value || 0
+            ),
+
+        created_by:
+            profile.id,
+
+        rup_number:
+            document.getElementById("rupNumber").value,
+
+        bidang_id:
+            document.getElementById("bidangSelect").value || null,
+
+        program:
+            document.getElementById("program").value || null,
+
+        kegiatan:
+            document.getElementById("kegiatan").value || null,
+
+        sub_kegiatan:
+            document.getElementById("subKegiatan").value || null,
+
+        budget_account_id:
+            document.getElementById("makSelect").value || null,
+
+        output:
+            document.getElementById("output").value || null,
+
+        dpp_date:
+            dppDateValue
+                ? dppDateValue
+                : null
     };
 
-    let query = editingPackageId ? db.from("packages").update(payload).eq("id", editingPackageId) : db.from("packages").insert(payload);
+    let query =
+        editingPackageId
+            ? db
+                .from("packages")
+                .update(payload)
+                .eq("id", editingPackageId)
+
+            : db
+                .from("packages")
+                .insert(payload);
+
     const { error } = await query;
 
-    if (error) {
+    if(error){
 
-        console.error("ERROR PACKAGE:", error);
-    
+        console.error(
+            "ERROR PACKAGE:",
+            error
+        );
+
         alert(
             "CODE: " + error.code +
             "\nMESSAGE: " + error.message +
             "\nDETAILS: " + error.details +
             "\nHINT: " + error.hint
         );
-    
+
         return;
     }
 
-    alert(editingPackageId ? "Paket berhasil diperbarui" : "Paket berhasil disimpan");
+    alert(
+        editingPackageId
+            ? "Paket berhasil diperbarui"
+            : "Paket berhasil disimpan"
+    );
+
     clearForm();
+
     await loadPackages();
 }
 
