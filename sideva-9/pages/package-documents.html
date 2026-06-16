@@ -299,9 +299,32 @@ async function renderSidevaDocumentInternal(slug, pId) {
 
             <table style="width:100%; font-size:10.5pt; margin-bottom:25px; border-collapse:collapse;">
                 <tr><td width="220" style="padding:3px;"><strong>Perangkat Daerah</strong></td><td style="padding:3px;">: ${opd?.opd_name || '-'}</td></tr>
-                <tr><td style="padding:3px;"><strong>Program</strong></td><td style="padding:3px;">: ${paket.program || '-'}</td></tr>
-                <tr><td style="padding:3px;"><strong>Kegiatan</strong></td><td style="padding:3px;">: ${paket.kegiatan || '-'}</td></tr>
-                <tr><td style="padding:3px;"><strong>Sub Kegiatan</strong></td><td style="padding:3px;">: ${paket.sub_kegiatan || '-'}</td></tr>
+                <tr>
+                    <td style="padding:3px;">
+                        <strong>Program</strong>
+                    </td>
+                    <td style="padding:3px;">
+                        : ${funding.program || '-'}
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td style="padding:3px;">
+                        <strong>Kegiatan</strong>
+                    </td>
+                    <td style="padding:3px;">
+                        : ${funding.kegiatan || '-'}
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td style="padding:3px;">
+                        <strong>Sub Kegiatan</strong>
+                    </td>
+                    <td style="padding:3px;">
+                        : ${funding.sub_kegiatan || '-'}
+                    </td>
+                </tr>
                 <tr><td style="padding:3px;"><strong>RUP</strong></td><td style="padding:3px;">: ${paket.rup_number || '-'}</td></tr>
                 <tr><td style="padding:3px;"><strong>Nama Paket Pengadaan</strong></td><td style="padding:3px;">: ${paket.package_name}</td></tr>
                 <tr><td style="padding:3px;"><strong>Pagu</strong></td><td style="padding:3px;">: ${docFmtRp(paket.budget_ceiling)}</td></tr>
@@ -408,9 +431,32 @@ async function renderSidevaDocumentInternal(slug, pId) {
             <table style="width:100%; font-size:10.5pt; margin-bottom:20px; border-collapse:collapse;">
                 <tr><td width="220" style="padding:3px;"><strong>Tanggal</strong></td><td style="padding:3px;">: ${tgl}</td></tr>
                 <tr><td style="padding:3px;"><strong>Perangkat Daerah</strong></td><td style="padding:3px;">: ${opd?.opd_name || '-'}</td></tr>
-                <tr><td style="padding:3px;"><strong>Program</strong></td><td style="padding:3px;">: ${paket.program || '-'}</td></tr>
-                <tr><td style="padding:3px;"><strong>Kegiatan</strong></td><td style="padding:3px;">: ${paket.kegiatan || '-'}</td></tr>
-                <tr><td style="padding:3px;"><strong>Sub Kegiatan</strong></td><td style="padding:3px;">: ${paket.sub_kegiatan || '-'}</td></tr>
+                <tr>
+                   <td style="padding:3px;">
+                       <strong>Program</strong>
+                   </td>
+                   <td style="padding:3px;">
+                       : ${funding.program || '-'}
+                   </td>
+               </tr>
+               
+               <tr>
+                   <td style="padding:3px;">
+                       <strong>Kegiatan</strong>
+                   </td>
+                   <td style="padding:3px;">
+                       : ${funding.kegiatan || '-'}
+                   </td>
+               </tr>
+               
+               <tr>
+                   <td style="padding:3px;">
+                       <strong>Sub Kegiatan</strong>
+                   </td>
+                   <td style="padding:3px;">
+                       : ${funding.sub_kegiatan || '-'}
+                   </td>
+               </tr>
                 <tr><td style="padding:3px;"><strong>RUP</strong></td><td style="padding:3px;">: ${paket.rup_number || '-'}</td></tr>
                 <tr><td style="padding:3px;"><strong>Nama Paket Pengadaan</strong></td><td style="padding:3px;">: ${paket.package_name}</td></tr>
                 <tr><td style="padding:3px;"><strong>Pagu Dana</strong></td><td style="padding:3px;">: ${docFmtRp(paket.budget_ceiling)}</td></tr>
