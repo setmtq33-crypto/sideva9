@@ -258,6 +258,20 @@ async function renderSidevaDocumentInternal(slug, pId) {
         const { data: opd } = await documentDb.from('opds').select('*').eq('id', paket.opd_id).maybeSingle(); 
         console.log("OPD :", opd);
 
+         const { data: fundingSources } =
+         await db
+         .from('package_funding_sources')
+         .select('*')
+         .eq('package_id', paket.id);
+         
+         const funding =
+         fundingSources?.[0] || {};
+         
+         console.log(
+         'FUNDING :',
+         funding
+         );
+
         const listItems = items || [];
         const kopHtml = `<div style="text-align:center; margin-bottom:20px;"><img src="${opd?.kop_url || ''}" style="width:100%;max-width:900px;height:auto;"></div>`;
         const tgl = docFmtDate(new Date());
@@ -304,7 +318,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
                         <strong>Program</strong>
                     </td>
                     <td style="padding:3px;">
-                        : ${funding.program || '-'}
+                        : ${funding?.program || '-' || '-'}
                     </td>
                 </tr>
                 
@@ -313,7 +327,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
                         <strong>Kegiatan</strong>
                     </td>
                     <td style="padding:3px;">
-                        : ${funding.kegiatan || '-'}
+                        : ${funding?.kegiatan || '-' || '-'}
                     </td>
                 </tr>
                 
@@ -322,7 +336,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
                         <strong>Sub Kegiatan</strong>
                     </td>
                     <td style="padding:3px;">
-                        : ${funding.sub_kegiatan || '-'}
+                        : ${funding?.sub_kegiatan || '-' || '-'}
                     </td>
                 </tr>
                 <tr><td style="padding:3px;"><strong>RUP</strong></td><td style="padding:3px;">: ${paket.rup_number || '-'}</td></tr>
@@ -436,7 +450,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
                        <strong>Program</strong>
                    </td>
                    <td style="padding:3px;">
-                       : ${funding.program || '-'}
+                       : ${funding?.program || '-' || '-'}
                    </td>
                </tr>
                
@@ -445,7 +459,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
                        <strong>Kegiatan</strong>
                    </td>
                    <td style="padding:3px;">
-                       : ${funding.kegiatan || '-'}
+                       : ${funding?.kegiatan || '-' || '-'}
                    </td>
                </tr>
                
@@ -454,7 +468,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
                        <strong>Sub Kegiatan</strong>
                    </td>
                    <td style="padding:3px;">
-                       : ${funding.sub_kegiatan || '-'}
+                       : ${funding?.sub_kegiatan || '-' || '-'}
                    </td>
                </tr>
                 <tr><td style="padding:3px;"><strong>RUP</strong></td><td style="padding:3px;">: ${paket.rup_number || '-'}</td></tr>
