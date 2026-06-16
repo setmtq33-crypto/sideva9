@@ -1,21 +1,87 @@
-/* RESET TOTAL */
-body { margin: 0; font-family: sans-serif; }
-.wrapper { display: flex; min-height: 100vh; }
-
-/* PASTIKAN SIDEBAR TIDAK TERTIMPA */
-#sidebar-container { 
-    width: 270px; 
-    flex-shrink: 0; 
+/* RESET TOTAL + VARIABLES */
+:root {
+  --sidebar-width: 280px;
+  --topbar-height: 70px;
+  color-scheme: light dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  overflow-x: hidden;
 }
 
-/* PASTIKAN KONTEN UTAMA FLEKSIBEL */
-.main-content { 
-    flex-grow: 1; 
-    width: 100%; 
-    transition: margin-left 0.3s; 
+.wrapper { display: flex; min-height: 100dvh; }
+
+/* SIDEBAR - presisi */
+#sidebar-container { width: var(--sidebar-width); flex-shrink: 0; }
+.adaptive-sidebar {
+  width: var(--sidebar-width);
+  height: 100dvh;
+  position: fixed;
+  top: 0; left: 0;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  background: #090d16;
+  z-index: 1040;
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
 }
 
-/* HAPUS LOGO SISA DARI LAYOUT LAMA */
-.brand-logo-container, .old-logo-class, .banner-gradient {
-    display: none !important; 
+/* MAIN CONTENT - sinkron dengan sidebar */
+.main-content {
+  flex-grow: 1;
+  width: 100%;
+  margin-left: var(--sidebar-width);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* TOPBAR safe area iPhone */
+.topbar-fluid {
+  height: calc(var(--topbar-height) + env(safe-area-inset-top));
+  padding-top: env(safe-area-inset-top);
+  position: sticky; top: 0; z-index: 1020;
+  backdrop-filter: saturate(180%) blur(8px);
+}
+
+/* HAPUS aturan yang mematikan banner */
+.brand-logo-container, .old-logo-class { display: none !important; }
+/* banner-gradient tetap hidup */
+.banner-gradient { display: block !important; }
+
+/* MOBILE: iPhone & Android */
+@media (max-width: 991.98px) {
+  .adaptive-sidebar { transform: translateX(-100%); box-shadow: none; }
+  body.sidebar-open .adaptive-sidebar { transform: translateX(0); box-shadow: 0 0 40px rgba(0,0,0,0.4); }
+  body.sidebar-open::after {
+    content:''; position:fixed; inset:0; background:rgba(0,0,0,0.4);
+    backdrop-filter: blur(2px); z-index: 1035;
+  }
+  .main-content { margin-left: 0 !important; }
+}
+
+/* Android Chrome 100vh fix */
+@supports (height: 100dvh) {
+  .adaptive-sidebar, .wrapper, .main-content { min-height: 100dvh; }
+}
+
+/* Tablet optimization */
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  :root { --sidebar-width: 260px; }
+}
+
+/* Reduce motion untuk aksesibilitas */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+/* SEO: sembunyikan hanya di print */
+@media print {
+  .adaptive-sidebar, .topbar-fluid { display: none !important; }
+  .main-content { margin-left: 0 !important; }
 }
