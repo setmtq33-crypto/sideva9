@@ -56,7 +56,6 @@ body{background:#f5f6fa}
 <th>Spesifikasi</th>
 <th>Qty</th>
 <th>Satuan</th>
-<th>Funding</th>
 <th>Harga</th>
 <th>Total</th>
 <th>Aksi</th>
@@ -77,12 +76,6 @@ body{background:#f5f6fa}
 <div class="modal-body">
 <input type="hidden" id="itemId">
 <div class="mb-2"><label>Nama Item</label><input id="itemName" class="form-control"></div>
-<div class="mb-2">
-<label>Sumber Pendanaan</label>
-<select id="fundingSourceId" class="form-select">
-<option value="">Pilih Sumber Pendanaan</option>
-</select>
-</div>
 <div class="mb-2">
 <label>Spesifikasi</label>
 <textarea
@@ -115,7 +108,6 @@ let profile=null;
 let packageId=null;
 let packageData=null;
 let items=[];
-let fundingSources=[];
 
 function rupiah(v){
  return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(v||0);
@@ -125,7 +117,6 @@ async function init(){
  profile = await getProfile();
  packageId = new URLSearchParams(location.search).get('id');
  await loadPackage();
- await loadFundingSources();
  await loadItems();
 }
 
@@ -135,40 +126,6 @@ async function loadPackage(){
  packageData=data;
  document.getElementById('packageName').innerText=data.package_name;
  document.getElementById('budgetCeiling').innerText=rupiah(data.budget_ceiling);
-}
-
-async function loadFundingSources(){
-
-     const {data,error}=await itemDb
-     .from('package_funding_sources')
-     .select('*')
-     .eq('package_id',packageId);
-    
-     if(error){
-       console.error(error);
-       return;
-     }
-    
-     fundingSources=data||[];
-    
-     const select=
-     document.getElementById(
-       'fundingSourceId'
-     );
-    
-     select.innerHTML=
-     '<option value="">Pilih Sumber Pendanaan</option>';
-    
-     fundingSources.forEach(f=>{
-    
-       select.innerHTML+=`
-       <option value="${f.id}">
-         ${f.program}
-       </option>
-       `;
-    
-     });
-
 }
 
 async function loadItems(){
@@ -188,15 +145,7 @@ function render(rows){
    <td>${r.specification||''}</td>
    <td>${r.quantity||0}</td>
    <td>${r.unit||''}</td>
-   <td>
-    ${
-     fundingSources.find(
-      f=>f.id===r.funding_source_id
-     )?.program || '-'
-    }
-    </td>
-    
-    <td>${rupiah(r.estimated_price)}</td>
+   <td>${rupiah(r.estimated_price)}</td>
    <td>${rupiah(rowTotal)}</td>
    <td>
    <button class="btn btn-warning btn-sm" onclick="editItem('${r.id}')">Edit</button>
@@ -211,37 +160,28 @@ function render(rows){
 
 function openAddModal(){
     document.getElementById(
-        'itemId'
-    ).value = '';
+        "itemId"
+    ).value = "";
     
     document.getElementById(
-        'itemName'
-    ).value = '';
+        "itemName"
+    ).value = "";
     
     document.getElementById(
-        'specification'
-    ).value = '';
+        "specification"
+    ).value = "";
     
     document.getElementById(
-        'quantity'
-    ).value = '';
+        "quantity"
+    ).value = "";
     
     document.getElementById(
-        'unit'
-    ).value = '';
+        "unit"
+    ).value = "";
     
     document.getElementById(
-        'estimatedPrice'
-    ).value = '';
-    
-    const fundingEl =
-        document.getElementById(
-            'fundingSourceId'
-        );
-    
-    if(fundingEl){
-        fundingEl.value = '';
-    }
+        "estimatedPrice"
+    ).value = "";
     
     modal.show();
 }
@@ -255,53 +195,42 @@ function editItem(id){
     if(!r) return;
     
     document.getElementById(
-        'itemId'
+        "itemId"
     ).value =
         r.id;
     
     document.getElementById(
-        'itemName'
+        "itemName"
     ).value =
-        r.item_name || '';
-    document.getElementById(
-    'specification'
-    ).value =
-    r.specification || '';
+        r.item_name || "";
     
     document.getElementById(
-        'quantity'
+        "specification"
+    ).value =
+        r.specification || "";
+    
+    document.getElementById(
+        "quantity"
     ).value =
         r.quantity || 0;
     
     document.getElementById(
-        'unit'
+        "unit"
     ).value =
-        r.unit || '';
+        r.unit || "";
     
     document.getElementById(
-        'estimatedPrice'
+        "estimatedPrice"
     ).value =
         r.estimated_price || 0;
-    
-    const fundingEl =
-        document.getElementById(
-            'fundingSourceId'
-        );
-    
-    if(fundingEl){
-    
-        fundingEl.value =
-            r.funding_source_id || '';
-    
-    }
     
     modal.show();
 }
 
 async function saveItem(){
-     const id =
+     const itemId =
         document.getElementById(
-            'itemId'
+            "itemId"
         ).value;
     
     const payload = {
@@ -317,55 +246,50 @@ async function saveItem(){
     
         item_name:
             document.getElementById(
-                'itemName'
+                "itemName"
             ).value,
     
         specification:
             document.getElementById(
-                'specification'
+                "specification"
             ).value,
     
         quantity:
             Number(
                 document.getElementById(
-                    'quantity'
+                    "quantity"
                 ).value || 0
             ),
     
         unit:
             document.getElementById(
-                'unit'
+                "unit"
             ).value,
     
         estimated_price:
             Number(
                 document.getElementById(
-                    'estimatedPrice'
+                    "estimatedPrice"
                 ).value || 0
-            ),
-    
-        funding_source_id:
-            document.getElementById(
-                'fundingSourceId'
-            ).value || null
+            )
     
     };
     
     let result;
     
-    if(id){
+    if(itemId){
     
         result =
             await itemDb
-                .from('package_items')
+                .from("package_items")
                 .update(payload)
-                .eq('id', id);
+                .eq("id", itemId);
     
     } else {
     
         result =
             await itemDb
-                .from('package_items')
+                .from("package_items")
                 .insert(payload);
     
     }
@@ -388,9 +312,9 @@ async function saveItem(){
     await loadItems();
     
     alert(
-        id
-        ? 'Item berhasil diperbarui'
-        : 'Item berhasil disimpan'
+        itemId
+        ? "Item berhasil diperbarui"
+        : "Item berhasil disimpan"
     );
 }
 
