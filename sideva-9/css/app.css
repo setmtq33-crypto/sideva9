@@ -62,7 +62,7 @@ body {
 }
 
 /* HAPUS aturan yang mematikan banner */
-.brand-logo-container, .old-logo-class { display: none !important; }
+/* .brand-logo-container, .old-logo-class { display: none !important; } */
 /* banner-gradient tetap hidup */
 .banner-gradient { display: block !important; }
 
