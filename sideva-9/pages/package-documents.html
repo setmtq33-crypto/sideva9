@@ -190,7 +190,7 @@ async function initPackageHeader() {
         return;
     }
     // Pastikan pemanggilan di bawah ini menggunakan variabel baru 'documentDb'
-    const { data, error } = await documentDb.from('packages').select('*').eq('id', packageId).single();
+    const { data, error } = await documentDb.from('packages').select('*').eq('id', packageId).maybeSingle();
     if(!error && data) {
         document.getElementById('packageName').innerText = data.package_name;
         document.getElementById('packageRup').innerText = `ID RUP: ${data.rup_id || '-'}`;
@@ -237,25 +237,25 @@ async function renderSidevaDocumentInternal(slug, pId) {
     targetDiv.innerHTML = `<div class="text-center text-white p-5"><div class="spinner-border text-light spinner-border-sm"></div><p class="small mt-2">Menyinkronkan data database...</p></div>`;
     
     try {
-        const { data: paket, error: paketError } = await documentDb.from('packages').select('*').eq('id', pId).single(); 
+        const { data: paket, error: paketError } = await documentDb.from('packages').select('*').eq('id', pId).maybeSingle(); 
         if (paketError) { throw paketError; } 
         console.log("PAKET :", paket); 
      
 
-        const { data: akun } = await documentDb.from('budget_accounts').select('*').eq('id', paket.budget_account_id).single(); 
+        const { data: akun } = await documentDb.from('budget_accounts').select('*').eq('id', paket.budget_account_id).maybeSingle(); 
         console.log("AKUN :", akun);
 
         const { data: items, error: itemsError } = await documentDb.from('package_items').select('*,price_surveys(*)').eq('package_id', pId); 
         if (itemsError) { throw itemsError; } 
         console.log("ITEMS :", items);
 
-        const { data: ppk } = await documentDb.from('ppkoms').select('*').eq('opd_id', paket.opd_id).single(); 
+        const { data: ppk } = await documentDb.from('ppkoms').select('*').eq('opd_id', paket.opd_id).maybeSingle(); 
         console.log("PPK :", ppk);
 
-        const { data: bidang } = await documentDb.from('bidangs').select('*').eq('id', paket.bidang_id).single(); 
+        const { data: bidang } = await documentDb.from('bidangs').select('*').eq('id', paket.bidang_id).maybeSingle(); 
         console.log("BIDANG :", bidang);
 
-        const { data: opd } = await documentDb.from('opds').select('*').eq('id', paket.opd_id).single(); 
+        const { data: opd } = await documentDb.from('opds').select('*').eq('id', paket.opd_id).maybeSingle(); 
         console.log("OPD :", opd);
 
         const listItems = items || [];
