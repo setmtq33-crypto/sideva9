@@ -1,9 +1,9 @@
 <nav class="sidebar border-end adaptive-sidebar" data-bs-theme="dark">
-    <div class="sidebar-brand-panel p-4 border-bottom text-center flex-column gap-2">
-        <div class="brand-logo-container mb-1 shadow-sm">
-            <img src="/logo-sideva.png" alt="SI-DEVA Logo" class="brand-logo-img" style="width:48px;height:48px;object-fit:contain">
+    <div class="sidebar-brand-panel p-3 border-bottom text-center">
+        <div class="brand-logo-container mb-1 mx-auto">
+            <img src="/logo-sideva.png" alt="SI-DEVA Logo" class="brand-logo-img" style="width:44px;height:44px;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,.4))">
         </div>
-        <h6 class="fw-bold text-white mb-0 tracking-wide" style="font-size: 0.9rem;">
+        <h6 class="fw-bold text-white mb-0 tracking-wide" style="font-size:0.85rem;letter-spacing:.5px">
             SIDEVA <span class="text-info">v9</span>
         </h6>
     </div>
@@ -18,7 +18,7 @@
                 </a>
             </li>
             <li class="nav-item"> 
-		        <a href="rup-import.html" class="nav-link text-white-50 d-flex align-items-center gap-3">
+                <a href="/pages/rup-import.html" class="nav-link text-white-50 d-flex align-items-center gap-3">
                     <i class="bi bi-folder2-open"></i> Input RUP
                 </a> 
             </li>
@@ -61,42 +61,41 @@
             <li class="menu-divider text-uppercase fw-bold text-muted mb-1 px-3">
                 <i class="bi bi-sliders me-2 opacity-50"></i>Sistem & Pengaturan
             </li>
-            <li class="nav-item">
+            <li class="nav-item" id="menuConfigs">
                 <a href="/pages/pengaturan.html" class="nav-link d-flex align-items-center gap-3">
                     <div class="nav-icon-wrapper"><i class="bi bi-gear-wide-connected"></i></div>
                     <span>Konfigurasi Sistem</span>
                 </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" id="menuOpds">
                 <a href="/pages/opds.html" class="nav-link d-flex align-items-center gap-3">
                     <div class="nav-icon-wrapper"><i class="bi bi-building-fill"></i></div>
                     <span>Data Master OPD</span>
                 </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" id="menuBidangs">
                 <a href="/pages/bidangs.html" class="nav-link d-flex align-items-center gap-3">
                     <div class="nav-icon-wrapper"><i class="bi bi-diagram-3-fill"></i></div>
                     <span>Struktur Bidang</span>
                 </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" id="menuAccounts">
                 <a href="/pages/budget-accounts.html" class="nav-link d-flex align-items-center gap-3">
                     <div class="nav-icon-wrapper"><i class="bi bi-bank2"></i></div>
                     <span>Rekening Belanja</span>
                 </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" id="menuUsers">
                 <a href="/pages/users.html" class="nav-link d-flex align-items-center gap-3">
                     <div class="nav-icon-wrapper"><i class="bi bi-people-fill"></i></div>
                     <span>Manajemen User</span>
                 </a>
             </li>
             
-        
             <li class="my-3 border-top border-secondary border-opacity-25"></li>
             
             <li class="nav-item mt-auto">
-                <a href="#" onclick="logout()" class="nav-link text-danger d-flex align-items-center gap-3 fw-semibold bg-danger bg-opacity-10">
+                <a href="#" onclick="logout()" class="nav-link text-danger d-flex align-items-center gap-3 fw-semibold bg-danger bg-opacity-10 logout-link">
                     <i class="bi bi-box-arrow-left"></i> Keluar Aplikasi
                 </a>
             </li>
@@ -105,7 +104,7 @@
 </nav>
 
 <style>
-    :root { --sidebar-width: 270px; }
+    :root { --sidebar-width: 256px; }
     
     .adaptive-sidebar {
         width: var(--sidebar-width);
@@ -120,24 +119,19 @@
         border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
     }
     .sidebar-brand-panel {
-        height: 70px;
+        height: auto;
+        min-height: 88px;
         background: #05080f;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+        padding-top: 14px !important;
+        padding-bottom: 14px !important;
     }
-    .logo-text {
-        font-family: 'Segoe UI', system-ui, sans-serif;
-        letter-spacing: 1.5px;
-    }
-    .animate-pulse {
-        animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-        0% { transform: scale(1); opacity: 0.8; }
-        50% { transform: scale(1.08); opacity: 1; text-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
-        100% { transform: scale(1); opacity: 0.8; }
+    .brand-logo-container {
+        background: transparent;
     }
     .sidebar-scroller {
         flex-grow: 1;
@@ -182,7 +176,6 @@
         color: #06b6d4 !important;
         transform: scale(1.05);
     }
-    /* Pencocokan link aktif otomatis */
     .nav-link.active {
         background: linear-gradient(135deg, #1e3c72 0%, #0284c7 100%) !important;
         color: #ffffff !important;
@@ -196,20 +189,16 @@
         background: #dc3545 !important;
         color: #ffffff !important;
     }
-    .logout-link:hover .nav-icon-wrapper {
-        background: rgba(255, 255, 255, 0.2) !important;
-        color: #ffffff !important;
-    }
     @media (max-width: 991.98px) {
-        .adaptive-sidebar { transform: translateX(-100%); }
+        .adaptive-sidebar { transform: translateX(-100%); transition: transform .3s; }
         body.sidebar-open .adaptive-sidebar { transform: translateX(0); }
     }
 </style>
 
 <script>
-    // Automatisasi penanda halaman aktif
     document.querySelectorAll('.nav-link').forEach(link => {
-        if(link.getAttribute('href') === window.location.pathname) {
+        const href = link.getAttribute('href');
+        if(href && window.location.pathname.endsWith(href.split('/').pop())) {
             link.classList.add('active');
         }
     });
