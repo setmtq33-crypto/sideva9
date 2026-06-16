@@ -14,49 +14,37 @@
 </head>
 <body class="bg-light">
 
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3><i class="bi bi-person-gear"></i> Master Pejabat Pengadaan</h3>
-        <button onclick="logout()" class="btn btn-outline-danger btn-sm"><i class="bi bi-box-arrow-right"></i> Logout</button>
-    </div>
+<div id="sidebar-container"></div>
+<div class="main-content" style="margin-left: 256px;">
+    <div id="topbar-container"></div>
 
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h5 class="mb-3">Tambah Data Baru</h5>
-            <div class="row g-3">
-                <div class="col-md-3">
-                    <input id="fullName" class="form-control" placeholder="Nama Lengkap">
-                </div>
-                <div class="col-md-2">
-                    <input id="nip" class="form-control" placeholder="NIP">
-                </div>
-                <div class="col-md-3">
-                    <input id="position" class="form-control" placeholder="Jabatan">
-                </div>
-                <div class="col-md-2" id="opdContainer" style="display:none;">
-                    <select id="opdSelect" class="form-select"></select>
-                </div>
-                <div class="col-md-2">
-                    <button onclick="saveOfficer()" class="btn btn-primary w-100"><i class="bi bi-plus-lg"></i> Simpan</button>
+    <div class="container py-4">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body p-4">
+                <h4 class="mb-4"><i class="bi bi-person-gear"></i> Master Pejabat Pengadaan</h4>
+                <div class="row g-3">
+                    <div class="col-md-3"><input id="fullName" class="form-control" placeholder="Nama Lengkap"></div>
+                    <div class="col-md-2"><input id="nip" class="form-control" placeholder="NIP"></div>
+                    <div class="col-md-3"><input id="position" class="form-control" placeholder="Jabatan"></div>
+                    <div class="col-md-2" id="opdContainer" style="display:none;">
+                        <select id="opdSelect" class="form-select"></select>
+                    </div>
+                    <div class="col-md-2">
+                        <button onclick="saveOfficer()" class="btn btn-primary w-100">Simpan</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Nama</th>
-                        <th>NIP</th>
-                        <th>Jabatan</th>
-                    </tr>
-                </thead>
-                <tbody id="officerList">
-                    <tr><td colspan="3" class="text-center">Memuat data...</td></tr>
-                </tbody>
-            </table>
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr><th>Nama</th><th>NIP</th><th>Jabatan</th></tr>
+                    </thead>
+                    <tbody id="officerList"><tr><td colspan="3" class="text-center">Memuat...</td></tr></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -68,13 +56,15 @@ async function init() {
     await loadLayout();
     profile = await getProfile();
     
+    if (!profile) return;
+    
+    // Jika Super Admin, munculkan pilihan OPD
     if (profile.role === 'SUPER_ADMIN') {
         document.getElementById('opdContainer').style.display = 'block';
         const { data } = await supabaseClient.from('opds').select('id, name');
         const select = document.getElementById('opdSelect');
-        data.forEach(o => select.innerHTML += `<option value="${o.id}">${o.name}</option>`);
+        data?.forEach(o => select.innerHTML += `<option value="${o.id}">${o.name}</option>`);
     }
-    
     await loadOfficers();
 }
 
@@ -85,6 +75,7 @@ async function saveOfficer() {
     const opd_id = profile.role === 'SUPER_ADMIN' ? document.getElementById("opdSelect").value : profile.opd_id;
 
     if (!full_name || !nip || !position) return alert("Semua kolom wajib diisi!");
+    if (!opd_id) return alert("OPD tidak ditemukan!");
 
     const { error } = await supabaseClient.from("procurement_officers").insert([{
         tenant_id: profile.tenant_id,
