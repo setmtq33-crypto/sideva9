@@ -315,68 +315,104 @@ async function loadMak(){
     });
 }
 
-function addFundingRow(data = {}) {
+async function addFundingRow(data = {}) {
+
+    const opdId =
+        profile.role === "SUPER_ADMIN"
+        ? currentOpdId
+        : profile.opd_id;
+
+    if (!opdId) {
+
+        alert(
+            "Pilih OPD terlebih dahulu sebelum menambah sumber pendanaan."
+        );
+
+        return;
+    }
 
     const container =
         document.getElementById("fundingContainer");
 
-    const row = document.createElement("div");
+    const row =
+        document.createElement("div");
 
     row.className =
-        "row g-2 border rounded p-2 mb-2 funding-row";
+        "row g-2 border rounded p-3 mb-2 funding-row bg-light";
 
     row.innerHTML = `
+
         <div class="col-md-2">
+            <label class="form-label">
+                Bidang
+            </label>
             <select class="form-select funding-bidang">
-                <option value="">Bidang</option>
+                <option value="">
+                    Loading...
+                </option>
             </select>
         </div>
 
         <div class="col-md-2">
+            <label class="form-label">
+                Program
+            </label>
             <input
                 type="text"
                 class="form-control funding-program"
-                placeholder="Program"
-                value="${data.program || ''}">
+                value="${data.program || ""}"
+                placeholder="Program">
         </div>
 
         <div class="col-md-2">
+            <label class="form-label">
+                Kegiatan
+            </label>
             <input
                 type="text"
                 class="form-control funding-kegiatan"
-                placeholder="Kegiatan"
-                value="${data.kegiatan || ''}">
+                value="${data.kegiatan || ""}"
+                placeholder="Kegiatan">
         </div>
 
         <div class="col-md-2">
+            <label class="form-label">
+                Sub Kegiatan
+            </label>
             <input
                 type="text"
                 class="form-control funding-sub"
-                placeholder="Sub Kegiatan"
-                value="${data.sub_kegiatan || ''}">
+                value="${data.sub_kegiatan || ""}"
+                placeholder="Sub Kegiatan">
         </div>
 
         <div class="col-md-2">
+            <label class="form-label">
+                MAK
+            </label>
             <select class="form-select funding-mak">
-                <option value="">MAK</option>
+                <option value="">
+                    Loading...
+                </option>
             </select>
         </div>
 
         <div class="col-md-1">
+            <label class="form-label">
+                Nilai
+            </label>
             <input
                 type="number"
                 class="form-control funding-budget"
-                placeholder="Nilai"
                 value="${data.allocated_budget || 0}">
         </div>
 
-        <div class="col-md-1">
+        <div class="col-md-1 d-flex align-items-end">
             <button
                 type="button"
-                class="btn btn-danger"
-                onclick="this.closest('.funding-row').remove()">
+                class="btn btn-danger w-100 remove-funding">
 
-                X
+                <i class="fa fa-trash"></i>
 
             </button>
         </div>
@@ -384,7 +420,94 @@ function addFundingRow(data = {}) {
 
     container.appendChild(row);
 
-    loadFundingDropdowns(row, data);
+    const bidangSelect =
+        row.querySelector(".funding-bidang");
+
+    const makSelect =
+        row.querySelector(".funding-mak");
+
+    const removeBtn =
+        row.querySelector(".remove-funding");
+
+    removeBtn.addEventListener(
+        "click",
+        () => {
+            row.remove();
+        }
+    );
+
+    /*
+    ===========================
+    LOAD BIDANG
+    ===========================
+    */
+
+    const {
+        data: bidangs,
+        error: bidangError
+    } = await db
+        .from("bidangs")
+        .select("*")
+        .eq("opd_id", opdId)
+        .order("bidang_name");
+
+    bidangSelect.innerHTML =
+        '<option value="">Pilih Bidang</option>';
+
+    if (!bidangError && bidangs) {
+
+        bidangs.forEach(item => {
+
+            bidangSelect.innerHTML += `
+                <option value="${item.id}">
+                    ${item.bidang_name}
+                </option>
+            `;
+        });
+    }
+
+    if (data.bidang_id) {
+
+        bidangSelect.value =
+            data.bidang_id;
+    }
+
+    /*
+    ===========================
+    LOAD MAK
+    ===========================
+    */
+
+    const {
+        data: maks,
+        error: makError
+    } = await db
+        .from("budget_accounts")
+        .select("*")
+        .order("account_code");
+
+    makSelect.innerHTML =
+        '<option value="">Pilih MAK</option>';
+
+    if (!makError && maks) {
+
+        maks.forEach(item => {
+
+            makSelect.innerHTML += `
+                <option value="${item.id}">
+                    ${item.account_code}
+                    -
+                    ${item.account_name}
+                </option>
+            `;
+        });
+    }
+
+    if (data.budget_account_id) {
+
+        makSelect.value =
+            data.budget_account_id;
+    }
 }
 
 async function loadFundingDropdowns(row, data = {}) {
