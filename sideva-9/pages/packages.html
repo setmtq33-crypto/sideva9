@@ -386,10 +386,20 @@ async function loadPackages() {
             </div>
             
             <div class="row mb-3">
-                <div class="col-md-6">
-                    <div class="meta-info-text"><i class="fa-solid fa-layer-group"></i><strong>Prog:</strong> ${pkg.program || '-'}</div>
-                    <div class="meta-info-text"><i class="fa-solid fa-bars-progress"></i><strong>Keg:</strong> ${pkg.kegiatan || '-'}</div>
-                    <div class="meta-info-text"><i class="fa-solid fa-circle-nodes"></i><strong>Sub:</strong> ${pkg.sub_kegiatan || '-'}</div>
+                // Ganti bagian col-md-6 lama dengan ini:
+                <div class="col-12">
+                    <div class="meta-info-text">
+                        <i class="fa-solid fa-layer-group"></i>
+                        <span><strong>Prog:</strong> ${pkg.program || '-'}</span>
+                    </div>
+                    <div class="meta-info-text">
+                        <i class="fa-solid fa-bars-progress"></i>
+                        <span><strong>Keg:</strong> ${pkg.kegiatan || '-'}</span>
+                    </div>
+                    <div class="meta-info-text">
+                        <i class="fa-solid fa-circle-nodes"></i>
+                        <span><strong>Sub:</strong> ${pkg.sub_kegiatan || '-'}</span>
+                    </div>
                 </div>
                 <div class="col-md-6">
                     <div class="meta-info-text"><i class="fa-solid fa-wallet"></i><strong>MAK ID:</strong> ${pkg.budget_account_id || '-'}</div>
