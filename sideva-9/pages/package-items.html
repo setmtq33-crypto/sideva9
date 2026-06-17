@@ -121,7 +121,14 @@ async function init(){
 }
 
 async function loadPackage(){
- const {data,error}=await itemDb.from('packages').select('*').eq('id',packageId).single();
+ const activeOpdId = getCurrentOpdId(profile);
+
+    const {data,error}=await itemDb
+    .from('packages')
+    .select('*')
+    .eq('id',packageId)
+    .eq('opd_id',activeOpdId)
+    .single();
  if(error) return console.error(error);
  packageData=data;
  document.getElementById('packageName').innerText=data.package_name;
