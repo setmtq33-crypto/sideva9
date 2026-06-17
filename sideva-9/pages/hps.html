@@ -52,19 +52,19 @@ async function init() {
     if (!packageId) { alert('ID Paket tidak ditemukan'); location.href = 'packages.html'; return; }
     
     // 1. Ambil data Paket
-    const { data: pkg } = await db.from('packages').select('*').eq('id', packageId).eq('opd_id', activeOpdId).single();
+    const { data: pkg } = await db.from('packages').select('*').eq('id', packageId);
     if (pkg) {
         document.getElementById('packageName').innerText = pkg.package_name;
         document.getElementById('budgetCeiling').innerText = rupiah(pkg.budget_ceiling);
     }
 
     // 2. Kalkulasi HPS
-    const { data: items } = await db.from('package_items').select('*').eq('package_id', packageId).eq('opd_id', activeOpdId);
+    const { data: items } = await db.from('package_items').select('*').eq('package_id', packageId);
     let totalHps = 0;
     let html = '';
 
     for (const item of (items || [])) {
-        const { data: surveys } = await db.from('price_surveys').select('*').eq('package_item_id', item.id).eq('opd_id', activeOpdId);
+        const { data: surveys } = await db.from('price_surveys').select('*').eq('package_item_id', item.id);
         
         let hpsUnit = surveys?.length > 0 
             ? (surveys.reduce((acc, s) => acc + (Number(s.negotiated_price || s.survey_price || 0)), 0) / surveys.length)
