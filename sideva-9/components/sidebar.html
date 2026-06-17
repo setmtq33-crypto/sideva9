@@ -28,7 +28,6 @@
                 </a>
             </li>
             
-            
             <li class="my-2 border-top border-secondary border-opacity-25"></li>
             
             <li class="menu-divider text-uppercase fw-bold text-info mb-1 px-3">
@@ -114,14 +113,21 @@
     .adaptive-sidebar {
         width: var(--sidebar-width);
         height: 100vh;
+        height: 100dvh; /* FIX iOS: Menggunakan Dynamic Viewport Height */
         position: fixed;
         top: 0;
+        bottom: 0;      /* FIX iOS: Mengunci tinggi sidebar di layar mobile */
         left: 0;
         background: #090d16 !important;
-        z-index: 1040;
+        z-index: 1050;   /* Naikkan sedikit di atas komponen standar Bootstrap */
         display: flex;
         flex-direction: column;
         border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+        
+        /* FIX iOS: Memaksa hardware acceleration agar elemen fixed tidak hilang */
+        -webkit-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        will-change: transform;
     }
     .sidebar-brand-panel {
         height: auto;
@@ -142,6 +148,7 @@
         flex-grow: 1;
         overflow-y: auto;
         scrollbar-width: none;
+        -webkit-overflow-scrolling: touch; /* FIX iOS: Memastikan scroll internal lancar di iPhone */
     }
     .sidebar-scroller::-webkit-scrollbar { display: none; }
     
@@ -194,9 +201,19 @@
         background: #dc3545 !important;
         color: #ffffff !important;
     }
+    
     @media (max-width: 991.98px) {
-        .adaptive-sidebar { transform: translateX(-100%); transition: transform .3s; }
-        body.sidebar-open .adaptive-sidebar { transform: translateX(0); }
+        /* FIX iOS: Menambahkan vendor prefix -webkit-transform dan properti transisi yang tepat */
+        .adaptive-sidebar { 
+            -webkit-transform: translate3d(-100%, 0, 0);
+            transform: translate3d(-100%, 0, 0); 
+            -webkit-transition: -webkit-transform .3s ease;
+            transition: transform .3s ease; 
+        }
+        body.sidebar-open .adaptive-sidebar { 
+            -webkit-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0); 
+        }
     }
 </style>
 
