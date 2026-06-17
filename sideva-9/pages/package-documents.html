@@ -389,7 +389,10 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 <tr>
                     <td width="220" style="padding:3px; vertical-align:top;"><strong>Nomor</strong></td>
                     <td width="15" style="padding:3px; vertical-align:top; text-align:center;">:</td>
-                    <td style="padding:3px; vertical-align:top; text-align:justify;">PENETAPAN/${paket.rup_number || '........'}/${opd?.code/2026</td>
+                    // Menggunakan tanda kurung kurawal untuk memisahkan variabel dan teks statis
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">
+                        PENETAPAN/${paket.rup_number || '........'}/${opd?.code || 'KODE'}/2026
+                    </td>
                 </tr>
                 <tr>
                     <td style="padding:3px; vertical-align:top;"><strong>Tanggal</strong></td>
