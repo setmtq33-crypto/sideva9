@@ -107,9 +107,9 @@ body { background: #f5f6fa; display: flex; margin: 0; padding: 0; }
                             <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('dpp')">5. Dokumen Persiapan (DPP)</button>
                             <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('spek')">6. Spesifikasi Teknis (SPEK)</button>
                             <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('riviu')">7. BA Kaji Ulang DPP (RIVIU)</button>
-                            <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('evhp')">8. BA Evaluasi Harga (EVHP)</button>
+                            <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('evht')">8. BA Evaluasi Harga (EVHP)</button>
                             <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('evat')">9. BA Evaluasi Admin (EVAT)</button>
-                            <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('bahpe')">10. BA Hasil Pengadaan (BAHPE)</button>
+                            <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('baep')">10. BA Hasil Pengadaan (BAHPE)</button>
                         </div>
                     </div>
                 </div>
@@ -392,7 +392,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 <tr>
                     <td width="220" style="padding:3px; vertical-align:top;"><strong>Nomor</strong></td>
                     <td width="15" style="padding:3px; vertical-align:top; text-align:center;">:</td>
-                    <td style="padding:3px; vertical-align:top; text-align:justify;">PENETAPAN/${paket.rup_number || '........'}/BAPPERIDA/2026</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">PENETAPAN/${paket.rup_number || '........'}/${opd?.code/2026</td>
                 </tr>
                 <tr>
                     <td style="padding:3px; vertical-align:top;"><strong>Tanggal</strong></td>
@@ -493,7 +493,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 <tr>
                     <td style="padding:3px; vertical-align:top;"><strong>Nomor</strong></td>
                     <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
-                    <td style="padding:3px; vertical-align:top; text-align:justify;">NODIS/${paket.rup_number || '........'}/BAPPERIDA/2026</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">NODIS/${paket.rup_number || '........'}/${opd?.code/2026</td>
                 </tr>
                 <tr>
                     <td style="padding:3px; vertical-align:top;"><strong>Perihal</strong></td>
@@ -567,7 +567,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 <tr>
                     <td width="100" style="padding:3px; vertical-align:top;"><strong>Nomor</strong></td>
                     <td width="15" style="padding:3px; vertical-align:top; text-align:center;">:</td>
-                    <td style="padding:3px; vertical-align:top;">${paket.rup_number || '........'}/BAPPERIDA/2026</td>
+                    <td style="padding:3px; vertical-align:top;">${paket.rup_number || '........'}/${opd?.code/2026</td>
                 </tr>
                 <tr>
                     <td style="padding:3px; vertical-align:top;"><strong>Sifat</strong></td>
@@ -660,13 +660,13 @@ async function renderSidevaDocumentInternal(slug, pId) {
             ${kopHtml}
             
             <div style="text-align:center; font-size:14pt; font-weight:bold; text-decoration:underline; margin-bottom:5px;">SPESIFIKASI TEKNIS PAKET E-PURCHASING</div>
-            <div style="text-align:center; font-size:11pt; margin-bottom:20px;">Nomor: SPEK/${paket.rup_number || '........'}/DEMO/2026</div>
+            <div style="text-align:center; font-size:11pt; margin-bottom:20px;">Nomor: SPEK/${paket.rup_number || '........'}/${opd?.code/2026</div>
 
             <table style="width:100%; font-size:10.5pt; margin-bottom:25px; border-collapse:collapse;">
                 <tr>
                     <td width="220" style="padding:3px; vertical-align:top;"><strong>Perangkat Daerah</strong></td>
                     <td width="15" style="padding:3px; vertical-align:top; text-align:center;">:</td>
-                    <td style="padding:3px; vertical-align:top; text-align:justify;">${opd?.opd_name || '-'}</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${opd?.name || '-'}</td>
                 </tr>
                 <tr>
                     <td style="padding:3px; vertical-align:top;"><strong>Program</strong></td>
@@ -813,7 +813,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
             ${kopHtml}
             
             <div style="text-align:center; font-size:14pt; font-weight:bold; text-decoration:underline; margin-bottom:5px;">DOKUMEN PERSIAPAN PENGADAAN (DPP) E - PURCHASING</div>
-            <div style="text-align:center; font-size:11pt; margin-bottom:15px;">Nomor: DPP/${paket.rup_number || '........'}/DEMO/2026</div>
+            <div style="text-align:center; font-size:11pt; margin-bottom:15px;">Nomor: DPP/${paket.rup_number || '........'}/${opd?.code/2026</div>
 
             <table style="width:100%; font-size:10.5pt; margin-bottom:20px; border-collapse:collapse;">
                 <tr>
@@ -824,7 +824,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 <tr>
                     <td style="padding:3px; vertical-align:top;"><strong>Perangkat Daerah</strong></td>
                     <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
-                    <td style="padding:3px; vertical-align:top; text-align:justify;">${opd?.opd_name || '-'}</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${opd?.name || '-'}</td>
                 </tr>
                 <tr>
                     <td style="padding:3px; vertical-align:top;"><strong>Program</strong></td>
@@ -1045,7 +1045,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 <tr>
                     <td width="220" style="padding:3px; vertical-align:top;"><strong>Nomor</strong></td>
                     <td width="15" style="padding:3px; vertical-align:top; text-align:center;">:</td>
-                    <td style="padding:3px; vertical-align:top; text-align:justify;">PP/${paket.rup_number || '........'}/BAHEV-HP/BAPPERIDA/2026</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">PP/${paket.rup_number || '........'}/BAHEV-HP/${opd?.code/2026</td>
                 </tr>
                 <tr>
                     <td style="padding:3px; vertical-align:top;"><strong>Program</strong></td>
@@ -1148,7 +1148,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 <tr>
                     <td width="220" style="padding:3px; vertical-align:top;"><strong>Nomor</strong></td>
                     <td width="15" style="padding:3px; vertical-align:top; text-align:center;">:</td>
-                    <td style="padding:3px; vertical-align:top; text-align:justify;">PP/${paket.rup_number || '........'}/BAHEV-AT/BAPPERIDA/2026</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">PP/${paket.rup_number || '........'}/BAHEV-AT/${opd?.code/2026</td>
                 </tr>
                 <tr>
                     <td style="padding:3px; vertical-align:top;"><strong>Program</strong></td>
@@ -1250,7 +1250,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 <tr>
                     <td width="220" style="padding:3px; vertical-align:top;"><strong>Nomor</strong></td>
                     <td width="15" style="padding:3px; vertical-align:top; text-align:center;">:</td>
-                    <td style="padding:3px; vertical-align:top; text-align:justify;">PP/${paket.rup_number || '........'}/BAHPE/BAPPERIDA/2026</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">PP/${paket.rup_number || '........'}/BAHPE/${opd?.code/2026</td>
                 </tr>
                 <tr>
                     <td style="padding:3px; vertical-align:top;"><strong>Program</strong></td>
