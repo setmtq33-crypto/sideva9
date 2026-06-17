@@ -79,6 +79,22 @@ async function logout() {
         '/pages/login.html';
 }
 
+window.getCurrentOpdId = function(profile){
+
+    if(!profile) return null;
+
+    if(profile.role === 'SUPER_ADMIN'){
+
+        return (
+            localStorage.getItem('global_opd_id')
+            || profile.opd_id
+            || null
+        );
+    }
+
+    return profile.opd_id;
+};
+
 window.requireAuth = requireAuth;
 window.logout = logout;
 
