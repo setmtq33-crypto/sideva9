@@ -337,7 +337,7 @@ async function selectItem(id){
         .from('price_surveys')
         .select('*')
         .eq('package_item_id', id)
-        .eq('opd_id', activeOpdId)
+       
         .order('survey_date', { ascending:false });
 
     if(error){
@@ -414,7 +414,7 @@ async function editSurvey(id){
  .from('price_surveys')
  .select('*')
  .eq('id',id)
- .eq('opd_id',activeOpdId)
+ 
  .single();
 
  if(error){
@@ -468,7 +468,7 @@ if(currentSurveyId){
     .insert({
         ...payload,
         tenant_id: profile.tenant_id,
-        opd_id: activeOpdId,
+       
         package_item_id: selectedItemId
     });
 }
