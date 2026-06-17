@@ -398,6 +398,12 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 </tr>`;
             });
 
+            // Helper untuk memisahkan kode SIPD dan nama ke baris baru
+            const formatSipd = (teks) => {
+                if (!teks) return '-';
+                return teks.includes(' - ') ? teks.replace(' - ', '<br>') : teks;
+            };
+
             htmlOutput = `
             ${kopHtml}
             
