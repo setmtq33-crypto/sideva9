@@ -212,9 +212,10 @@ async function loadPackage(){
     await reviewDb
     .from('packages')
     .select('*')
+    .eq('id', packageId)
     .eq(
-        'id',
-        packageId
+        'opd_id',
+        getCurrentOpdId(profile)
     )
     .single();
 
@@ -240,6 +241,10 @@ async function loadReview(){
     .eq(
         'package_id',
         packageId
+    )
+    .eq(
+        'opd_id',
+        getCurrentOpdId(profile)
     )
     .maybeSingle();
 
@@ -268,7 +273,7 @@ async function saveReview(){
             profile.tenant_id,
 
         opd_id:
-            profile.opd_id,
+            getCurrentOpdId(profile),
 
         package_id:
             packageId,
@@ -309,16 +314,19 @@ async function saveReview(){
     }
 
     await reviewDb
+    await reviewDb
     .from('packages')
     .update({
-
         package_status:
-            'REVIEW_COMPLETE'
-
+        'REVIEW_COMPLETE'
     })
     .eq(
         'id',
         packageId
+    )
+    .eq(
+        'opd_id',
+        getCurrentOpdId(profile)
     );
 
     await writeAuditLog(
