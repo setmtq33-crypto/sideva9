@@ -505,6 +505,7 @@ async function deleteSurvey(id){
 
 // FUNGSI UTAMA YANG MENGGUNAKAN CLOUDFLARE WORKERS
 async function fetchCatalogData(){
+
     const url = catalogUrl.value.trim();
 
     if(!url){
@@ -512,59 +513,87 @@ async function fetchCatalogData(){
         return;
     }
 
-    // Ubah status tombol menjadi Loading sejenak agar terlihat responsif
-    const btn = document.querySelector("button[onclick='fetchCatalogData()']");
-    const originalText = btn.innerText;
-    btn.innerText = "Mengurai URL...";
+    const btn =
+        document.querySelector(
+            "button[onclick='fetchCatalogData()']"
+        );
+
+    const originalText =
+        btn.innerText;
+
+    btn.innerText =
+        'Mengambil Data...';
+
     btn.disabled = true;
 
     try {
-        // 1. Ambil slug produk (elemen terakhir dari URL)
-        // Contoh: "https://katalog.inaproc.id/cv-muria-setia/kertas-hvs-f4" -> "kertas-hvs-f4"
-        const urlObj = new URL(url);
-        const pathSegments = urlObj.pathname.split('/').filter(p => p.length > 0);
-        
-        if (pathSegments.length < 1) {
-            throw new Error('Struktur URL E-Katalog tidak dikenali');
+
+        const response =
+            await fetch(
+                'https://sideva9-sirup-proxy.terlanjurtamvan18.workers.dev',
+                {
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json'
+                    },
+                    body: JSON.stringify({
+                        url:url
+                    })
+                }
+            );
+
+        const result =
+            await response.json();
+
+        if(result.error){
+            throw new Error(result.error);
         }
 
-        const slug = pathSegments[pathSegments.length - 1];
-        const cleanBrand = slug.replaceAll('-', ' ').toUpperCase();
-
-        // 2. Deteksi Nama Vendor secara cerdas dari Path URL
-        // Biasanya struktur URL E-Katalog: /id/produk/nama-vendor/nama-produk atau /nama-vendor/nama-produk
-        let detectedVendor = 'PENYEDIA E-KATALOG';
-        
-        if (pathSegments.length >= 2) {
-            // Mengambil segment tepat sebelum nama produk sebagai nama vendor
-            const vendorSegment = pathSegments[pathSegments.length - 2];
-            if (vendorSegment !== 'product' && vendorSegment !== 'produk') {
-                detectedVendor = vendorSegment.replaceAll('-', ' ').toUpperCase();
-            }
+        if(!result.success){
+            throw new Error(
+                'Data produk tidak ditemukan'
+            );
         }
 
-        // 3. Masukkan data hasil urai otomatis ke dalam Form Modal
-        vendorName.value = detectedVendor;
-        brand.value = cleanBrand;
-        sourceUrl.value = url;
-        
-        // Berikan nilai default Rp0 agar User terbiasa mengetikkan harga asli dari tab sebelah
-        surveyPrice.value = 0;
-        negotiatedPrice.value = 0;
+        vendorName.value =
+            result.seller_name || '';
 
-        alert('Berhasil mengurai data lokal! Proteksi E-Katalog ketat, silakan input manual harga aslinya.');
+        brand.value =
+            result.brand || '';
 
-        // Fokuskan kursor langsung ke input harga agar user tinggal mengetik
-        setTimeout(() => { surveyPrice.focus(); }, 300);
+        surveyPrice.value =
+            result.price || 0;
 
-    } catch (error) {
-        console.error('Error parsing catalog:', error);
-        alert('Gagal membaca URL. Pastikan format URL utuh dan benar.');
-    } finally {
-        // Kembalikan status tombol ke semula
-        btn.innerText = originalText;
-        btn.disabled = false;
+        negotiatedPrice.value =
+            result.price || 0;
+
+        sourceUrl.value =
+            url;
+
+        alert(
+            'Data E-Katalog berhasil diambil'
+        );
+
     }
+    catch(error){
+
+        console.error(error);
+
+        alert(
+            'Gagal mengambil data : ' +
+            error.message
+        );
+
+    }
+    finally {
+
+        btn.innerText =
+            originalText;
+
+        btn.disabled = false;
+
+    }
+
 }
 
 window.openAddModal = openAddModal;
