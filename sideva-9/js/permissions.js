@@ -1,96 +1,48 @@
 async function getRole() {
-
-    const profile =
-        await getProfile();
-
+    const profile = await getProfile();
     return profile?.role || null;
 }
 
 async function canManageUsers() {
-
-    const role =
-        await getRole();
-
-    return [
-        'SUPER_ADMIN',
-        'ADMIN_OPD'
-    ].includes(role);
+    const role = await getRole();
+    return ['SUPER_ADMIN','ADMIN_OPD'].includes(role);
 }
 
 async function canManageOpds() {
-
-    const role =
-        await getRole();
-
-    return role ===
-        'SUPER_ADMIN';
+    const role = await getRole();
+    return role === 'SUPER_ADMIN';
 }
 
-async function canCreatePackage() {
-
-    const role =
-        await getRole();
-
-    return [
-        'SUPER_ADMIN',
-        'ADMIN_OPD',
-        'PPTK'
-    ].includes(role);
+async function canManageRup() {
+    const role = await getRole();
+    return ['SUPER_ADMIN','ADMIN_OPD'].includes(role);
 }
 
-async function canEditHps() {
-
-    const role =
-        await getRole();
-
-    return [
-        'SUPER_ADMIN',
-        'ADMIN_OPD',
-        'PPK'
-    ].includes(role);
+async function canManagePackages() {
+    const role = await getRole();
+    return ['SUPER_ADMIN','ADMIN_OPD','PPTK'].includes(role);
 }
 
-async function canApproveBahpe() {
-
-    const role =
-        await getRole();
-
-    return [
-        'SUPER_ADMIN',
-        'ADMIN_OPD',
-        'PPK'
-    ].includes(role);
+async function canManageSurvey() {
+    const role = await getRole();
+    return ['SUPER_ADMIN','ADMIN_OPD','PBJ'].includes(role);
 }
 
-async function canSubmitPbj() {
-
-    const role =
-        await getRole();
-
-    return [
-        'SUPER_ADMIN',
-        'ADMIN_OPD',
-        'PPK'
-    ].includes(role);
+async function canManageHps() {
+    const role = await getRole();
+    return ['SUPER_ADMIN','ADMIN_OPD','PBJ'].includes(role);
 }
 
-window.getRole =
-    getRole;
+async function canManageBahpe() {
+    const role = await getRole();
+    return ['SUPER_ADMIN','ADMIN_OPD','PBJ'].includes(role);
+}
 
-window.canManageUsers =
-    canManageUsers;
-
-window.canManageOpds =
-    canManageOpds;
-
-window.canCreatePackage =
-    canCreatePackage;
-
-window.canEditHps =
-    canEditHps;
-
-window.canApproveBahpe =
-    canApproveBahpe;
-
-window.canSubmitPbj =
-    canSubmitPbj;
+window.getRole = getRole;
+window.canManageUsers = canManageUsers;
+window.canManageOpds = canManageOpds;
+window.canManageRup = canManageRup;
+window.canManagePackages = canManagePackages;
+window.canManageSurvey = canManageSurvey;
+window.canManageHps = canManageHps;
+window.canManageBahpe = canManageBahpe;
