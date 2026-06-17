@@ -338,6 +338,117 @@ function rupiah(v){
  }).format(v||0);
 }
 
+async function loadBudgetChart(){
+
+ const selectedOpd = localStorage.getItem('global_opd_id') || 'ALL';
+
+ let packageQuery = dashboardDb
+   .from('packages')
+   .select('package_name,budget_ceiling,opd_id')
+   .limit(10);
+
+ let hpsQuery = dashboardDb
+   .from('package_hps')
+   .select('package_id,total_hps,opd_id');
+
+ if(selectedOpd !== 'ALL'){
+   packageQuery = packageQuery.eq('opd_id', selectedOpd);
+   hpsQuery = hpsQuery.eq('opd_id', selectedOpd);
+ }
+
+ const { data: packages } = await packageQuery;
+ const { data: hps } = await hpsQuery;
+
+ const labels = [];
+ const paguData = [];
+ const hpsData = [];
+
+ (packages || []).forEach(pkg => {
+
+   const hpsRow =
+      (hps || []).find(
+         x => x.package_id === pkg.id
+      );
+
+   labels.push(pkg.package_name);
+
+   paguData.push(
+      Number(pkg.budget_ceiling || 0)
+   );
+
+   hpsData.push(
+      Number(hpsRow?.total_hps || 0)
+   );
+ });
+
+ const ctx =
+ document.getElementById('chartPaguHps');
+
+ new Chart(ctx,{
+   type:'bar',
+   data:{
+      labels,
+      datasets:[
+      {
+        label:'Pagu',
+        data:paguData
+      },
+      {
+        label:'HPS',
+        data:hpsData
+      }]
+   },
+   options:{
+      responsive:true,
+      maintainAspectRatio:false
+   }
+ });
+}
+
+async function loadStatusChart(){
+
+ const selectedOpd =
+ localStorage.getItem('global_opd_id')
+ || 'ALL';
+
+ let query =
+ dashboardDb
+ .from('packages')
+ .select('package_status');
+
+ if(selectedOpd !== 'ALL'){
+   query = query.eq('opd_id', selectedOpd);
+ }
+
+ const { data } = await query;
+
+ const statuses = {};
+
+ (data || []).forEach(row => {
+
+   statuses[row.package_status] =
+   (statuses[row.package_status] || 0) + 1;
+
+ });
+
+ const ctx =
+ document.getElementById('chartStatusPie');
+
+ new Chart(ctx,{
+   type:'pie',
+   data:{
+      labels:Object.keys(statuses),
+      datasets:[{
+        data:Object.values(statuses)
+      }]
+   },
+   options:{
+      responsive:true,
+      maintainAspectRatio:false
+   }
+ });
+}
+
 // ====== GANTI FUNGSI init() LAMA ANDA DENGAN INI ======
 async function init(){
   try {
@@ -360,6 +471,12 @@ async function init(){
     await loadStatus();
     await loadOpdSummary();
     await loadRecentPackages();
+
+    await loadBudgetChart();
+    await loadStatusChart();
+
+
+      
   } catch (error) {
     console.error("Gagal memuat inisialisasi awal dashboard:", error);
   }
