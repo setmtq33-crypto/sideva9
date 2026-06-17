@@ -219,12 +219,16 @@ async function init(){
 
 async function loadPackage(){
 
- const {data} =
- await window.supabaseClient
- .from('packages')
- .select('*')
- .eq('id',packageId)
- .single();
+ const profile = await getProfile();
+const activeOpdId = getCurrentOpdId(profile);
+
+const {data} =
+await window.supabaseClient
+.from('packages')
+.select('*')
+.eq('id',packageId)
+.eq('opd_id',activeOpdId)
+.single();
 
  packageData=data;
 
@@ -245,12 +249,16 @@ async function loadPackage(){
 
 async function loadBahpe(){
 
- const {data} =
- await window.supabaseClient
- .from('package_bahpe')
- .select('*')
- .eq('package_id',packageId)
- .maybeSingle();
+ const profile = await getProfile();
+const activeOpdId = getCurrentOpdId(profile);
+
+const {data} =
+await window.supabaseClient
+.from('package_bahpe')
+.select('*')
+.eq('package_id',packageId)
+.eq('opd_id',activeOpdId)
+.maybeSingle();
 
  bahpeData=data;
 
