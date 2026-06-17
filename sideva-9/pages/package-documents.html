@@ -12,6 +12,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 <script>
@@ -180,11 +181,16 @@ body { background: #f5f6fa; display: flex; margin: 0; padding: 0; }
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="fw-bold text-secondary small">DAFTAR PILIHAN BERKAS</span>
-                            <button id="btn-print-action" class="btn btn-danger btn-sm px-3" onclick="cetakDokumenAktif()" disabled>
-                                <i class="bi bi-printer"></i> Cetak A4
-                            </button>
-                        </div>
+                           <span class="fw-bold text-secondary small">DAFTAR PILIHAN BERKAS</span>
+                           <div class="btn-group">
+                               <button id="btn-ttd-cap" class="btn btn-warning btn-sm px-3" onclick="ttdCapOtomatis()" disabled>
+                                   <i class="bi bi-pen"></i> TTD & Cap
+                               </button>
+                               <button id="btn-print-action" class="btn btn-danger btn-sm px-3" onclick="cetakDokumenAktif()" disabled>
+                                   <i class="bi bi-printer"></i> Cetak A4
+                               </button>
+                           </div>
+                       </div>
 
                         <div class="list-group" id="auto-doc-list">
                             <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('idkb')">1. Identifikasi Kebutuhan (IDKB)</button>
@@ -367,6 +373,8 @@ function switchPrintView(slug) {
     // ----------------------------------------------------
 
     document.getElementById('btn-print-action').removeAttribute('disabled');
+    document.getElementById('btn-ttd-cap').removeAttribute('disabled'); // <--- tambah ini
+    
 
     // Memanggil fungsi render dokumen
     renderSidevaDocumentInternal(slug, packageId);
@@ -1585,6 +1593,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
     }
 }
 
+const db = documentDb;
 // ─── STORAGE HANDLING BAWAAN ASLI ANDA ───
 // Hapus kode actionButtons di loadUploadedDocuments
 // Pastikan loadUploadedDocuments Anda hanya seperti ini:
@@ -1861,6 +1870,47 @@ async function saveSignedDocument() {
     }
 }
 
+// ===== TTD & CAP UNTUK DOKUMEN OTOMATIS =====
+async function ttdCapOtomatis(){
+    if(!currentActiveSlug ||!packageId){
+        return Swal.fire('Oops','Pilih dokumen dulu','warning');
+    }
+
+    Swal.fire({title:'Menyiapkan PDF...', allowOutsideClick:false, didOpen:()=>Swal.showLoading()});
+
+    try {
+        // 1. Ambil HTML yang sedang dirender
+        const element = document.getElementById('document-render-area');
+
+        // 2. Convert HTML → PDF (pakai html2pdf)
+        const opt = {
+            margin: 10,
+            filename: `${currentActiveSlug}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        const pdfBlob = await html2pdf().set(opt).from(element).outputPdf('blob');
+
+        // 3. Upload ke Supabase (folder auto/)
+        const filePath = `${packageId}/auto/${currentActiveSlug}-${Date.now()}.pdf`;
+        const file = new File([pdfBlob], filePath.split('/').pop(), {type:'application/pdf'});
+
+        const { error: upErr } = await db.storage.from('package-documents').upload(filePath, file, {upsert:true});
+        if(upErr) throw upErr;
+
+        Swal.close();
+
+        // 4. Langsung buka editor yang sudah kamu punya
+        await openSignEditor(null, filePath); // docId null karena belum ada di tabel
+
+    } catch(err){
+        console.error(err);
+        Swal.fire('Error','Gagal buat PDF: '+err.message,'error');
+    }
+}
+
+    
  
 </script>
 </body>
