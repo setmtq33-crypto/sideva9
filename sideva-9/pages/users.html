@@ -231,54 +231,168 @@ body{
 <div class="modal fade" id="modalTambahUser" tabindex="-1" aria-labelledby="modalTambahUserLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
+
             <div class="modal-header">
                 <h5 class="modal-title fw-bold text-dark" id="modalTambahUserLabel">
-                    <i class="fa-solid fa-user-shield text-primary me-2"></i>Registrasi User Baru
+                    <i class="fa-solid fa-user-shield text-primary me-2"></i>
+                    Registrasi User Baru
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close">
+                </button>
             </div>
+    
             <form onsubmit="tambahUser(event)">
+    
                 <div class="modal-body p-4">
+    
                     <div class="mb-3">
-                        <label for="addFullName" class="form-label fw-semibold">Nama Lengkap</label>
+                        <label for="addFullName" class="form-label fw-semibold">
+                            Nama Lengkap
+                        </label>
+    
                         <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-id-card text-muted"></i></span>
-                            <input type="text" class="form-control border-start-0 ps-1" id="addFullName" placeholder="Masukkan nama tanpa gelar" required>
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fa-solid fa-id-card text-muted"></i>
+                            </span>
+    
+                            <input
+                                type="text"
+                                class="form-control border-start-0 ps-1"
+                                id="addFullName"
+                                placeholder="Masukkan nama tanpa gelar"
+                                required>
                         </div>
                     </div>
+    
                     <div class="mb-3">
-                        <label for="addEmail" class="form-label fw-semibold">Alamat Email</label>
+                        <label for="addEmail" class="form-label fw-semibold">
+                            Alamat Email
+                        </label>
+    
                         <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-envelope text-muted"></i></span>
-                            <input type="email" class="form-control border-start-0 ps-1" id="addEmail" placeholder="contoh: nama@domain.com" required>
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fa-solid fa-envelope text-muted"></i>
+                            </span>
+    
+                            <input
+                                type="email"
+                                class="form-control border-start-0 ps-1"
+                                id="addEmail"
+                                placeholder="contoh: nama@domain.com"
+                                required>
                         </div>
                     </div>
+    
+                    <div class="mb-3">
+                        <label for="addPassword" class="form-label fw-semibold">
+                            Password Awal
+                        </label>
+    
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fa-solid fa-key text-muted"></i>
+                            </span>
+    
+                            <input
+                                type="password"
+                                class="form-control border-start-0 ps-1"
+                                id="addPassword"
+                                placeholder="Masukkan password awal"
+                                required>
+                        </div>
+                    </div>
+    
                     <div class="row">
+    
                         <div class="col-md-6 mb-3">
-                            <label for="addRole" class="form-label fw-semibold">Hak Akses (Role)</label>
-                            <select class="form-select" id="addRole" required>
-                                <option value="">-- Pilih Role --</option>
-                                <option value="SUPER_ADMIN">SUPER_ADMIN</option>
-                                <option value="ADMIN_OPD">ADMIN_OPD</option>
-                                <option value="PPK">PPK</option>
-                                <option value="PPTK">PPTK</option>
-                                <option value="PBJ">PBJ</option>
-                                <option value="VIEWER">VIEWER</option>
+                            <label for="addRole" class="form-label fw-semibold">
+                                Hak Akses (Role)
+                            </label>
+    
+                            <select
+                                class="form-select"
+                                id="addRole"
+                                required>
+    
+                                <option value="">
+                                    -- Pilih Role --
+                                </option>
+    
+                                <option value="SUPER_ADMIN">
+                                    SUPER_ADMIN
+                                </option>
+    
+                                <option value="ADMIN_OPD">
+                                    ADMIN_OPD
+                                </option>
+    
+                                <option value="PPK">
+                                    PPK
+                                </option>
+    
+                                <option value="PPTK">
+                                    PPTK
+                                </option>
+    
+                                <option value="PBJ">
+                                    PBJ
+                                </option>
+    
+                                <option value="VIEWER">
+                                    VIEWER
+                                </option>
+    
                             </select>
                         </div>
+    
                         <div class="col-md-6 mb-3">
-                            <label for="addOpdId" class="form-label fw-semibold">Instansi Kedinasan</label>
-                            <select class="form-select" id="addOpdId" required>
-                                <option value="">-- Pilih OPD --</option>
+                            <label for="addOpdId" class="form-label fw-semibold">
+                                Instansi Kedinasan
+                            </label>
+    
+                            <select
+                                class="form-select"
+                                id="addOpdId"
+                                required>
+    
+                                <option value="">
+                                    -- Pilih OPD --
+                                </option>
+    
                             </select>
                         </div>
+    
                     </div>
+    
                 </div>
+    
                 <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary px-4"><i class="fa-solid fa-floppy-disk me-1"></i> Simpan User</button>
+    
+                    <button
+                        type="button"
+                        class="btn btn-light border"
+                        data-bs-dismiss="modal">
+                        Batal
+                    </button>
+    
+                    <button
+                        type="submit"
+                        class="btn btn-primary px-4">
+    
+                        <i class="fa-solid fa-floppy-disk me-1"></i>
+                        Simpan User
+    
+                    </button>
+    
                 </div>
+    
             </form>
+    
         </div>
     </div>
 </div>
