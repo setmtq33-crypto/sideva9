@@ -1602,10 +1602,32 @@ function renderUploadedTable(){
         document.getElementById('documentsTable').innerHTML = '<tr><td colspan="5" class="text-center py-3 text-muted">Belum ada file manual yang diunggah ke storage.</td></tr>';
         return;
     }
-    documents.forEach(doc=>{
-        html += `<tr><td><span class="badge bg-secondary">${doc.document_type}</span></td><td>${doc.file_name}</td><td>${formatBytes(doc.file_size)}</td><td>${new Date(doc.created_at).toLocaleDateString('id-ID')}</td><td><button class="btn btn-success btn-sm p-1 px-2 me-1" onclick="downloadDocument('${doc.file_path}')"><i class="bi bi-download"></i></button><button class="btn btn-danger btn-sm p-1 px-2" onclick="deleteDocument('${doc.id}','${doc.file_path}')"><i class="bi bi-trash"></i></button></td></tr>`;
+    
+    // Looping data dokumen
+    documents.forEach(doc => {
+        // Tombol diletakkan DI DALAM loop agar variabel 'doc' terbaca
+        const actionButtons = `
+            <div class="d-flex flex-wrap gap-1">
+                <button class="btn btn-sm btn-info" onclick="downloadDocument('${doc.file_path}')" title="Unduh"><i class="bi bi-download"></i></button>
+                <button class="btn btn-sm btn-danger" onclick="deleteDocument('${doc.id}','${doc.file_path}')" title="Hapus"><i class="bi bi-trash"></i></button>
+                <button class="btn btn-sm btn-secondary" onclick="returnDocument('${doc.id}')" title="Kembalikan Dokumen"><i class="bi bi-arrow-return-left"></i></button>
+                <button class="btn btn-sm btn-success" onclick="approveDocument('${doc.id}')" title="Setujui Dokumen"><i class="bi bi-check-lg"></i></button>
+                <button class="btn btn-sm btn-primary" onclick="editDocument('${doc.id}')" title="Beri Catatan"><i class="bi bi-chat-text"></i></button>
+                <button class="btn btn-sm btn-warning" onclick="openSignEditor('${doc.id}', '${doc.file_path}')" title="Bubuhi TTD & Cap"><i class="bi bi-pen"></i> TTD & Cap</button>
+            </div>
+        `;
+
+        html += `
+        <tr>
+            <td><span class="badge bg-secondary">${doc.document_type}</span></td>
+            <td>${doc.file_name}</td>
+            <td>${formatBytes(doc.file_size)}</td>
+            <td>${new Date(doc.created_at).toLocaleDateString('id-ID')}</td>
+            <td style="min-width: 250px;">${actionButtons}</td>
+        </tr>`;
     });
-    document.getElementById('documentsTable').innerHTML=html;
+    
+    document.getElementById('documentsTable').innerHTML = html;
 }
 
 document.getElementById('uploadForm').addEventListener('submit', async (e)=>{
