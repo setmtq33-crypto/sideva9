@@ -318,9 +318,56 @@ function switchPrintView(slug) {
 }
 
  function cetakDokumenAktif() {
-    window.print();
-}
 
+    const isi =
+        document.getElementById('document-render-area').innerHTML;
+
+    const win =
+        window.open('', '_blank');
+
+    win.document.write(`
+        <html>
+        <head>
+            <title>Cetak Dokumen</title>
+            <style>
+                body{
+                    font-family:'Times New Roman',serif;
+                    margin:20px;
+                    background:#fff;
+                }
+
+                table{
+                    border-collapse:collapse;
+                    width:100%;
+                }
+
+                th,td{
+                    border:1px solid #000;
+                }
+
+                img{
+                    max-width:100%;
+                }
+
+                @page{
+                    size:A4;
+                    margin:15mm;
+                }
+            </style>
+        </head>
+        <body>
+            ${isi}
+        </body>
+        </html>
+    `);
+
+    win.document.close();
+
+    setTimeout(() => {
+        win.print();
+    }, 500);
+
+}
 
 // ─── CORE ENGINE GENERATOR ADMINISTRASI FISIK ───
 function docFmtRp(v) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(v || 0); }
