@@ -1728,29 +1728,25 @@ async function loadPpkomsAssets() {
     try {
         const { data: ppkom, error } = await db.from('ppkoms').select('signature_url, stamp_url').limit(1).single();
         if (error) throw error;
-
-        const bucketName = 'sideva-documents'; // Menggunakan bucket yang baru
-
-        // Memproses URL Cap (Stempel)
-        if (ppkom.stamp_url) {
-            if (ppkom.stamp_url.startsWith('http')) {
-                dynamicUrlCap = ppkom.stamp_url;
-            } else {
-                // Pastikan path mengarah ke folder 'stamps/'
-                const pathCap = ppkom.stamp_url.startsWith('stamps/') ? ppkom.stamp_url : `stamps/${ppkom.stamp_url}`;
-                dynamicUrlCap = db.storage.from(bucketName).getPublicUrl(pathCap).data.publicUrl;
-            }
-        }
         
-        // Memproses URL Tanda Tangan
+        console.log("Data PPKOM ditemukan:", ppkom); // <--- TAMBAHKAN INI
+
+        const bucketName = 'sideva-documents';
+
         if (ppkom.signature_url) {
-            if (ppkom.signature_url.startsWith('http')) {
-                dynamicUrlTtd = ppkom.signature_url;
-            } else {
-                // Pastikan path mengarah ke folder 'signatures/'
-                const pathTtd = ppkom.signature_url.startsWith('signatures/') ? ppkom.signature_url : `signatures/${ppkom.signature_url}`;
-                dynamicUrlTtd = db.storage.from(bucketName).getPublicUrl(pathTtd).data.publicUrl;
-            }
+            const pathTtd = ppkom.signature_url.startsWith('signatures/') ? ppkom.signature_url : `signatures/${ppkom.signature_url}`;
+            dynamicUrlTtd = db.storage.from(bucketName).getPublicUrl(pathTtd).data.publicUrl;
+            console.log("URL TTD:", dynamicUrlTtd); // <--- TAMBAHKAN INI
+        } else {
+            console.warn("Kolom signature_url kosong!");
+        }
+
+        if (ppkom.stamp_url) {
+            const pathCap = ppkom.stamp_url.startsWith('stamps/') ? ppkom.stamp_url : `stamps/${ppkom.stamp_url}`;
+            dynamicUrlCap = db.storage.from(bucketName).getPublicUrl(pathCap).data.publicUrl;
+            console.log("URL Cap:", dynamicUrlCap); // <--- TAMBAHKAN INI
+        } else {
+            console.warn("Kolom stamp_url kosong!");
         }
     } catch (err) {
         console.error("Gagal memuat aset PPKOM:", err);
