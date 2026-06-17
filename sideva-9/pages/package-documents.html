@@ -637,7 +637,9 @@ async function renderSidevaDocumentInternal(slug, pId) {
         } else if (slug === 'spek') {
             let itemRows = "";
             listItems.forEach((it, i) => {
-                const hargaSatuan = it.price_surveys?.[0]?.price || 0;
+                // PERBAIKAN: Mengambil harga satuan dari estimated_price sesuai package-items
+                const hargaSatuan = it.estimated_price || 0;
+                
                 itemRows += `
                 <tr>
                     <td style="border:1px solid #000; padding:6px; text-align:left;">
@@ -785,7 +787,9 @@ async function renderSidevaDocumentInternal(slug, pId) {
         } else if (slug === 'dpp') {
             let rows = "";
             listItems.forEach((it, i) => {
-                const hargaSatuan = it.price_surveys?.[0]?.price || 0;
+                // PERBAIKAN: Mengambil harga satuan dari estimated_price sesuai package-items
+                const hargaSatuan = it.estimated_price || 0;
+                
                 rows += `
                 <tr>
                     <td style="border:1px solid #000; padding:6px; text-align:center;">${i+1}.</td>
