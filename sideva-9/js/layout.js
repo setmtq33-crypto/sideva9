@@ -76,7 +76,7 @@ async function loadLayout() {
                     'menuConfigs',
                     'menuAccounts',
                     'menuBidangs',
-                    'menuSipd'
+                    'menuSipd',
                     'menuRup'
                 ],
             
@@ -87,7 +87,7 @@ async function loadLayout() {
                     'menuAccounts',
                     'menuBidangs',
                     'menuSipd',
-                    'menuRup'
+                    'menuRup',
                     'menuPackages'
                 ]
             };
