@@ -251,9 +251,14 @@ async function initPage(){
 
     if(profile.role === "SUPER_ADMIN"){
         await loadOpds();
+        currentOpdId = getCurrentOpdId(profile);
+
+        document.getElementById("opdSelect").value =
+    
+            currentOpdId || "";
     } else {
         document.getElementById("opdWrapper").style.display = "none";
-        const currentOpdId = getCurrentOpdId(profile);
+        currentOpdId = getCurrentOpdId(profile);
     }
 
     await loadMak();
@@ -262,6 +267,13 @@ async function initPage(){
 
     document.getElementById("opdSelect")?.addEventListener("change", async e => {
         currentOpdId = e.target.value;
+        if(profile.role === "SUPER_ADMIN"){
+            localStorage.setItem(    
+                "global_opd_id",
+                currentOpdId    
+            );
+    
+        }
         await loadBidangs();
         await loadPackages();
     });
@@ -276,12 +288,23 @@ async function loadOpds(){
     const select = document.getElementById("opdSelect");
     select.innerHTML = '<option value="">Pilih OPD</option>';
     data.forEach(opd => {
-        select.innerHTML += `<option value="${opd.id}">${opd.name}</option>`;
+        select.innerHTML += `
+            <option value="${opd.id}">
+                ${opd.code} - ${opd.name}
+            </option>
+        `;
     });
+    
+    const activeOpd = getCurrentOpdId(profile);
+    
+    if(activeOpd){
+        select.value = activeOpd;
+        currentOpdId = activeOpd;
+    }
 }
 
 async function loadBidangs(){
-    const opdId = profile.role === "SUPER_ADMIN" ? const currentOpdId : getCurrentOpdId(profile);
+    const opdId = profile.role === "SUPER_ADMIN" ? currentOpdId : getCurrentOpdId(profile);
     const select = document.getElementById("bidangSelect");
     select.innerHTML = '<option value="">Pilih Bidang</option>';
     
@@ -311,7 +334,7 @@ async function savePackage(){
         return;
     }
 
-    const opdId = profile.role === "SUPER_ADMIN" ? const currentOpdId : getCurrentOpdId(profile);
+    const opdId = profile.role === "SUPER_ADMIN" ? currentOpdId : getCurrentOpdId(profile);
     if(!opdId){
         alert("Pilih OPD terlebih dahulu");
         return;
@@ -351,7 +374,7 @@ async function savePackage(){
 async function loadPackages() {
     let query = db.from("packages").select("*").order("created_at", { ascending: false });
     
-    const opdId = profile.role === "SUPER_ADMIN" ? const currentOpdId : getCurrentOpdId(profile);
+    const opdId = profile.role === "SUPER_ADMIN" ? currentOpdId : getCurrentOpdId(profile);
     if (opdId) {
         query = query.eq("opd_id", opdId);
     }
