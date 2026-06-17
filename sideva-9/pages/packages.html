@@ -337,6 +337,16 @@ function formatMultilineText(text) {
     // dan menggantinya dengan baris baru (\n)
     return text.trim().replace(/(\s)(\d+\.)/g, '\n$2');
 }
+
+function formatTextWithBreak(text) {
+    if (!text) return '-';
+    // Bagian pertama (kode) akan ditebalkan, lalu baris baru, lalu sisanya
+    let parts = text.split(/\s*-\s*/);
+    if (parts.length > 1) {
+        return `<strong>${parts[0]}</strong><br><span class="text-secondary">${parts.slice(1).join(' - ')}</span>`;
+    }
+    return text;
+}
     
 
 async function loadOpds(){
@@ -471,15 +481,15 @@ async function loadPackages() {
             <div class="row g-3 mb-3 pb-3 border-bottom">
                 <div class="col-md-4">
                     <label class="form-label text-muted" style="font-size: 0.75rem; text-transform: uppercase;">Program Kerja</label>
-                    <div class="meta-info-text text-dark fw-medium">${pkg.program || '-'}</div>
+                    <div class="meta-info-text text-dark fw-medium">${formatTextWithBreak(pkg.program)}</div>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label text-muted" style="font-size: 0.75rem; text-transform: uppercase;">Kegiatan</label>
-                    <div class="meta-info-text text-dark fw-medium">${pkg.kegiatan || '-'}</div>
+                    <div class="meta-info-text text-dark fw-medium">${formatTextWithBreak(pkg.kegiatan)}</div>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label text-muted" style="font-size: 0.75rem; text-transform: uppercase;">Sub Kegiatan</label>
-                    <div class="meta-info-text text-dark fw-medium">${pkg.sub_kegiatan || '-'}</div>
+                    <div class="meta-info-text text-dark fw-medium">${formatTextWithBreak(pkg.sub_kegiatan)}</div>
                 </div>
             </div>
     
