@@ -398,16 +398,14 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 </tr>`;
             });
 
-            // Helper Cerdas: Deteksi multikode & potong spasi
+            // Helper Cerdas: Deteksi multikode tanpa memotong tanda strip
             const formatSipd = (teks) => {
                 if (!teks) return '-';
                 
-                // 1. Deteksi spasi yang diikuti oleh format kode SIPD (misal: 5.05.02...) di tengah kalimat
-                // Lalu paksa turun ke baris baru dengan jarak (<br><br>)
-                let pisahKegiatanGanda = teks.replace(/ (?=\d{1,2}\.\d{2}\.\d{2})/g, '<br><br>');
-                
-                // 2. Ganti tanda strip yang memisahkan Kode dan Nama menjadi <br> agar nama turun sejajar
-                return pisahKegiatanGanda.replace(/ - /g, '<br>');
+                // Hanya mencari spasi yang diikuti oleh pola angka kode (misal 5.05.02...)
+                // Lalu ganti spasi tersebut dengan <br> agar turun ke baris baru
+                // Tanda strip (-) dibiarkan apa adanya agar tetap sejajar: Kode - Nama
+                return teks.replace(/\s+(?=\d{1,2}\.\d{2}\.\d{2})/g, '<br>');
             };
 
             htmlOutput = `
@@ -460,7 +458,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 <tr>
                     <td style="padding:3px; vertical-align:top;"><strong>Mata Anggaran Belanja</strong></td>
                     <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
-                    <td style="padding:3px; vertical-align:top; text-align:justify;">${akun ? `${akun.account_code} <br> ${akun.account_name}` : '-'}</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${akun ? `${akun.account_code} - ${akun.account_name}` : '-'}</td>
                 </tr>
                 <tr>
                     <td style="padding:3px; vertical-align:top;"><strong>Sumber Dana</strong></td>
