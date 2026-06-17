@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pusat Bantuan SI-DEVA9</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+
+<style>
+body{
+    background:#f8fafc;
+}
+
+.card{
+    border:none;
+    border-radius:16px;
+    box-shadow:0 4px 15px rgba(0,0,0,.08);
+}
+
+.card-header{
+    font-weight:700;
+}
+
+.section-icon{
+    margin-right:8px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container py-4">
+
+<div class="mb-4">
+    <h2>
+        <i class="fa-solid fa-book-open text-primary"></i>
+        Pusat Bantuan SI-DEVA9
+    </h2>
+    <p class="text-muted">
+        Panduan penggunaan Sistem Informasi Digital Evaluasi Verifikasi Administrasi E-Purchasing.
+    </p>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header bg-primary text-white">
+        <i class="fa-solid fa-circle-info section-icon"></i>
+        Tentang SI-DEVA9
+    </div>
+    <div class="card-body">
+        SI-DEVA9 merupakan aplikasi pendukung proses pengadaan barang/jasa pemerintah untuk membantu OPD menyusun kebutuhan, melakukan survei harga, menghitung HPS, menyusun dokumen administrasi, dan mempersiapkan pengadaan sebelum dilaksanakan melalui sistem resmi pengadaan pemerintah.
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header bg-success text-white">
+        <i class="fa-solid fa-users section-icon"></i>
+        Hak Akses Pengguna
+    </div>
+    <div class="card-body">
+
+        <ul>
+            <li><b>SUPER ADMIN</b> → Mengelola seluruh sistem SI-DEVA9.</li>
+            <li><b>ADMIN OPD</b> → Mengelola data pengadaan pada OPD masing-masing.</li>
+            <li><b>PPTK</b> → Menyusun kebutuhan dan data paket.</li>
+            <li><b>PPK</b> → Verifikasi dan persiapan pengadaan.</li>
+            <li><b>PBJ</b> → Melaksanakan proses pengadaan.</li>
+            <li><b>VIEWER</b> → Monitoring dan pelaporan.</li>
+        </ul>
+
+        <a href="access-matrix.html" class="btn btn-outline-success">
+            <i class="fa-solid fa-shield-halved"></i>
+            Lihat Matriks Hak Akses
+        </a>
+
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header bg-warning">
+        <i class="fa-solid fa-diagram-project section-icon"></i>
+        Alur Kerja SI-DEVA9
+    </div>
+    <div class="card-body">
+
+        <ol>
+            <li>Import / Input RUP</li>
+            <li>Membuat Paket Pengadaan</li>
+            <li>Mengisi Rincian Barang/Jasa</li>
+            <li>Melakukan Survei Harga</li>
+            <li>Menghitung HPS</li>
+            <li>Menyusun Dokumen Persiapan Pengadaan</li>
+            <li>Menyusun BAHPE</li>
+            <li>Ready Procurement</li>
+            <li>Diserahkan ke PBJ/SPSE</li>
+        </ol>
+
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header bg-info text-white">
+        <i class="fa-solid fa-list-check section-icon"></i>
+        Status Paket
+    </div>
+    <div class="card-body">
+
+        <ul>
+            <li><b>DRAFT</b> → Paket masih dalam proses penyusunan.</li>
+            <li><b>HPS_COMPLETE</b> → HPS telah selesai dihitung.</li>
+            <li><b>BAHPE_COMPLETE</b> → Dokumen BAHPE selesai.</li>
+            <li><b>READY_PROCUREMENT</b> → Paket siap diproses pengadaan.</li>
+        </ul>
+
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header bg-secondary text-white">
+        <i class="fa-solid fa-circle-question section-icon"></i>
+        Pertanyaan Umum (FAQ)
+    </div>
+    <div class="card-body">
+
+        <p><b>Siapa yang dapat menambah user?</b><br>SUPER ADMIN.</p>
+
+        <p><b>Siapa yang dapat mengubah OPD?</b><br>SUPER ADMIN.</p>
+
+        <p><b>Mengapa menu saya berbeda?</b><br>Karena setiap role memiliki hak akses berbeda.</p>
+
+        <p><b>Mengapa tidak bisa membuka halaman tertentu?</b><br>Karena halaman tersebut tidak termasuk hak akses role Anda.</p>
+
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-dark text-white">
+        <i class="fa-solid fa-headset section-icon"></i>
+        Dukungan Teknis
+    </div>
+    <div class="card-body">
+
+        Jika mengalami kendala penggunaan aplikasi, silakan menghubungi Administrator SI-DEVA9 pada instansi masing-masing.
+
+    </div>
+</div>
+
+</div>
+
+</body>
+</html>
