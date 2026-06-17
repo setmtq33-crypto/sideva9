@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIPD-RI Data Center</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+
+<style>
+body{
+    background:#f8fafc;
+}
+
+.card{
+    border:none;
+    border-radius:16px;
+    box-shadow:0 4px 15px rgba(0,0,0,.08);
+}
+
+.console{
+    background:#0f172a;
+    color:#10b981;
+    border-radius:12px;
+    padding:15px;
+    height:220px;
+    overflow:auto;
+    font-family:monospace;
+    font-size:.85rem;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container-fluid py-4">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold">
+            <i class="fa-solid fa-database text-success me-2"></i>
+            SIPD-RI Data Center
+        </h3>
+        <p class="text-muted mb-0">
+            Sinkronisasi Data Perencanaan dan Anggaran SIPD-RI ke SI-DEVA9
+        </p>
+    </div>
+
+    <span class="badge bg-success fs-6">
+        Tahap Pengembangan
+    </span>
+</div>
+
+<div class="row g-3 mb-4">
+
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h6 class="fw-bold mb-3">
+                <i class="fa-solid fa-link me-2"></i>
+                Koneksi SIPD-RI
+            </h6>
+
+            <div class="mb-3">
+                <label class="form-label">Domain SIPD-RI</label>
+                <input type="text"
+                       class="form-control"
+                       value="https://sipd-ri.kemendagri.go.id">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Bearer Token</label>
+                <textarea class="form-control" rows="4"></textarea>
+            </div>
+
+            <button class="btn btn-primary">
+                <i class="fa-solid fa-plug me-2"></i>
+                Uji Koneksi
+            </button>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+
+        <div class="card p-3 mb-3">
+
+            <h6 class="fw-bold mb-3">
+                <i class="fa-solid fa-cloud-arrow-down me-2"></i>
+                Sinkronisasi Data
+            </h6>
+
+            <div class="row g-2">
+
+                <div class="col-md-4">
+                    <button class="btn btn-outline-primary w-100">
+                        📥 Tarik Program
+                    </button>
+                </div>
+
+                <div class="col-md-4">
+                    <button class="btn btn-outline-primary w-100">
+                        📥 Tarik Kegiatan
+                    </button>
+                </div>
+
+                <div class="col-md-4">
+                    <button class="btn btn-outline-primary w-100">
+                        📥 Tarik Sub Kegiatan
+                    </button>
+                </div>
+
+                <div class="col-md-6">
+                    <button class="btn btn-outline-success w-100">
+                        📥 Tarik Rekening Belanja
+                    </button>
+                </div>
+
+                <div class="col-md-6">
+                    <button class="btn btn-outline-success w-100">
+                        📥 Tarik Pagu Anggaran
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="card p-3">
+
+            <h6 class="fw-bold mb-3">
+                <i class="fa-solid fa-chart-simple me-2"></i>
+                Statistik SIPD-RI
+            </h6>
+
+            <div class="row text-center">
+
+                <div class="col">
+                    <h4 id="totalProgram">0</h4>
+                    <small>Program</small>
+                </div>
+
+                <div class="col">
+                    <h4 id="totalKegiatan">0</h4>
+                    <small>Kegiatan</small>
+                </div>
+
+                <div class="col">
+                    <h4 id="totalSub">0</h4>
+                    <small>Sub Kegiatan</small>
+                </div>
+
+                <div class="col">
+                    <h4 id="totalRekening">0</h4>
+                    <small>Rekening</small>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="card p-3 mb-4">
+
+    <h6 class="fw-bold mb-3">
+        <i class="fa-solid fa-terminal me-2"></i>
+        Log Sinkronisasi
+    </h6>
+
+    <div class="console" id="consoleLog">
+
+[SISTEM] SIPD-RI Data Center siap digunakan.
+
+[INFO] Menunggu proses sinkronisasi.
+
+    </div>
+
+</div>
+
+<div class="card">
+
+    <div class="card-header bg-white fw-bold">
+        <i class="fa-solid fa-table me-2"></i>
+        Hasil Sinkronisasi SIPD-RI
+    </div>
+
+    <div class="table-responsive">
+
+        <table class="table table-hover">
+
+            <thead>
+
+            <tr>
+                <th>Program</th>
+                <th>Kegiatan</th>
+                <th>Sub Kegiatan</th>
+                <th>Rekening</th>
+                <th>Pagu</th>
+                <th>Tahun</th>
+            </tr>
+
+            </thead>
+
+            <tbody>
+
+            <tr>
+                <td colspan="6" class="text-center text-muted">
+                    Belum ada data sinkronisasi.
+                </td>
+            </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</div>
+
+</body>
+</html>
