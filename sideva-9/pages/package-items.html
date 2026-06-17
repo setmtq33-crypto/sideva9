@@ -127,7 +127,7 @@ async function loadPackage(){
     .from('packages')
     .select('*')
     .eq('id',packageId)
-    .eq('opd_id',activeOpdId)
+   
     .single();
  if(error) return console.error(error);
  packageData=data;
