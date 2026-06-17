@@ -389,7 +389,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 <tr>
                     <td width="220" style="padding:3px; vertical-align:top;"><strong>Nomor</strong></td>
                     <td width="15" style="padding:3px; vertical-align:top; text-align:center;">:</td>
-                    // Menggunakan tanda kurung kurawal untuk memisahkan variabel dan teks statis
+                    
                     <td style="padding:3px; vertical-align:top; text-align:justify;">
                         PENETAPAN/${paket.rup_number || '........'}/${opd?.code || '...'}/2026
                     </td>
@@ -402,7 +402,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 <tr>
                     <td style="padding:3px; vertical-align:top;"><strong>Perangkat Daerah</strong></td>
                     <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
-                    <td style="padding:3px; vertical-align:top; text-align:justify;">${opd?.opd_name || '-'}</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${opd?.name || '-'}</td>
                 </tr>
                 <tr>
                     <td style="padding:3px; vertical-align:top;"><strong>PA/KPA/PPK</strong></td>
