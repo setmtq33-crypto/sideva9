@@ -201,6 +201,21 @@ body { background: #f5f6fa; color: #333; }
             const userRole = (profile.role || '').toUpperCase();
             const userOpdId = profile.opd_id;
 
+            if (
+                userRole !== 'SUPER_ADMIN' &&
+                userRole !== 'ADMIN_OPD'
+            ) {
+                Swal.fire(
+                    'Akses Ditolak',
+                    'Halaman ini hanya untuk Super Admin dan Admin OPD',
+                    'warning'
+                ).then(() => {
+                    window.location.href = 'dashboard.html';
+                });
+            
+                return;
+            }
+
             // Selector muncul jika role mengandung SUPER_ADMIN
             if (userRole.includes('SUPER_ADMIN')) {
                 isSuperAdmin = true;
