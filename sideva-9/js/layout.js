@@ -45,11 +45,49 @@ async function loadLayout() {
         } else {
             // Logika hide menu untuk role selain SUPER_ADMIN
             const menuConfigs = {
-                'ADMIN_OPD': ['menuOpds'],
-                'PPTK': ['menuUsers', 'menuOpds', 'menuAudit', 'menuHps'],
-                'PPK': ['menuUsers', 'menuOpds', 'menuAudit', 'menuSurvey', 'menuDocuments', 'menuBidangs', 'menuAccounts'],
-                'PBJ': ['menuUsers', 'menuOpds', 'menuAudit', 'menuSurvey', 'menuDocuments', 'menuHps', 'menuBidangs', 'menuAccounts'],
-                'VIEWER': ['menuUsers', 'menuOpds', 'menuAudit']
+
+                ADMIN_OPD: [
+                    'menuOpds',
+                    'menuConfigs'
+                ],
+            
+                PPTK: [
+                    'menuUsers',
+                    'menuOpds',
+                    'menuConfigs',
+                    'menuAccounts',
+                    'menuBidangs',
+                    'menuSipd'
+                ],
+            
+                PPK: [
+                    'menuUsers',
+                    'menuOpds',
+                    'menuConfigs',
+                    'menuAccounts',
+                    'menuBidangs',
+                    'menuSipd',
+                    'menuRup'
+                ],
+            
+                PBJ: [
+                    'menuUsers',
+                    'menuOpds',
+                    'menuConfigs',
+                    'menuAccounts',
+                    'menuBidangs',
+                    'menuSipd'
+                ],
+            
+                VIEWER: [
+                    'menuUsers',
+                    'menuOpds',
+                    'menuConfigs',
+                    'menuAccounts',
+                    'menuBidangs',
+                    'menuSipd',
+                    'menuRup'
+                ]
             };
 
             const hiddenMenus = menuConfigs[profile.role] || [];
