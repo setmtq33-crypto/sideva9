@@ -52,7 +52,14 @@ async function init() {
     if (!packageId) { alert('ID Paket tidak ditemukan'); location.href = 'packages.html'; return; }
     
     // 1. Ambil data Paket
-    const { data: pkg } = await db.from('packages').select('*').eq('id', packageId);
+    const { data: pkg } = await db.from('packages').select('*').eq('id', packageId).single();
+        if(error){
+    
+        console.error(error);
+    
+        return;
+    
+    }
     if (pkg) {
         document.getElementById('packageName').innerText = pkg.package_name;
         document.getElementById('budgetCeiling').innerText = rupiah(pkg.budget_ceiling);
@@ -81,8 +88,13 @@ async function init() {
     const eff = pagu - totalHps;
     document.getElementById('totalHps').innerText = rupiah(totalHps);
     document.getElementById('efficiency').innerText = rupiah(eff);
+    const percent =
+    pagu > 0
+    ? ((eff / pagu) * 100).toFixed(2)
+    : 0;
+    
     document.getElementById('efficiencyPercent')
-        .innerText = ((eff / pagu) * 100).toFixed(2) + '%';
+    .innerText = percent + '%';
 }
 
 async function saveHPS() {
@@ -90,7 +102,7 @@ async function saveHPS() {
     
     // Upsert ke package_hps dan update status paket
     await db.from('package_hps').upsert({ package_id: packageId, total_hps: total });
-    await db.from('packages').update({ package_status: 'HPS_COMPLETE' }).eq('id', packageId).eq('opd_id', getCurrentOpdId(profile));
+    await db.from('packages').update({ package_status: 'HPS_COMPLETE' }).eq('id', packageId);
     
     alert('HPS Disimpan & Paket Terkunci!');
     location.href = 'packages.html';
