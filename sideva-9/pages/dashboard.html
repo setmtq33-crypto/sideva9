@@ -446,7 +446,7 @@ async function loadOpdSummary(){
  (data||[]).forEach(row=>{
    html += `
    <tr>
-     <td class="fw-bold"><i class="fa-solid fa-building-user me-2 opacity-50"></i>${row.name}</td>
+     <td class="fw-bold"><i class="fa-solid fa-building-user me-2 opacity-50"></i>${row.opd_name}</td>
      <td class="fw-semibold text-secondary">${row.total_packages} Paket</td>
      <td class="fw-bold text-primary">${rupiah(row.total_budget)}</td>
    </tr>`;
