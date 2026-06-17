@@ -178,18 +178,13 @@ body { background: #f5f6fa; display: flex; margin: 0; padding: 0; }
 
 <script>
 // Penyelarasan Variabel Global Supabase Kluster Keamanan V9
-// Ganti bagian awal deklarasi database Anda menjadi seperti ini:
 const documentDb = window.supabaseClient || window.supabase || window.db; 
 const urlParams = new URLSearchParams(window.location.search);
 const packageId = urlParams.get('package_id') || urlParams.get('id');
 let documents = [];
 
 async function initPackageHeader() {
-    if(!packageId) {
-        document.getElementById('packageName').innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Peringatan: Harap masuk melalui menu "Packages" lalu klik tombol dokumen agar ID paket terbaca.</span>`;
-        return;
-    }
-    // Pastikan pemanggilan di bawah ini menggunakan variabel baru 'documentDb'
+    if(!packageId) return;
     const { data, error } = await documentDb.from('packages').select('*').eq('id', packageId).single();
     if(!error && data) {
         document.getElementById('packageName').innerText = data.package_name;
@@ -197,22 +192,19 @@ async function initPackageHeader() {
     }
 }
 
+// Fungsi yang sebelumnya hilang
 function switchPrintView(slug) {
-
     console.log("SLUG DIPILIH =", slug);
 
-    const listItems =
-        document.querySelectorAll('#auto-doc-list .list-group-item');
+    const listItems = document.querySelectorAll('#auto-doc-list .list-group-item');
+    listItems.forEach(el => el.classList.remove('active'));
 
-    listItems.forEach(el =>
-        el.classList.remove('active'));
-
+    // Menandai tombol yang diklik sebagai aktif
     event.currentTarget.classList.add('active');
 
-    document
-        .getElementById('btn-print-action')
-        .removeAttribute('disabled');
+    document.getElementById('btn-print-action').removeAttribute('disabled');
 
+    // Memanggil fungsi render dokumen
     renderSidevaDocumentInternal(slug, packageId);
 }
 
@@ -234,33 +226,38 @@ async function renderSidevaDocumentInternal(slug, pId) {
         targetDiv.innerHTML = `<div class="alert alert-warning text-dark m-3">ID Paket Kosong. Buka halaman ini dari menu Detail Paket.</div>`;
         return;
     }
+
     targetDiv.innerHTML = `<div class="text-center text-white p-5"><div class="spinner-border text-light spinner-border-sm"></div><p class="small mt-2">Menyinkronkan data database...</p></div>`;
-    
+
+    // Helper untuk merapikan kode SIPD
+    const formatSipd = (teks) => (!teks ? '-' : teks.replace(/\s+(?=\d{1,2}\.\d{2}\.\d{2})/g, '<br>'));
+
     try {
-        const { data: paket, error: paketError } = await documentDb.from('packages').select('*').eq('id', pId).single(); 
-        if (paketError) { throw paketError; } 
-        console.log("PAKET :", paket); 
-     
+        // 1. Ambil data paket utama
+        const { data: paket, error: paketError } = await documentDb.from('packages').select('*').eq('id', pId).single();
+        if (paketError) throw paketError;
 
-        const { data: akun } = await documentDb.from('budget_accounts').select('*').eq('id', paket.budget_account_id).single(); 
-        console.log("AKUN :", akun);
+        // 2. Ambil data pendukung (menggunakan maybeSingle agar tidak crash jika kosong)
+        const [
+            { data: akun },
+            { data: items, error: itemsError },
+            { data: ppk },
+            { data: bidang },
+            { data: opd }
+        ] = await Promise.all([
+            documentDb.from('budget_accounts').select('*').eq('id', paket.budget_account_id).maybeSingle(),
+            documentDb.from('package_items').select('*,price_surveys(*)').eq('package_id', pId),
+            documentDb.from('ppkoms').select('*').eq('opd_id', paket.opd_id).maybeSingle(),
+            documentDb.from('bidangs').select('*').eq('id', paket.bidang_id).maybeSingle(),
+            documentDb.from('opds').select('*').eq('id', paket.opd_id).maybeSingle()
+        ]);
 
-        const { data: items, error: itemsError } = await documentDb.from('package_items').select('*,price_surveys(*)').eq('package_id', pId); 
-        if (itemsError) { throw itemsError; } 
-        console.log("ITEMS :", items);
-
-        const { data: ppk } = await documentDb.from('ppkoms').select('*').eq('opd_id', paket.opd_id).single(); 
-        console.log("PPK :", ppk);
-
-        const { data: bidang } = await documentDb.from('bidangs').select('*').eq('id', paket.bidang_id).single(); 
-        console.log("BIDANG :", bidang);
-
-        const { data: opd } = await documentDb.from('opds').select('*').eq('id', paket.opd_id).single(); 
-        console.log("OPD :", opd);
+        if (itemsError) throw itemsError;
 
         const listItems = items || [];
-        const kopHtml = `<div style="text-align:center; margin-bottom:20px;"><img src="${opd?.kop_url || ''}" style="width:100%;max-width:900px;height:auto;"></div>`;
         const tgl = docFmtDate(new Date());
+        const kopHtml = `<div style="text-align:center; margin-bottom:20px;"><img src="${opd?.kop_url || ''}" style="width:100%;max-width:900px;height:auto;"></div>`;
+        
         let htmlOutput = "";
 
         if (slug === 'idkb') {
