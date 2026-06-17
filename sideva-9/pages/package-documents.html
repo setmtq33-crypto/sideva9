@@ -31,7 +31,18 @@ body { background: #f5f6fa; display: flex; margin: 0; padding: 0; }
 /* Konten Utama */
 .local-main-content { margin-left: 260px; width: calc(100% - 260px); padding: 30px; }
 .card { border: none; border-radius: 12px; }
-.paper-viewport { background: #6c757d; padding: 30px 15px; border-radius: 8px; min-height: 650px; display: flex; justify-content: center; }
+.paper-viewport {
+    width: 100%;
+    min-height: 80vh;
+    background: #fff;
+    padding: 20px;
+    box-sizing: border-box; /* Penting agar padding tidak merusak lebar */
+    overflow-x: auto;      /* Agar dokumen tetap bisa di-scroll jika terlalu lebar */
+}
+
+#document-render-area {
+    width: 100% !important;
+}
 
 /* Aturan Cetak Kertas Kerja Pemerintah A4 */
 @media print {
@@ -235,21 +246,23 @@ function refreshCurrentDocument() {
 
 function switchPrintView(slug) {
     console.log("SLUG DIPILIH =", slug);
-    currentActiveSlug = slug; // Simpan nilai slug saat ini agar bisa di-refresh
+    currentActiveSlug = slug;
 
-    // 1. Bersihkan class 'active' dari semua menu pilihan dokumen
+    // 1. Bersihkan class 'active'
     const listItems = document.querySelectorAll('#auto-doc-list .list-group-item');
     listItems.forEach(el => el.classList.remove('active'));
 
-    // 2. Cari tombol menu yang diklik berdasarkan nama slug-nya secara spesifik (Anti-Salah-Sasaran)
+    // 2. Cari target tombol
     const targetBtn = Array.from(listItems).find(btn => 
         btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`'${slug}'`)
     );
-    
-    // 3. Hanya berikan class active pada tombol dokumen yang tepat
-    if (targetBtn) {
-        targetBtn.classList.add('active');
-    }
+    if (targetBtn) targetBtn.classList.add('active');
+
+    // --- TAMBAHAN: Pastikan area render normal kembali ---
+    const renderArea = document.getElementById('document-render-area');
+    renderArea.style.width = '100%';
+    renderArea.style.maxWidth = '100%';
+    // ----------------------------------------------------
 
     document.getElementById('btn-print-action').removeAttribute('disabled');
 
