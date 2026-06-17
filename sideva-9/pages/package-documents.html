@@ -402,20 +402,59 @@ async function renderSidevaDocumentInternal(slug, pId) {
             ${kopHtml}
             
             <div style="text-align:center; font-size:14pt; font-weight:bold; text-decoration:underline; margin-bottom:5px;">DOKUMEN PERSIAPAN PENGADAAN (DPP) E - PURCHASING</div>
-            <div style="text-align:center; font-size:11pt; margin-bottom:5px;">Nomor: DPP/${paket.rup_number || '........'}/DEMO/2026</div>
-            <br>
+            <div style="text-align:center; font-size:11pt; margin-bottom:15px;">Nomor: DPP/${paket.rup_number || '........'}/DEMO/2026</div>
 
             <table style="width:100%; font-size:10.5pt; margin-bottom:20px; border-collapse:collapse;">
-                <tr><td width="220" style="padding:3px;"><strong>Tanggal</strong></td><td style="padding:3px;">: ${tgl}</td></tr>
-                <tr><td style="padding:3px;"><strong>Perangkat Daerah</strong></td><td style="padding:3px;">: ${opd?.opd_name || '-'}</td></tr>
-                <tr><td style="padding:3px;"><strong>Program</strong></td><td style="padding:3px;">: ${paket.program || '-'}</td></tr>
-                <tr><td style="padding:3px;"><strong>Kegiatan</strong></td><td style="padding:3px;">: ${paket.kegiatan || '-'}</td></tr>
-                <tr><td style="padding:3px;"><strong>Sub Kegiatan</strong></td><td style="padding:3px;">: ${paket.sub_kegiatan || '-'}</td></tr>
-                <tr><td style="padding:3px;"><strong>RUP</strong></td><td style="padding:3px;">: ${paket.rup_number || '-'}</td></tr>
-                <tr><td style="padding:3px;"><strong>Nama Paket Pengadaan</strong></td><td style="padding:3px;">: ${paket.package_name}</td></tr>
-                <tr><td style="padding:3px;"><strong>Pagu Dana</strong></td><td style="padding:3px;">: ${docFmtRp(paket.budget_ceiling)}</td></tr>
-                <tr><td style="padding:3px;"><strong>Mata Anggaran Belanja</strong></td><td style="padding:3px;">: ${akun ? `${akun.account_code} - ${akun.account_name}` : '-'}</td></tr>
-                <tr><td style="padding:3px;"><strong>Sumber Dana</strong></td><td style="padding:3px;">: APBD Kabupaten Kapuas Hulu</td></tr>
+                <tr>
+                    <td width="220" style="padding:3px; vertical-align:top;"><strong>Tanggal</strong></td>
+                    <td width="15" style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${tgl}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Perangkat Daerah</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${opd?.opd_name || '-'}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Program</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${paket.program || '-'}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Kegiatan</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${paket.kegiatan || '-'}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Sub Kegiatan</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${paket.sub_kegiatan || '-'}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>RUP</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${paket.rup_number || '-'}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Nama Paket Pengadaan</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${paket.package_name}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Pagu Dana</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${docFmtRp(paket.budget_ceiling)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Mata Anggaran Belanja</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${akun ? `${akun.account_code} - ${akun.account_name}` : '-'}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Sumber Dana</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">APBD Kabupaten Kapuas Hulu</td>
+                </tr>
             </table>
 
             <div style="font-weight:bold; margin-top:15px; margin-bottom:5px;">I. Spesifikasi Teknis</div>
