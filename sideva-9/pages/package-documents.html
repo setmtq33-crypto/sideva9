@@ -1579,28 +1579,49 @@ async function renderSidevaDocumentInternal(slug, pId) {
 // ─── STORAGE HANDLING BAWAAN ASLI ANDA ───
 // Hapus kode actionButtons di loadUploadedDocuments
 // Pastikan loadUploadedDocuments Anda hanya seperti ini:
-async function loadUploadedDocuments(){
-    if(!packageId) return;
-    const {data, error} = await documentDb.from('package_documents').select('*').eq('package_id',packageId).order('created_at',{ascending:false});
-    if(error) return;
+async function loadUploadedDocuments() {
+    if (!packageId) return;
+    
+    // Ambil data dari database
+    const { data, error } = await documentDb
+        .from('package_documents')
+        .select('*')
+        .eq('package_id', packageId)
+        .order('created_at', { ascending: false });
+        
+    if (error) {
+        console.error("Error loading documents:", error);
+        return;
+    }
+    
+    // Simpan ke variabel global documents dan panggil fungsi render
     documents = data || [];
-    renderUploadedTable(); // Cukup panggil fungsi render ini saja
+    renderUploadedTable(); 
 }
 
 // LALU, cari fungsi renderUploadedTable() dan masukkan kode di sini:
-function renderUploadedTable(){
+function renderUploadedTable() {
+    const tableBody = document.getElementById('documentsTable');
     let html = '';
+
+    if (documents.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="5" class="text-center">Belum ada dokumen.</td></tr>';
+        return;
+    }
+
+    // Variabel 'doc' didefinisikan di sini
     documents.forEach(doc => {
-        // Variabel 'doc' sekarang tersedia karena berada di dalam forEach
+        // Buat tombol di sini
         const actionButtons = `
             <button class="btn btn-sm btn-info me-1" onclick="downloadDocument('${doc.file_path}')" title="Unduh"><i class="bi bi-download"></i></button>
             <button class="btn btn-sm btn-danger me-1" onclick="deleteDocument('${doc.id}', '${doc.file_path}')" title="Hapus"><i class="bi bi-trash"></i></button>
-            <button class="btn btn-sm btn-secondary me-1" onclick="returnDocument('${doc.id}')" title="Kembalikan Dokumen"><i class="bi bi-arrow-return-left"></i></button>
-            <button class="btn btn-sm btn-success me-1" onclick="approveDocument('${doc.id}')" title="Setujui Dokumen"><i class="bi bi-check-lg"></i></button>
-            <button class="btn btn-sm btn-primary me-1" onclick="editDocument('${doc.id}')" title="Beri Catatan"><i class="bi bi-chat-text"></i></button>
-            <button class="btn btn-sm btn-warning" onclick="openSignEditor('${doc.id}', '${doc.file_path}')" title="Bubuhi TTD & Cap"><i class="bi bi-pen"></i> TTD & Cap</button>
+            <button class="btn btn-sm btn-secondary me-1" onclick="returnDocument('${doc.id}')" title="Kembalikan"><i class="bi bi-arrow-return-left"></i></button>
+            <button class="btn btn-sm btn-success me-1" onclick="approveDocument('${doc.id}')" title="Setujui"><i class="bi bi-check-lg"></i></button>
+            <button class="btn btn-sm btn-primary me-1" onclick="editDocument('${doc.id}')" title="Catatan"><i class="bi bi-chat-text"></i></button>
+            <button class="btn btn-sm btn-warning" onclick="openSignEditor('${doc.id}', '${doc.file_path}')" title="TTD & Cap"><i class="bi bi-pen"></i></button>
         `;
 
+        // Masukkan ke dalam baris tabel
         html += `
             <tr>
                 <td>${doc.file_name}</td>
@@ -1608,7 +1629,8 @@ function renderUploadedTable(){
             </tr>
         `;
     });
-    document.getElementById('documentsTable').innerHTML = html;
+
+    tableBody.innerHTML = html;
 }
 
 document.getElementById('uploadForm').addEventListener('submit', async (e)=>{
