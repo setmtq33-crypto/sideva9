@@ -378,9 +378,262 @@ async function renderSidevaDocumentInternal(slug, pId) {
             <div style="clear:both;"></div>`;
          
         } else if (slug === 'penetapan') {
-            // TODO: Tambahkan HTML untuk slug penetapan di sini jika ada
-            htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:13pt; text-decoration:underline;">DOKUMEN PENETAPAN</div>`;
+            // Helper Cerdas: Deteksi multikode agar kegiatan ganda turun ke baris baru
+            const formatSipd = (teks) => {
+                if (!teks) return '-';
+                return teks.replace(/\s+(?=\d{1,2}\.\d{2}\.\d{2})/g, '<br>');
+            };
+
+            htmlOutput = `
+            ${kopHtml}
+            <div style="text-align:center; font-size:14pt; font-weight:bold; text-decoration:underline; margin-bottom:15px;">FORMULIR PENETAPAN BARANG/JASA E-PURCHASING</div>
             
+            <table style="width:100%; font-size:10.5pt; margin-bottom:25px; border-collapse:collapse;">
+                <tr>
+                    <td width="220" style="padding:3px; vertical-align:top;"><strong>Nomor</strong></td>
+                    <td width="15" style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">PENETAPAN/${paket.rup_number || '........'}/BAPPERIDA/2026</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Tanggal</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${tgl}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Perangkat Daerah</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${opd?.opd_name || '-'}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>PA/KPA/PPK</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${ppk?.full_name || '-'}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Program</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.program)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Kegiatan</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.kegiatan)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Sub Kegiatan</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.sub_kegiatan)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Output</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${paket.output || '-'}</td>
+                </tr>
+            </table>
+
+            <div style="font-weight:bold; margin-bottom:10px;">I. Penetapan Metode E-Purchasing</div>
+            <div style="padding:10px; border:1px solid #000; margin-bottom:20px;">
+                <strong>Negosiasi Harga</strong>
+            </div>
+
+            <div style="font-weight:bold; margin-bottom:10px;">II. Dasar Pemilihan Metode E-Purchasing</div>
+            <div style="padding:10px; border:1px solid #000; margin-bottom:20px; text-align:justify;">
+                Dasar memilih Metode e-purchasing dengan Negosiasi melalui Katalog Elektronik LKPP dipilih berdasarkan pertimbangan berikut:
+                <ul style="margin-top:5px; padding-left:20px;">
+                    <li><strong>Efisiensi Waktu:</strong> E-purchasing memungkinkan proses pengadaan yang lebih cepat.</li>
+                    <li><strong>Transparansi:</strong> Harga dan spesifikasi produk sudah tercantum, mengurangi risiko mark-up.</li>
+                    <li><strong>Kemudahan Komparasi:</strong> Memungkinkan perbandingan langsung antara produk dan penyedia.</li>
+                </ul>
+            </div>
+
+            <table style="width:100%; margin-top:50px; border-collapse:collapse;">
+                <tr>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        Ditetapkan oleh,<br>
+                        PA/KPA/PPK<br><br><br><br><br>
+                        <strong>${ppk?.full_name || '-'}</strong><br>
+                        NIP. ${ppk?.nip || '-'}
+                    </td>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        Disusun oleh,<br>
+                        ${bidang?.position_name || 'Kepala Bidang'}<br><br><br><br><br>
+                        <strong>${bidang?.head_name || '-'}</strong><br>
+                        NIP. ${bidang?.head_nip || '-'}
+                    </td>
+                </tr>
+            </table>`;
+
+         } else if (slug === 'nodis') {
+            // Helper Cerdas: Deteksi multikode agar kegiatan ganda turun ke baris baru
+            const formatSipd = (teks) => {
+                if (!teks) return '-';
+                return teks.replace(/\s+(?=\d{1,2}\.\d{2}\.\d{2})/g, '<br>');
+            };
+
+            htmlOutput = `
+            ${kopHtml}
+            <div style="text-align:center; font-size:14pt; font-weight:bold; text-decoration:underline; margin-bottom:15px;">NOTA DINAS</div>
+            
+            <table style="width:100%; font-size:10.5pt; margin-bottom:25px; border-collapse:collapse;">
+                <tr>
+                    <td width="150" style="padding:3px; vertical-align:top;"><strong>Yth.</strong></td>
+                    <td width="15" style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">Pejabat Pembuat Komitmen (PPK)</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Dari</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${bidang?.bidang_name || 'Bidang Terkait'}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Tanggal</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${tgl}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Nomor</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">NODIS/${paket.rup_number || '........'}/BAPPERIDA/2026</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Perihal</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">Pengajuan Belanja ${paket.package_name || ''}</td>
+                </tr>
+            </table>
+
+            <div style="font-size:10.5pt; text-align:justify; margin-bottom:20px;">
+                Terlampir disampaikan pengajuan dengan rincian sebagai berikut:
+            </div>
+
+            <table style="width:100%; font-size:10.5pt; margin-bottom:30px; border-collapse:collapse;">
+                <tr>
+                    <td width="20" style="padding:5px; border:1px solid #000; vertical-align:top;">1.</td>
+                    <td width="180" style="padding:5px; border:1px solid #000; vertical-align:top;"><strong>Nama Program</strong></td>
+                    <td style="padding:5px; border:1px solid #000; vertical-align:top;">${formatSipd(paket.program)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:5px; border:1px solid #000; vertical-align:top;">2.</td>
+                    <td style="padding:5px; border:1px solid #000; vertical-align:top;"><strong>Nama Kegiatan</strong></td>
+                    <td style="padding:5px; border:1px solid #000; vertical-align:top;">${formatSipd(paket.kegiatan)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:5px; border:1px solid #000; vertical-align:top;">3.</td>
+                    <td style="padding:5px; border:1px solid #000; vertical-align:top;"><strong>Nama Sub Kegiatan</strong></td>
+                    <td style="padding:5px; border:1px solid #000; vertical-align:top;">${formatSipd(paket.sub_kegiatan)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:5px; border:1px solid #000; vertical-align:top;">4.</td>
+                    <td style="padding:5px; border:1px solid #000; vertical-align:top;"><strong>Nama Paket</strong></td>
+                    <td style="padding:5px; border:1px solid #000; vertical-align:top;">${paket.package_name || '-'}</td>
+                </tr>
+                <tr>
+                    <td style="padding:5px; border:1px solid #000; vertical-align:top;">5.</td>
+                    <td style="padding:5px; border:1px solid #000; vertical-align:top;"><strong>Pagu Anggaran</strong></td>
+                    <td style="padding:5px; border:1px solid #000; vertical-align:top;">${docFmtRp(paket.budget_ceiling)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:5px; border:1px solid #000; vertical-align:top;">6.</td>
+                    <td style="padding:5px; border:1px solid #000; vertical-align:top;"><strong>Kode Rekening</strong></td>
+                    <td style="padding:5px; border:1px solid #000; vertical-align:top;">${akun ? `${akun.account_code} - ${akun.account_name}` : '-'}</td>
+                </tr>
+            </table>
+
+            <table style="width:100%; margin-top:30px; border-collapse:collapse;">
+                <tr>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        &nbsp;
+                    </td>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        ${bidang?.position_name || 'Kepala Bidang'}<br><br><br><br><br>
+                        <strong>${bidang?.head_name || '-'}</strong><br>
+                        NIP. ${bidang?.head_nip || '-'}
+                    </td>
+                </tr>
+            </table>`;
+
+         } else if (slug === 'sppbj') {
+            // Helper untuk merapikan kode SIPD ganda
+            const formatSipd = (teks) => {
+                if (!teks) return '-';
+                return teks.replace(/\s+(?=\d{1,2}\.\d{2}\.\d{2})/g, '<br>');
+            };
+
+            htmlOutput = `
+            ${kopHtml}
+            <div style="text-align:center; font-size:14pt; font-weight:bold; text-decoration:underline; margin-bottom:20px;">SURAT PERINTAH PENGADAAN BARANG/JASA</div>
+            
+            <table style="width:100%; font-size:10.5pt; margin-bottom:25px; border-collapse:collapse;">
+                <tr>
+                    <td width="100" style="padding:3px; vertical-align:top;"><strong>Nomor</strong></td>
+                    <td width="15" style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top;">${paket.rup_number || '........'}/BAPPERIDA/2026</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Sifat</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top;">Biasa</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Lampiran</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top;">1 (satu) rangkap</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Perihal</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top;">Perintah Pengadaan Barang & Jasa</td>
+                </tr>
+            </table>
+
+            <div style="font-size:10.5pt; margin-bottom:15px;">
+                Yth. <strong>Pejabat Pengadaan</strong> pada ${opd?.opd_name || 'Perangkat Daerah'}<br>
+                di - <br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Kapuas Hulu</strong>
+            </div>
+
+            <div style="font-size:10.5pt; text-align:justify; margin-bottom:20px; line-height:1.5;">
+                Sehubungan dengan akan dilaksanakannya kegiatan pengadaan barang/jasa di lingkungan <strong>${opd?.opd_name || 'Perangkat Daerah'}</strong> Tahun Anggaran 2026 melalui <strong>E-Purchasing</strong>, maka dengan ini disampaikan untuk segera melakukan proses kegiatan dimaksud sebagai dasar pelaksanaan, dengan rincian:
+            </div>
+
+            <table style="width:100%; font-size:10.5pt; margin-bottom:20px; border:1px solid #000; border-collapse:collapse;">
+                <tr>
+                    <td style="padding:8px; border:1px solid #000; width:30%;"><strong>Program</strong></td>
+                    <td style="padding:8px; border:1px solid #000;">${formatSipd(paket.program)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px; border:1px solid #000;"><strong>Kegiatan</strong></td>
+                    <td style="padding:8px; border:1px solid #000;">${formatSipd(paket.kegiatan)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px; border:1px solid #000;"><strong>Sub Kegiatan</strong></td>
+                    <td style="padding:8px; border:1px solid #000;">${formatSipd(paket.sub_kegiatan)}</td>
+                </tr>
+            </table>
+
+            <div style="font-size:10.5pt; margin-bottom:20px;">
+                Bersama ini dilampirkan:<br>
+                1. Spesifikasi Teknis Barang/Jasa;<br>
+                2. Dokumen Persiapan Pengadaan Barang/Jasa.
+            </div>
+
+            <div style="font-size:10.5pt; text-align:justify; margin-bottom:30px;">
+                Dalam melakukan proses kegiatan tersebut harus berpedoman pada peraturan perundang-undangan yang berlaku dengan tetap memperhatikan batasan waktu yang tersedia. Demikian disampaikan untuk dapat dipergunakan sebagaimana mestinya.
+            </div>
+
+            <table style="width:100%; margin-top:20px; border-collapse:collapse;">
+                <tr>
+                    <td style="width:50%;"></td>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        Kapuas Hulu, ${tgl}<br>
+                        Pejabat Pembuat Komitmen (PPKom)<br>
+                        ${opd?.opd_name || ''}<br><br><br><br><br>
+                        <strong>${ppk?.full_name || '-'}</strong><br>
+                        NIP. ${ppk?.nip || '-'}
+                    </td>
+                </tr>
+            </table>`;
+         
         } else if (slug === 'spek') {
             let itemRows = "";
             listItems.forEach((it, i) => {
@@ -679,11 +932,418 @@ async function renderSidevaDocumentInternal(slug, pId) {
                     </td>
                 </tr>
             </table>`;
+
+         } else if (slug === 'riviu') {
+            // Helper untuk merapikan kode SIPD ganda agar turun ke baris bawah
+            const formatSipd = (teks) => {
+                if (!teks) return '-';
+                return teks.replace(/\s+(?=\d{1,2}\.\d{2}\.\d{2})/g, '<br>');
+            };
+
+            htmlOutput = `
+            ${kopHtml}
+            <div style="text-align:center; font-size:14pt; font-weight:bold; text-decoration:underline; margin-bottom:20px;">BERITA ACARA REVIU DOKUMEN PERSIAPAN PENGADAAN (DPP)</div>
+            
+            <table style="width:100%; font-size:10.5pt; margin-bottom:25px; border-collapse:collapse;">
+                <tr>
+                    <td width="220" style="padding:3px; vertical-align:top;"><strong>Perangkat Daerah</strong></td>
+                    <td width="15" style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${opd?.opd_name || '-'}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Program</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.program)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Kegiatan</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.kegiatan)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Sub Kegiatan</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.sub_kegiatan)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>RUP</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${paket.rup_number || '-'}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Nama Paket</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${paket.package_name || '-'}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Pagu</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${docFmtRp(paket.budget_ceiling)}</td>
+                </tr>
+            </table>
+
+            <div style="font-size:10.5pt; text-align:justify; margin-bottom:20px; line-height:1.5;">
+                Pada hari ini, telah dilakukan reviu terhadap Dokumen Persiapan Pengadaan (DPP) untuk paket pengadaan tersebut di atas dengan hasil sebagai berikut:
+            </div>
+
+            <table style="width:100%; border-collapse:collapse; font-size:10pt; margin-bottom:30px;">
+                <thead style="background:#eee;">
+                    <tr>
+                        <th style="border:1px solid #000; padding:8px; text-align:center; width:5%;">No</th>
+                        <th style="border:1px solid #000; padding:8px; text-align:center; width:45%;">Komponen Reviu</th>
+                        <th style="border:1px solid #000; padding:8px; text-align:center;">Hasil Reviu</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;">1</td>
+                        <td style="border:1px solid #000; padding:8px; vertical-align:top;">Identifikasi Kebutuhan</td>
+                        <td style="border:1px solid #000; padding:8px; vertical-align:top;">Sesuai dengan kebutuhan operasional Perangkat Daerah.</td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;">2</td>
+                        <td style="border:1px solid #000; padding:8px; vertical-align:top;">Spesifikasi Teknis</td>
+                        <td style="border:1px solid #000; padding:8px; vertical-align:top;">Spesifikasi telah memenuhi standar teknis yang ditetapkan.</td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;">3</td>
+                        <td style="border:1px solid #000; padding:8px; vertical-align:top;">Metode Pemilihan Penyedia</td>
+                        <td style="border:1px solid #000; padding:8px; vertical-align:top;">E-Purchasing melalui Katalog Elektronik (Negosiasi Harga).</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table style="width:100%; margin-top:20px; border-collapse:collapse;">
+                <tr>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        Reviu oleh,<br>
+                        Pejabat Pembuat Komitmen (PPKom)<br><br><br><br><br>
+                        <strong>${ppk?.full_name || '-'}</strong><br>
+                        NIP. ${ppk?.nip || '-'}
+                    </td>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        Disusun oleh,<br>
+                        ${bidang?.position_name || 'Kepala Bidang'}<br><br><br><br><br>
+                        <strong>${bidang?.head_name || '-'}</strong><br>
+                        NIP. ${bidang?.head_nip || '-'}
+                    </td>
+                </tr>
+            </table>`;
+
+         } else if (slug === 'evht') {
+            // Helper Cerdas: Deteksi multikode agar kegiatan ganda turun ke baris bawah
+            const formatSipd = (teks) => {
+                if (!teks) return '-';
+                return teks.replace(/\s+(?=\d{1,2}\.\d{2}\.\d{2})/g, '<br>');
+            };
+
+            htmlOutput = `
+            ${kopHtml}
+            <div style="text-align:center; font-size:14pt; font-weight:bold; text-decoration:underline; margin-bottom:15px;">BERITA ACARA HASIL EVALUASI HARGA PENAWARAN E-PURCHASING</div>
+            
+            <table style="width:100%; font-size:10.5pt; margin-bottom:20px; border-collapse:collapse;">
+                <tr>
+                    <td width="220" style="padding:3px; vertical-align:top;"><strong>Nomor</strong></td>
+                    <td width="15" style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">PP/${paket.rup_number || '........'}/BAHEV-HP/BAPPERIDA/2026</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Program</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.program)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Kegiatan</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.kegiatan)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Sub Kegiatan</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.sub_kegiatan)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Nama Paket</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${paket.package_name || '-'}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Pagu</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${docFmtRp(paket.budget_ceiling)}</td>
+                </tr>
+            </table>
+
+            <div style="font-weight:bold; margin-bottom:10px;">A. DATA UMUM</div>
+            <table style="width:100%; border-collapse:collapse; font-size:10pt; margin-bottom:20px;">
+                <tr>
+                    <td style="border:1px solid #000; padding:8px; width:40%;">Kode RUP</td>
+                    <td style="border:1px solid #000; padding:8px;">${paket.rup_number || '-'}</td>
+                </tr>
+                <tr>
+                    <td style="border:1px solid #000; padding:8px;">Metode</td>
+                    <td style="border:1px solid #000; padding:8px;">E-Purchasing dengan Negosiasi Harga</td>
+                </tr>
+            </table>
+
+            <div style="font-weight:bold; margin-bottom:10px;">B. EVALUASI PEMBANDING HARGA</div>
+            <table style="width:100%; border-collapse:collapse; font-size:10pt; margin-bottom:20px;">
+                <thead>
+                    <tr style="background:#eee;">
+                        <th style="border:1px solid #000; padding:8px;">No</th>
+                        <th style="border:1px solid #000; padding:8px;">Kriteria</th>
+                        <th style="border:1px solid #000; padding:8px;">Penjelasan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="border:1px solid #000; padding:8px; text-align:center;">1</td>
+                        <td style="border:1px solid #000; padding:8px;">Harga Hasil Negosiasi Terendah</td>
+                        <td style="border:1px solid #000; padding:8px;">Penyedia menawarkan total harga hasil negosiasi terendah untuk item yang dievaluasi.</td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #000; padding:8px; text-align:center;">2</td>
+                        <td style="border:1px solid #000; padding:8px;">Kesesuaian Spesifikasi</td>
+                        <td style="border:1px solid #000; padding:8px;">Seluruh spesifikasi alat/bahan sesuai kebutuhan teknis yang ditetapkan.</td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #000; padding:8px; text-align:center;">3</td>
+                        <td style="border:1px solid #000; padding:8px;">Kelengkapan Item</td>
+                        <td style="border:1px solid #000; padding:8px;">Penyedia dapat menyediakan seluruh item dalam satu paket.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="font-weight:bold; margin-bottom:10px;">C. KESIMPULAN DAN REKOMENDASI</div>
+            <div style="font-size:10.5pt; text-align:justify; margin-bottom:30px;">
+                Berdasarkan hasil evaluasi pembanding harga dari beberapa penyedia pada e-Katalog serta hasil negosiasi harga satuan, diperoleh bahwa penyedia menawarkan harga yang paling kompetitif. Harga tersebut berada di bawah/sama dengan HPS dan dinilai wajar serta memenuhi seluruh spesifikasi teknis yang dipersyaratkan. Oleh karena itu, penyedia tersebut direkomendasikan untuk ditetapkan sebagai pelaksana pekerjaan.
+            </div>
+
+            <table style="width:100%; margin-top:20px; border-collapse:collapse;">
+                <tr>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        &nbsp;
+                    </td>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        Putussibau, ${tgl}<br>
+                        Pejabat Pengadaan<br><br><br><br><br>
+                        <strong>${ppk?.full_name || '-'}</strong><br>
+                        NIP. ${ppk?.nip || '-'}
+                    </td>
+                </tr>
+            </table>`;
+
+         } else if (slug === 'evat') {
+            // Helper Cerdas: Deteksi multikode agar kegiatan ganda turun ke baris bawah
+            const formatSipd = (teks) => {
+                if (!teks) return '-';
+                return teks.replace(/\s+(?=\d{1,2}\.\d{2}\.\d{2})/g, '<br>');
+            };
+
+            htmlOutput = `
+            ${kopHtml}
+            <div style="text-align:center; font-size:14pt; font-weight:bold; text-decoration:underline; margin-bottom:15px;">BERITA ACARA HASIL EVALUASI PENYEDIA E-PURCHASING</div>
+            
+            <table style="width:100%; font-size:10.5pt; margin-bottom:20px; border-collapse:collapse;">
+                <tr>
+                    <td width="220" style="padding:3px; vertical-align:top;"><strong>Nomor</strong></td>
+                    <td width="15" style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">PP/${paket.rup_number || '........'}/BAHEV-AT/BAPPERIDA/2026</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Program</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.program)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Kegiatan</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.kegiatan)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Sub Kegiatan</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.sub_kegiatan)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Nama Paket</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${paket.package_name || '-'}</td>
+                </tr>
+            </table>
+
+            <div style="font-weight:bold; margin-bottom:10px;">A. DATA UMUM</div>
+            <table style="width:100%; border-collapse:collapse; font-size:10pt; margin-bottom:20px;">
+                <tr>
+                    <td style="border:1px solid #000; padding:8px; width:40%;">Kode RUP</td>
+                    <td style="border:1px solid #000; padding:8px;">${paket.rup_number || '-'}</td>
+                </tr>
+                <tr>
+                    <td style="border:1px solid #000; padding:8px;">Metode</td>
+                    <td style="border:1px solid #000; padding:8px;">E-Purchasing dengan Negosiasi Harga</td>
+                </tr>
+            </table>
+
+            <div style="font-weight:bold; margin-bottom:10px;">B. EVALUASI ADMINISTRASI DAN TEKNIS</div>
+            <div style="font-size:10.5pt; text-align:justify; margin-bottom:15px;">
+                Verifikasi Penyedia Jasa (Berdasarkan Syarat dan Ketentuan Katalog Elektronik Versi 6):
+            </div>
+            <table style="width:100%; border-collapse:collapse; font-size:9.5pt; margin-bottom:20px;">
+                <thead style="background:#eee;">
+                    <tr>
+                        <th style="border:1px solid #000; padding:6px;">No</th>
+                        <th style="border:1px solid #000; padding:6px;">Kriteria Evaluasi</th>
+                        <th style="border:1px solid #000; padding:6px;">Hasil</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="border:1px solid #000; padding:6px; text-align:center;">1</td>
+                        <td style="border:1px solid #000; padding:6px;">Alamat penyedia di Kab. Kapuas Hulu</td>
+                        <td style="border:1px solid #000; padding:6px; text-align:center;">Ya</td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #000; padding:6px; text-align:center;">2</td>
+                        <td style="border:1px solid #000; padding:6px;">Barang di Etalase lengkap (Nama, Harga, Satuan, dll)</td>
+                        <td style="border:1px solid #000; padding:6px; text-align:center;">Ya</td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #000; padding:6px; text-align:center;">3</td>
+                        <td style="border:1px solid #000; padding:6px;">Spesifikasi sesuai kebutuhan</td>
+                        <td style="border:1px solid #000; padding:6px; text-align:center;">Sesuai</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="font-size:10.5pt; text-align:justify; margin-bottom:30px;">
+                Berdasarkan hasil verifikasi dan evaluasi terhadap penyedia yang tercantum dalam Katalog Elektronik, maka dinyatakan bahwa penyedia yang dipilih telah memenuhi persyaratan administratif dan teknis yang ditetapkan.
+            </div>
+
+            <table style="width:100%; margin-top:20px; border-collapse:collapse;">
+                <tr>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        &nbsp;
+                    </td>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        Putussibau, ${tgl}<br>
+                        Pejabat Pengadaan<br><br><br><br><br>
+                        <strong>${ppk?.full_name || '-'}</strong><br>
+                        NIP. ${ppk?.nip || '-'}
+                    </td>
+                </tr>
+            </table>`;
+
          
-        } else {
-            // Berkas Berita Acara Rangkuman Administrasi Umum Lainnya
-            htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:12pt; text-decoration:underline; margin-bottom:15px;">BERITA ACARA ADMINISTRASI ALUR KERJA (SIDEVA-V9)</div><p>Menerangkan dengan sah bahwa dokumen pengadaan instansi untuk paket <strong>${paket.package_name}</strong> dengan alokasi HPS senilai <strong>${docFmtRp(paket.budget_ceiling)}</strong> telah diperiksa melalui sistem otomasi berkas fisik.</p><p>Status Kelayakan administrasi dinyatakan: <strong style="color:green;">MEMENUHI SYARAT (VALID)</strong></p><div style="margin-top:50px; display:flex; justify-content:between;"><div style="width:200px;"><strong>PPKom</strong><br><br><br><br>(........................)</div><div style="width:200px; text-align:right;"><strong>Pejabat Pengadaan</strong><br><br><br><br>(........................)</div></div>`;
-        }
+         
+        } else if (slug === 'baep') {
+            // Helper Cerdas: Deteksi multikode agar kegiatan ganda turun ke baris bawah
+            const formatSipd = (teks) => {
+                if (!teks) return '-';
+                return teks.replace(/\s+(?=\d{1,2}\.\d{2}\.\d{2})/g, '<br>');
+            };
+
+            htmlOutput = `
+            ${kopHtml}
+            <div style="text-align:center; font-size:14pt; font-weight:bold; text-decoration:underline; margin-bottom:15px;">BERITA ACARA HASIL PENETAPAN E-PURCHASING</div>
+            
+            <table style="width:100%; font-size:10.5pt; margin-bottom:20px; border-collapse:collapse;">
+                <tr>
+                    <td width="220" style="padding:3px; vertical-align:top;"><strong>Nomor</strong></td>
+                    <td width="15" style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">PP/${paket.rup_number || '........'}/BAHPE/BAPPERIDA/2026</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Program</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.program)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Kegiatan</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.kegiatan)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Sub Kegiatan</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.sub_kegiatan)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Nama Paket</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${paket.package_name || '-'}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Pagu Anggaran</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${docFmtRp(paket.budget_ceiling)}</td>
+                </tr>
+            </table>
+
+            <div style="font-weight:bold; margin-bottom:10px;">A. DATA UMUM</div>
+            <table style="width:100%; border-collapse:collapse; font-size:10pt; margin-bottom:20px;">
+                <tr>
+                    <td style="border:1px solid #000; padding:8px; width:40%;">Kode RUP</td>
+                    <td style="border:1px solid #000; padding:8px;">${paket.rup_number || '-'}</td>
+                </tr>
+                <tr>
+                    <td style="border:1px solid #000; padding:8px;">Metode Pengadaan</td>
+                    <td style="border:1px solid #000; padding:8px;">E-Purchasing dengan Negosiasi Harga</td>
+                </tr>
+            </table>
+
+            <div style="font-weight:bold; margin-bottom:10px;">B. HASIL PENETAPAN PENYEDIA</div>
+            <table style="width:100%; border-collapse:collapse; font-size:9pt; margin-bottom:20px;">
+                <thead style="background:#eee;">
+                    <tr>
+                        <th style="border:1px solid #000; padding:6px;">No</th>
+                        <th style="border:1px solid #000; padding:6px;">Nama Barang/Jasa</th>
+                        <th style="border:1px solid #000; padding:6px;">Vol</th>
+                        <th style="border:1px solid #000; padding:6px;">Satuan</th>
+                        <th style="border:1px solid #000; padding:6px;">Harga Nego (Rp)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${listItems.map((it, i) => `
+                    <tr>
+                        <td style="border:1px solid #000; padding:6px; text-align:center;">${i + 1}</td>
+                        <td style="border:1px solid #000; padding:6px;">${it.item_name}</td>
+                        <td style="border:1px solid #000; padding:6px; text-align:center;">${it.quantity}</td>
+                        <td style="border:1px solid #000; padding:6px; text-align:center;">${it.unit}</td>
+                        <td style="border:1px solid #000; padding:6px; text-align:right;">${docFmtRp(it.price_surveys?.[0]?.price || 0)}</td>
+                    </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+
+            <div style="font-weight:bold; margin-bottom:10px;">C. REKAP NILAI</div>
+            <table style="width:100%; border-collapse:collapse; font-size:10pt; margin-bottom:30px;">
+                <tr>
+                    <td style="border:1px solid #000; padding:6px; width:40%;">Nilai Pagu Anggaran</td>
+                    <td style="border:1px solid #000; padding:6px;">${docFmtRp(paket.budget_ceiling)}</td>
+                </tr>
+                <tr>
+                    <td style="border:1px solid #000; padding:6px;">Nilai Hasil Negosiasi</td>
+                    <td style="border:1px solid #000; padding:6px;">${docFmtRp(paket.negotiated_price || 0)}</td>
+                </tr>
+            </table>
+
+            <div style="font-size:10.5pt; text-align:justify; margin-bottom:30px;">
+                Berdasarkan hasil evaluasi dan negosiasi harga yang telah dilaksanakan, maka ditetapkan Penyedia yang memenuhi persyaratan dan memberikan penawaran terbaik adalah <strong>${paket.vendor_name || '...'}</strong>.
+            </div>
+
+            <table style="width:100%; margin-top:20px; border-collapse:collapse;">
+                <tr>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        &nbsp;
+                    </td>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        Putussibau, ${tgl}<br>
+                        Pejabat Pengadaan<br><br><br><br><br>
+                        <strong>${ppk?.full_name || '-'}</strong><br>
+                        NIP. ${ppk?.nip || '-'}
+                    </td>
+                </tr>
+            </table>`;
 
         targetDiv.innerHTML = `<div class="bg-white text-dark p-5 mx-auto text-start shadow-lg" style="width:100%; max-width:760px; min-height:900px; font-family:'Times New Roman',Times,serif; font-size:11pt; line-height:1.5; color:#000;">${htmlOutput}</div>`;
     } catch (e) { 
