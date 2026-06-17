@@ -108,9 +108,9 @@
             border-radius: 6px;
         }
         .meta-info-text {
-            font-size: 0.85rem;
-            color: #64748b;
-            margin-bottom: 4px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+            display: block; /* Memastikan tiap info punya baris sendiri */
         }
         .meta-info-text i {
             width: 20px;
@@ -120,8 +120,8 @@
             color: red;
         }
         textarea.form-control {
-            resize: vertical; 
-            min-height: 80px; 
+            white-space: pre-wrap; 
+            overflow-wrap: break-word;
         }
 
                 /* Styling tambahan untuk elemen di dalam kartu daftar */
@@ -222,17 +222,17 @@
 
             <div class="col-md-4">
                 <label class="form-label">Program Kerja</label>
-                <textarea id="program" class="form-control" rows="2" placeholder="Input detail nama program"></textarea>
+                <textarea id="program" class="form-control" rows="4" placeholder="Input detail nama program"></textarea>
             </div>
             
             <div class="col-md-4">
                 <label class="form-label">Kegiatan</label>
-                <textarea id="kegiatan" class="form-control" rows="2" placeholder="Input detail nama kegiatan"></textarea>
+                <textarea id="kegiatan" class="form-control" rows="4" placeholder="Input detail nama kegiatan"></textarea>
             </div>
             
             <div class="col-md-4">
                 <label class="form-label">Sub Kegiatan</label>
-                <textarea id="subKegiatan" class="form-control" rows="2" placeholder="Input detail sub kegiatan"></textarea>
+                <textarea id="subKegiatan" class="form-control" rows="4" placeholder="Input detail sub kegiatan"></textarea>
             </div>
 
             <div class="col-md-12">
@@ -339,11 +339,13 @@ function formatMultilineText(text) {
 }
 
 function formatTextWithBreak(text) {
-    if (!text) return '-';
-    // Bagian pertama (kode) akan ditebalkan, lalu baris baru, lalu sisanya
+    if (!text) return '<span class="text-muted">-</span>';
+    // Memisahkan berdasarkan tanda "-" pertama
     let parts = text.split(/\s*-\s*/);
     if (parts.length > 1) {
-        return `<strong>${parts[0]}</strong><br><span class="text-secondary">${parts.slice(1).join(' - ')}</span>`;
+        // parts[0] adalah Kode, sisanya adalah Deskripsi
+        return `<div class="fw-bold text-primary">${parts[0]}</div>
+                <div class="small text-secondary" style="line-height:1.2;">${parts.slice(1).join(' - ')}</div>`;
     }
     return text;
 }
