@@ -47,33 +47,57 @@ body { background: #f5f6fa; display: flex; margin: 0; padding: 0; }
 
 @media print {
 
-  body{
-      margin:0 !important;
-      padding:0 !important;
-      background:#fff !important;
-  }
+    body{
+        margin:0 !important;
+        padding:0 !important;
+        background:#fff !important;
+    }
 
-  .local-sidebar,
-  .nav-pills,
-  .card:first-child,
-  #auto-doc-list,
-  #btn-print-action,
-  .col-lg-4{
-      display:none !important;
-  }
+    .local-sidebar,
+    .nav-pills,
+    .card:first-child,
+    #auto-doc-list,
+    #btn-print-action,
+    .col-lg-4{
+        display:none !important;
+    }
 
-  .col-lg-8{
-      width:100% !important;
-      max-width:100% !important;
-      flex:0 0 100% !important;
-  }
+    .local-main-content{
+        margin-left:0 !important;
+        width:100% !important;
+        padding:0 !important;
+    }
 
-  #document-render-area{
-      display:block !important;
-      width:100% !important;
-      margin:0 !important;
-      padding:0 !important;
-  }
+    .container,
+    .container-fluid,
+    .row,
+    .col,
+    .col-lg-8{
+        width:100% !important;
+        max-width:100% !important;
+        margin:0 !important;
+        padding:0 !important;
+    }
+
+    .paper-viewport{
+        padding:0 !important;
+        margin:0 !important;
+        overflow:visible !important;
+        background:#fff !important;
+    }
+
+    #document-render-area{
+        display:block !important;
+        width:100% !important;
+        max-width:100% !important;
+        margin:0 auto !important;
+        padding:0 !important;
+    }
+
+    @page{
+        size:A4;
+        margin:10mm;
+    }
 }
  
 </style>
