@@ -163,6 +163,14 @@
             gap: 8px;
         }
 
+        /* Tambahkan di dalam tag <style> */
+        .meta-info-text .content-multiline {
+            white-space: pre-line;
+            display: block;
+            margin-top: 4px;
+            padding-left: 20px; /* Opsional: agar teks menjorok setelah ikon */
+        }
+
         
     </style>
 </head>
@@ -321,6 +329,15 @@ async function initPage(){
 
     document.getElementById("saveBtn").addEventListener("click", savePackage);
 }
+
+// Tambahkan di dalam tag <script> file packages
+function formatMultilineText(text) {
+    if (!text) return "-";
+    // Regex ini akan mencari pola angka kode (misal 5.05) yang didahului spasi 
+    // dan menggantinya dengan baris baru (\n)
+    return text.trim().replace(/(\s)(\d+\.)/g, '\n$2');
+}
+    
 
 async function loadOpds(){
     const { data, error } = await db.from("opds").select("*").order("name");
