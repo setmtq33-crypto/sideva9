@@ -70,71 +70,56 @@ body { background: #f5f6fa; display: flex; margin: 0; padding: 0; }
     <a href="opds.html">OPD</a>
 </div>
 
-                       <div class="local-main-content">
-                           <div class="card p-4 mb-4 shadow-sm bg-white">
-                               <div class="d-flex justify-content-between align-items-center">
-                                   <div>
-                                       <span class="badge bg-primary mb-1">Modul Berkas Fisik v9 (Stabil)</span>
-                                       <h3 class="fw-bold m-0" id="packageName">Memuat nama paket...</h3>
-                                       <small class="text-muted" id="packageRup">ID RUP: -</small>
-                                   </div>
-                                   <div>
-                                       <a href="packages.html" class="btn btn-outline-secondary btn-sm px-3 rounded-pill">
-                                           <i class="bi bi-arrow-left me-1"></i> Kembali ke Paket
-                                       </a>
-                                   </div>
-                               </div>
-                           </div>
-                       
-                           <ul class="nav nav-pills mb-4" id="documentTab" role="tablist">
-                               <li class="nav-item">
-                                   <button class="nav-link active px-4 fw-bold" id="auto-print-tab" data-bs-toggle="tab" data-bs-target="#auto-print" type="button">
-                                       <i class="bi bi-printer-fill me-2"></i>Cetak Dokumen Otomatis (10 Berkas)
-                                   </button>
-                               </li>
-                               <li class="nav-item">
-                                   <button class="nav-link px-4 fw-bold" id="manual-upload-tab" data-bs-toggle="tab" data-bs-target="#manual-upload" type="button">
-                                       <i class="bi bi-cloud-arrow-up-fill me-2"></i>Berkas Unggahan / Storage
-                                   </button>
-                               </li>
-                           </ul>
-                       
-                           <div class="tab-content" id="documentTabContent">
-                               <div class="tab-pane fade show active" id="auto-print">
-                                   <div class="row">
-                                       <div class="col-lg-4 mb-4">
-                                           <div class="card p-3 shadow-sm bg-white">
-                                               <div class="mb-3">
-                                                   <label for="ppkomSelect" class="form-label small fw-bold text-secondary">
-                                                       <i class="bi bi-person-badge-fill me-1"></i> PILIH PPKOM PENANDATANGAN
-                                                   </label>
-                                                   <select id="ppkomSelect" class="form-select form-select-sm shadow-sm" onchange="refreshCurrentDocument()">
-                                                       <option value="">-- Gunakan PPKOM Default --</option>
-                                                   </select>
-                                               </div>
-                                               
-                                               <div class="d-flex justify-content-between align-items-center mb-3">
-                                                   <span class="fw-bold text-secondary small">DAFTAR PILIHAN BERKAS</span>
-                                                   <button id="btn-print-action" class="btn btn-danger btn-sm px-3" onclick="window.print()" disabled>
-                                                       <i class="bi bi-printer"></i> Cetak A4
-                                                   </button>
-                                               </div>
-                                               
-                                               <div id="auto-doc-list" class="list-group">
-                                                   </div>
-                                           </div>
-                                       </div>
-                       
-                                       <div class="col-lg-8">
-                                           <div class="paper-viewport card p-3 shadow-sm bg-white">
-                                               <div id="document-render-area" class="w-100">
-                                                    </div>
-                                           </div>
-                                       </div>
-                                   </div>
-                               </div>
-                           </div>
-                       </div>
+    <div class="local-main-content">
+    <div class="card p-4 mb-4 shadow-sm bg-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <span class="badge bg-primary mb-1">Modul Berkas Fisik v9 (Stabil)</span>
+                <h3 class="fw-bold m-0" id="packageName">Memuat nama paket...</h3>
+                <small class="text-muted" id="packageRup">ID RUP: -</small>
+            </div>
+            <div>
+                <a href="packages.html" class="btn btn-outline-secondary btn-sm px-3 rounded-pill">
+                    <i class="bi bi-arrow-left me-1"></i> Kembali ke Paket
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <ul class="nav nav-pills mb-4" id="documentTab" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active px-4 fw-bold" id="auto-print-tab" data-bs-toggle="tab" data-bs-target="#auto-print" type="button">
+                <i class="bi bi-printer-fill me-2"></i>Cetak Dokumen Otomatis (10 Berkas)
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link px-4 fw-bold" id="manual-upload-tab" data-bs-toggle="tab" data-bs-target="#manual-upload" type="button">
+                <i class="bi bi-cloud-arrow-up-fill me-2"></i>Berkas Unggahan / Storage
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="documentTabContent">
+        <div class="tab-pane fade show active" id="auto-print">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <div class="card p-3 shadow-sm bg-white">
+                        <div class="mb-3">
+                            <label for="ppkomSelect" class="form-label small fw-bold text-secondary">
+                                <i class="bi bi-person-badge-fill me-1"></i> PILIH PPKOM PENANDATANGAN
+                            </label>
+                            <select id="ppkomSelect" class="form-select form-select-sm shadow-sm" onchange="refreshCurrentDocument()">
+                                <option value="">-- Gunakan PPKOM Default --</option>
+                            </select>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="fw-bold text-secondary small">DAFTAR PILIHAN BERKAS</span>
+                            <button id="btn-print-action" class="btn btn-danger btn-sm px-3" onclick="window.print()" disabled>
+                                <i class="bi bi-printer"></i> Cetak A4
+                            </button>
+                        </div>
+
                         <div class="list-group" id="auto-doc-list">
                             <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('idkb')">1. Identifikasi Kebutuhan (IDKB)</button>
                             <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('penetapan')">2. Penetapan Cara Pengadaan</button>
@@ -149,10 +134,11 @@ body { background: #f5f6fa; display: flex; margin: 0; padding: 0; }
                         </div>
                     </div>
                 </div>
+
                 <div class="col-lg-8">
-                    <div class="paper-viewport">
+                    <div class="paper-viewport card p-4 shadow-sm bg-white" style="min-height: 80vh;">
                         <div id="document-render-area" class="w-100">
-                            <div class="text-center text-white my-5 py-5">
+                            <div class="text-center text-muted my-5 py-5">
                                 <i class="bi bi-file-earmark-pdf display-1 opacity-25"></i>
                                 <p class="mt-3 opacity-75">Silakan pilih jenis berkas di menu kiri untuk melihat draf cetak.</p>
                             </div>
@@ -160,7 +146,10 @@ body { background: #f5f6fa; display: flex; margin: 0; padding: 0; }
                     </div>
                 </div>
             </div>
-        </div>
+
+### Apa yang bikin normal lagi?
+1. **Nesting Tag Ditutup Sempurna:** Duplikasi kolom ganda bawaan kode lama (`col-lg-4` di dalam `col-lg-4`) yang merusak grid sidebar kanan-kiri sudah dibabat habis.
+2. **Viewport Dokumen Diberi Background Terang:** Area preview kanan (`.paper-viewport`) kini dibungkus dengan `card p-4 shadow-sm bg-white` agar kertas dokumen memanjang ke bawah dengan ukuran normal A4 secara visual dan teks placeholder awal berubah menjadi abu-abu gelap (`text-muted`) agar terbaca jelas, tidak samar putih di atas putih lagi.
 
         <div class="tab-pane fade" id="manual-upload">
             <div class="card p-4 shadow-sm bg-white">
