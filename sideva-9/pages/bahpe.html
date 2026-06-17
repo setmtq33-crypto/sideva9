@@ -219,15 +219,11 @@ async function init(){
 
 async function loadPackage(){
 
- const profile = await getProfile();
-const activeOpdId = getCurrentOpdId(profile);
-
 const {data} =
 await window.supabaseClient
 .from('packages')
 .select('*')
 .eq('id',packageId)
-.eq('opd_id',activeOpdId)
 .single();
 
  packageData=data;
@@ -249,15 +245,11 @@ await window.supabaseClient
 
 async function loadBahpe(){
 
- const profile = await getProfile();
-const activeOpdId = getCurrentOpdId(profile);
-
 const {data} =
 await window.supabaseClient
 .from('package_bahpe')
 .select('*')
 .eq('package_id',packageId)
-.eq('opd_id',activeOpdId)
 .maybeSingle();
 
  bahpeData=data;
