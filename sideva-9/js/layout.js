@@ -67,7 +67,7 @@ async function loadLayout() {
                     'menuAccounts',
                     'menuBidangs',
                     'menuSipd',
-                    'menuRup'
+                    
                 ],
             
                 PBJ: [
@@ -77,6 +77,7 @@ async function loadLayout() {
                     'menuAccounts',
                     'menuBidangs',
                     'menuSipd'
+                    'menuRup'
                 ],
             
                 VIEWER: [
@@ -87,6 +88,7 @@ async function loadLayout() {
                     'menuBidangs',
                     'menuSipd',
                     'menuRup'
+                    'menuPackages'
                 ]
             };
 
