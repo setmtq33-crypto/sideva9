@@ -269,8 +269,114 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 rows += `<tr><td style="border:1px solid #000; padding:6px; text-align:center;">${i+1}</td><td style="border:1px solid #000; padding:6px;">${it.item_name}</td><td style="border:1px solid #000; padding:6px; text-align:center;">${it.quantity} ${it.unit}</td></tr>`; 
             });
             
-            htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:13pt; text-decoration:underline; margin-bottom:15px;">FORMULIR IDENTIFIKASI KEBUTUHAN BARANG/JASA</div><table style="width:100%; border-collapse:collapse; margin-bottom:15px; font-size:10.5pt;"><tr><td style="width:25%; font-weight:bold; padding:4px;">Nama Paket</td><td>: ${paket.package_name}</td></tr><tr><td style="font-weight:bold; padding:4px;">Nomor RUP</td><td>: ${paket.rup_number || '-'}</td></tr><tr><td style="font-weight:bold; padding:4px;">Program</td><td>: ${paket.program || '-'}</td></tr><tr><td style="font-weight:bold; padding:4px;">Kegiatan</td><td>: ${paket.kegiatan || '-'}</td></tr><tr><td style="font-weight:bold; padding:4px;">Sub Kegiatan</td><td>: ${paket.sub_kegiatan || '-'}</td></tr><tr><td style="font-weight:bold; padding:4px;">Output</td><td>: ${paket.output || '-'}</td></tr><tr><td style="font-weight:bold; padding:4px;">Metode Pengadaan</td><td>: ${paket.procurement_method || '-'}</td></tr><tr><td style="font-weight:bold; padding:4px;">Mata Anggaran</td><td>: ${akun ? `${akun.account_code} - ${akun.account_name}` : '-'}</td></tr><tr><td style="font-weight:bold; padding:4px;">Pagu Dana</td><td>: ${docFmtRp(paket.budget_ceiling)}</td></tr></table><div style="margin-bottom:10px;"><strong>A. IDENTIFIKASI KEBUTUHAN BARANG/JASA</strong></div><table style="width:100%; border-collapse:collapse; font-size:10.5pt;"><thead style="background:#eee;"><tr><th style="border:1px solid #000; padding:6px; text-align:center; width:10%;">No</th><th style="border:1px solid #000; padding:6px;">Komoditas Barang</th><th style="border:1px solid #000; padding:6px; text-align:center; width:25%;">Volume</th></tr></thead><tbody>${rows || `<tr><td colspan="3" style="border:1px solid #000; text-align:center; padding:10px;">Belum ada item belanja</td></tr>`}</tbody></table><div style="margin-top:25px;"><strong>B. SPESIFIKASI TEKNIS MINIMAL</strong></div><table style="width:100%; border-collapse:collapse; margin-top:10px; font-size:10.5pt;"><tr><th style="border:1px solid #000;padding:6px;">No</th><th style="border:1px solid #000;padding:6px;">Spesifikasi Teknis</th></tr>${listItems.map((it,i)=>`<tr><td style="border:1px solid #000;padding:6px;text-align:center;width:50px;">${i+1}</td><td style="border:1px solid #000;padding:6px;"><strong>${it.item_name}</strong><br>${it.specification || '-'}</td></tr>`).join('')}</table><div style="margin-top:25px;"><strong>C. KETERSEDIAAN PRODUK DAN PELAKU USAHA</strong></div><table style="width:100%; border-collapse:collapse; margin-top:10px; font-size:10pt;">${[...new Map(listItems.flatMap(item => item.price_surveys || []).map(ps => [ps.vendor_name, ps])).values()].map((ps,index)=>`<tr><td style="border:1px solid #000; padding:6px; width:40px; text-align:center;">${index + 1}</td><td style="border:1px solid #000; padding:6px;">${ps.vendor_name}</td></tr>`).join('')}</table><div style="margin-top:25px;"><strong>D. PENENTUAN PRIORITAS BARANG/JASA</strong></div><div style="margin-top:10px;margin-left:20px;">Prioritas PDN, UMKM, Lokal Kabupaten Kapuas Hulu</div><table style="width:100%; margin-top:50px; border-collapse:collapse;"><tr><td style="width:50%; text-align:center; vertical-align:top;">Ditetapkan oleh,<br>${ppk?.position || 'PA/KPA/PPK'}<br><br><br><br><br><br><strong>${ppk?.full_name || '-'}</strong><br>NIP. ${ppk?.nip || '-'}</td><td style="width:50%; text-align:center; vertical-align:top;">Disusun oleh,<br>${bidang?.position_name || 'Kepala Bidang'}<br>${bidang?.bidang_name || ''}<br><br><br><br><br><strong>${bidang?.head_name || '-'}</strong><br>NIP. ${bidang?.head_nip || '-'}</td></tr></table><div style="clear:both;"></div>`;
-        
+            // Helper Cerdas: Deteksi multikode tanpa memotong tanda strip
+            const formatSipd = (teks) => {
+                if (!teks) return '-';
+                return teks.replace(/\s+(?=\d{1,2}\.\d{2}\.\d{2})/g, '<br>');
+            };
+
+            htmlOutput = `
+            ${kopHtml}
+            <div style="text-align:center; font-weight:bold; font-size:13pt; text-decoration:underline; margin-bottom:15px;">FORMULIR IDENTIFIKASI KEBUTUHAN BARANG/JASA</div>
+            
+            <table style="width:100%; font-size:10.5pt; margin-bottom:15px; border-collapse:collapse;">
+                <tr>
+                    <td width="220" style="padding:3px; vertical-align:top;"><strong>Nama Paket</strong></td>
+                    <td width="15" style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${paket.package_name}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Nomor RUP</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${paket.rup_number || '-'}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Program</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.program)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Kegiatan</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.kegiatan)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Sub Kegiatan</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.sub_kegiatan)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Output</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${paket.output || '-'}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Metode Pengadaan</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${paket.procurement_method || '-'}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Mata Anggaran</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${akun ? `${akun.account_code} - ${akun.account_name}` : '-'}</td>
+                </tr>
+                <tr>
+                    <td style="padding:3px; vertical-align:top;"><strong>Pagu Dana</strong></td>
+                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
+                    <td style="padding:3px; vertical-align:top; text-align:justify;">${docFmtRp(paket.budget_ceiling)}</td>
+                </tr>
+            </table>
+
+            <div style="margin-bottom:10px;"><strong>A. IDENTIFIKASI KEBUTUHAN BARANG/JASA</strong></div>
+            <table style="width:100%; border-collapse:collapse; font-size:10.5pt;">
+                <thead style="background:#eee;">
+                    <tr>
+                        <th style="border:1px solid #000; padding:6px; text-align:center; width:10%;">No</th>
+                        <th style="border:1px solid #000; padding:6px;">Komoditas Barang</th>
+                        <th style="border:1px solid #000; padding:6px; text-align:center; width:25%;">Volume</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rows || `<tr><td colspan="3" style="border:1px solid #000; text-align:center; padding:10px;">Belum ada item belanja</td></tr>`}
+                </tbody>
+            </table>
+
+            <div style="margin-top:25px;"><strong>B. SPESIFIKASI TEKNIS MINIMAL</strong></div>
+            <table style="width:100%; border-collapse:collapse; margin-top:10px; font-size:10.5pt;">
+                <tr>
+                    <th style="border:1px solid #000;padding:6px;">No</th>
+                    <th style="border:1px solid #000;padding:6px;">Spesifikasi Teknis</th>
+                </tr>
+                ${listItems.map((it,i)=>`<tr><td style="border:1px solid #000;padding:6px;text-align:center;width:50px;">${i+1}</td><td style="border:1px solid #000;padding:6px;"><strong>${it.item_name}</strong><br>${it.specification || '-'}</td></tr>`).join('')}
+            </table>
+
+            <div style="margin-top:25px;"><strong>C. KETERSEDIAAN PRODUK DAN PELAKU USAHA</strong></div>
+            <table style="width:100%; border-collapse:collapse; margin-top:10px; font-size:10pt;">
+                ${[...new Map(listItems.flatMap(item => item.price_surveys || []).map(ps => [ps.vendor_name, ps])).values()].map((ps,index)=>`<tr><td style="border:1px solid #000; padding:6px; width:40px; text-align:center;">${index + 1}</td><td style="border:1px solid #000; padding:6px;">${ps.vendor_name}</td></tr>`).join('')}
+            </table>
+
+            <div style="margin-top:25px;"><strong>D. PENENTUAN PRIORITAS BARANG/JASA</strong></div>
+            <div style="margin-top:10px;margin-left:20px;">Prioritas PDN, UMKM, Lokal Kabupaten Kapuas Hulu</div>
+
+            <table style="width:100%; margin-top:50px; border-collapse:collapse;">
+                <tr>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        Ditetapkan oleh,<br>
+                        ${ppk?.position || 'PA/KPA/PPK'}<br><br><br><br><br><br>
+                        <strong>${ppk?.full_name || '-'}</strong><br>
+                        NIP. ${ppk?.nip || '-'}
+                    </td>
+                    <td style="width:50%; text-align:center; vertical-align:top;">
+                        Disusun oleh,<br>
+                        ${bidang?.position_name || 'Kepala Bidang'}<br>
+                        ${bidang?.bidang_name || ''}<br><br><br><br><br>
+                        <strong>${bidang?.head_name || '-'}</strong><br>
+                        NIP. ${bidang?.head_nip || '-'}
+                    </td>
+                </tr>
+            </table>
+            <div style="clear:both;"></div>`;
+         
         } else if (slug === 'penetapan') {
             // TODO: Tambahkan HTML untuk slug penetapan di sini jika ada
             htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:13pt; text-decoration:underline;">DOKUMEN PENETAPAN</div>`;
