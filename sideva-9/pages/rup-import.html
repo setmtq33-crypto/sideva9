@@ -306,6 +306,52 @@ textarea.form-control:focus {
 </div>
 
 <div class="card shadow-sm">
+    <div class="card mb-4">
+
+    <div class="card-header">
+        <i class="bi bi-search"></i>
+        Tarik Data SIRUP
+    </div>
+
+    <div class="card-body">
+
+        <div class="mb-3">
+            <label class="form-label">Kode RUP</label>
+            <input id="searchRupCode"
+                   class="form-control"
+                   placeholder="64115826">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">URL Satker SIRUP</label>
+            <input id="searchSatkerUrl"
+                   class="form-control"
+                   placeholder="https://sirup.inaproc.id/sirup/home/penyediaSatker?idSatker=101651">
+        </div>
+
+        <div class="row g-2">
+
+            <div class="col-md-6">
+                <button id="searchRupBtn"
+                        class="btn btn-primary w-100">
+                    Cari Kode RUP
+                </button>
+            </div>
+
+            <div class="col-md-6">
+                <button id="searchSatkerBtn"
+                        class="btn btn-success w-100">
+                    Tarik Satker
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="card shadow-sm">
     <div class="card-header d-flex align-items-center gap-2">
         <div class="icon-box bg-info-subtle text-info"><i class="bi bi-list-task"></i></div>
         <span>Daftar Import RUP</span>
@@ -339,44 +385,6 @@ textarea.form-control:focus {
 
 </div>
 
-<div class="container-fluid px-4">
-<div class="card-header">
-<i class="bi bi-search"></i>
-Tarik Data SIRUP
-</div>
-
-<div class="card-body">
-
-<div class="mb-3">
-<label class="form-label">Kode RUP</label>
-<input id="searchRupCode" class="form-control" placeholder="64115826">
-</div>
-
-<div class="mb-3">
-<label class="form-label">URL Satker SIRUP</label>
-<input id="searchSatkerUrl"
-class="form-control"
-style="max-width:100%;"
-placeholder="https://sirup.inaproc.id/sirup/home/penyediaSatker?idSatker">
-</div>
-
-<div class="row g-2">
-
-    <div class="col-md-6">
-        <button id="searchRupBtn"
-        class="btn btn-primary w-100">
-        Cari Kode RUP
-        </button>
-    </div>
-
-    <div class="col-md-6">
-        <button id="searchSatkerBtn"
-        class="btn btn-success w-100">
-        Tarik Satker
-        </button>
-    </div>
-
-</div>
 </div>
     
 
@@ -424,6 +432,13 @@ async function init(){
     )
     .onclick =
     importSirupJson;
+
+    document
+    .getElementById(
+        'searchSatkerBtn'
+    )
+    .onclick =
+    tarikSatker;
     
 }
 
@@ -1014,9 +1029,7 @@ function clearForm(){
         .value='';
 }
 
-document
-.getElementById('searchSatkerBtn')
-.onclick = tarikSatker;
+
 
 async function tarikSatker(){
 
