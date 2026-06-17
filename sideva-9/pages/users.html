@@ -558,49 +558,120 @@ async function toggleUser(
 }
 
 async function tambahUser(event) {
+
     event.preventDefault();
 
-    const fullName = document.getElementById('addFullName').value;
-    const email = document.getElementById('addEmail').value;
-    const role = document.getElementById('addRole').value;
-    const opdId = document.getElementById('addOpdId').value;
+    const fullName =
+        document.getElementById('addFullName').value;
+
+    const email =
+        document.getElementById('addEmail').value;
+
+    const password =
+        document.getElementById('addPassword').value;
+
+    const role =
+        document.getElementById('addRole').value;
+
+    const opdId =
+        document.getElementById('addOpdId').value;
 
     try {
-        const { data, error } = await usersDb
-            .from('profiles')
-            .insert([
-                {
-                    full_name: fullName,
-                    email: email,
-                    role: role,
-                    opd_id: opdId,
-                    is_active: true
-                }
-            ])
-            .select();
 
-        if (error) throw error;
+        const {
+            data: authData,
+            error: authError
+        } =
+        await usersDb.auth.signUp({
 
-        if (data && data.length > 0) {
-            await writeAuditLog(
-                'USER',
-                'INSERT_USER',
-                data[0].id,
-                `Menambahkan user baru: ${fullName}`
+            email,
+            password
+
+        });
+
+        if (authError)
+            throw authError;
+
+        if (!authData.user)
+            throw new Error(
+                'Gagal membuat Auth User'
             );
-        }
 
-        alert('User berhasil ditambahkan!');
-        
-        const modalEl = document.getElementById('modalTambahUser');
-        const modalInstance = bootstrap.Modal.getInstance(modalEl);
-        modalInstance.hide();
+        const {
+            data,
+            error
+        } =
+        await usersDb
+        .from('profiles')
+        .insert([{
+
+            auth_user_id:
+                authData.user.id,
+
+            tenant_id:
+                currentProfile.tenant_id,
+
+            full_name:
+                fullName,
+
+            email:
+                email,
+
+            role:
+                role,
+
+            opd_id:
+                opdId,
+
+            is_active:
+                true
+
+        }])
+        .select();
+
+        if (error)
+            throw error;
+
+        await writeAuditLog(
+
+            'USER',
+
+            'INSERT_USER',
+
+            data[0].id,
+
+            `Menambahkan user baru: ${fullName}`
+
+        );
+
+        alert(
+            'User berhasil dibuat\n\n' +
+            'Email : ' + email + '\n' +
+            'Password : ' + password
+        );
+
+        const modalEl =
+            document.getElementById(
+                'modalTambahUser'
+            );
+
+        bootstrap
+        .Modal
+        .getInstance(modalEl)
+        .hide();
+
         event.target.reset();
 
         await loadUsers();
 
     } catch (err) {
-        alert('Gagal menambahkan user: ' + err.message);
+
+        console.error(err);
+
+        alert(
+            'Gagal menambahkan user : ' +
+            err.message
+        );
     }
 }
 
