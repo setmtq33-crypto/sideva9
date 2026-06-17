@@ -149,16 +149,10 @@ function rupiah(v){
 
 async function loadSummary(){
 
-    const activeOpdId =
-        getCurrentOpdId(
-            await getProfile()
-        );
-
     const { data, error } =
     await db
     .from('ready_procurement_summary')
     .select('*')
-    .eq('opd_id', activeOpdId)
     .single();
 
     if(error){
@@ -185,16 +179,29 @@ async function loadPackages(){
         getCurrentOpdId(
             await getProfile()
         );
-    
+
+    let query =
+        db
+        .from('ready_procurement_packages')
+        .select('*')
+        .order(
+            'created_at',
+            { ascending:false }
+        );
+
+    if(
+        activeOpdId &&
+        activeOpdId !== 'ALL'
+    ){
+        query =
+            query.eq(
+                'opd_id',
+                activeOpdId
+            );
+    }
+
     const { data, error } =
-    await db
-    .from('ready_procurement_packages')
-    .select('*')
-    .eq('opd_id', activeOpdId)
-    .order(
-        'created_at',
-        { ascending:false }
-    );
+        await query;
 
     if(error){
         console.error(error);
@@ -225,13 +232,11 @@ async function loadPackages(){
             </td>
 
             <td>
-
                 <a
                     href="bahpe.html?id=${pkg.id}"
                     class="btn btn-primary btn-sm">
                     BAHPE
                 </a>
-
             </td>
 
         </tr>
