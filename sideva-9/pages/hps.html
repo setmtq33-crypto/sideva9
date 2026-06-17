@@ -52,19 +52,19 @@ async function init() {
     if (!packageId) { alert('ID Paket tidak ditemukan'); location.href = 'packages.html'; return; }
     
     // 1. Ambil data Paket
-    const { data: pkg } = await db.from('packages').select('*').eq('id', packageId).single();
+    const { data: pkg } = await db.from('packages').select('*').eq('id', packageId).eq('opd_id', activeOpdId).single();
     if (pkg) {
         document.getElementById('packageName').innerText = pkg.package_name;
         document.getElementById('budgetCeiling').innerText = rupiah(pkg.budget_ceiling);
     }
 
     // 2. Kalkulasi HPS
-    const { data: items } = await db.from('package_items').select('*').eq('package_id', packageId);
+    const { data: items } = await db.from('package_items').select('*').eq('package_id', packageId).eq('opd_id', activeOpdId);
     let totalHps = 0;
     let html = '';
 
     for (const item of (items || [])) {
-        const { data: surveys } = await db.from('price_surveys').select('*').eq('package_item_id', item.id);
+        const { data: surveys } = await db.from('price_surveys').select('*').eq('package_item_id', item.id).eq('opd_id', activeOpdId);
         
         let hpsUnit = surveys?.length > 0 
             ? (surveys.reduce((acc, s) => acc + (Number(s.negotiated_price || s.survey_price || 0)), 0) / surveys.length)
@@ -81,7 +81,8 @@ async function init() {
     const eff = pagu - totalHps;
     document.getElementById('totalHps').innerText = rupiah(totalHps);
     document.getElementById('efficiency').innerText = rupiah(eff);
-    document.getElementById('efficiencyPercent').innerText = ((eff / pagu) * 100).toFixed(2) + '%';
+    document.getElementById('efficiencyPercent')
+        .innerText = ((eff / pagu) * 100).toFixed(2) + '%';
 }
 
 async function saveHPS() {
@@ -89,7 +90,7 @@ async function saveHPS() {
     
     // Upsert ke package_hps dan update status paket
     await db.from('package_hps').upsert({ package_id: packageId, total_hps: total });
-    await db.from('packages').update({ package_status: 'HPS_COMPLETE' }).eq('id', packageId);
+    await db.from('packages').update({ package_status: 'HPS_COMPLETE' }).eq('id', packageId).eq('opd_id', getCurrentOpdId(profile));
     
     alert('HPS Disimpan & Paket Terkunci!');
     location.href = 'packages.html';
