@@ -53,7 +53,31 @@
                         <select id="opdSelect" class="form-select border-info"></select>
                     </div>
                     <div class="col-md-2">
-                        <button onclick="savePPKOM()" class="btn btn-primary w-100 shadow-sm">Simpan Data</button>
+                        <label class="form-label small fw-semibold">
+                            Scan TTD
+                        </label>
+                        <input
+                            type="file"
+                            id="signatureFile"
+                            class="form-control"
+                            accept="image/*">
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <label class="form-label small fw-semibold">
+                            Scan Cap/Stempel
+                        </label>
+                        <input
+                            type="file"
+                            id="stampFile"
+                            class="form-control"
+                            accept="image/*">
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <button onclick="savePPKOM()" class="btn btn-primary w-100 shadow-sm">
+                            Simpan Data
+                        </button>
                     </div>
                 </div>
             </div>
@@ -71,11 +95,15 @@
                                 <th class="ps-4">Nama PPK / KPA</th>
                                 <th>NIP</th>
                                 <th>Jabatan</th>
-                                <th class="text-end pe-4" style="width: 150px;">Aksi</th>
+                                <th>TTD</th>
+                                <th>Cap</th>
+                                <th class="text-end pe-4">
+                                    Aksi
+                                </th>
                             </tr>
                         </thead>
                         <tbody id="ppkomList">
-                            <tr><td colspan="4" class="text-center py-5 text-muted">Memuat data pejabat...</td></tr>
+                            <tr><td colspan="6" class="text-center py-5 text-muted">Memuat data pejabat...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -147,22 +175,138 @@ async function init() {
     await loadPPKOMs();
 }
 
+async function uploadPPKFile(file, folder){
+
+    if(!file) return null;
+
+    const ext =
+        file.name.split('.').pop();
+
+    const fileName =
+        `${folder}/${Date.now()}-${Math.random()
+        .toString(36)
+        .substring(2)}.${ext}`;
+
+    const { error } =
+        await window.supabaseClient
+        .storage
+        .from('sideva-documents')
+        .upload(
+            fileName,
+            file,
+            {
+                upsert:true
+            }
+        );
+
+    if(error){
+        throw error;
+    }
+
+    const { data } =
+        window.supabaseClient
+        .storage
+        .from('sideva-documents')
+        .getPublicUrl(fileName);
+
+    return data.publicUrl;
+}
+
 async function savePPKOM() {
-    const full_name = document.getElementById("fullName").value.trim();
-    const nip = document.getElementById("nip").value.trim();
-    const position = document.getElementById("position").value.trim();
-    const opd_id = profile.role === 'SUPER_ADMIN' ? document.getElementById("opdSelect").value : profile.opd_id;
 
-    if (!full_name || !nip || !position) return alert("Semua kolom wajib diisi!");
+    const full_name =
+        document.getElementById("fullName").value.trim();
 
-    const { error } = await window.supabaseClient.from("ppkoms").insert([{
-        tenant_id: profile.tenant_id,
-        opd_id, full_name, nip, position
-    }]);
+    const nip =
+        document.getElementById("nip").value.trim();
 
-    if (error) return alert("Gagal menyimpan data: " + error.message);
-    alert("Data Pejabat PPK/KPA berhasil disimpan.");
-    document.querySelectorAll('.card-body input').forEach(i => i.value = '');
+    const position =
+        document.getElementById("position").value.trim();
+
+    const opd_id =
+        profile.role === 'SUPER_ADMIN'
+        ? document.getElementById("opdSelect").value
+        : profile.opd_id;
+
+    if (!full_name || !nip || !position) {
+        return alert("Semua kolom wajib diisi!");
+    }
+
+    let signature_url = null;
+    let stamp_url = null;
+
+    try{
+
+        const signatureFile =
+            document.getElementById('signatureFile')
+            .files[0];
+
+        const stampFile =
+            document.getElementById('stampFile')
+            .files[0];
+
+        if(signatureFile){
+
+            signature_url =
+                await uploadPPKFile(
+                    signatureFile,
+                    'signatures'
+                );
+
+        }
+
+        if(stampFile){
+
+            stamp_url =
+                await uploadPPKFile(
+                    stampFile,
+                    'stamps'
+                );
+
+        }
+
+    }catch(err){
+
+        alert(
+            'Upload gagal : ' +
+            err.message
+        );
+
+        return;
+    }
+
+    const { error } =
+        await window.supabaseClient
+        .from("ppkoms")
+        .insert([{
+            tenant_id: profile.tenant_id,
+            opd_id,
+            full_name,
+            nip,
+            position,
+            signature_url,
+            stamp_url
+        }]);
+
+    if(error){
+
+        return alert(
+            "Gagal menyimpan data: " +
+            error.message
+        );
+
+    }
+
+    alert(
+        "Data PPK/KPA berhasil disimpan."
+    );
+
+    document.getElementById('fullName').value = '';
+    document.getElementById('nip').value = '';
+    document.getElementById('position').value = '';
+    document.getElementById('signatureFile').value = '';
+    document.getElementById('stampFile').value = '';
+
     await loadPPKOMs();
 }
 
@@ -174,12 +318,12 @@ async function loadPPKOMs() {
     const container = document.getElementById("ppkomList");
 
     if (error) {
-        container.innerHTML = `<tr><td colspan="4" class="text-center text-danger py-4">Gagal memuat data.</td></tr>`;
+        container.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">Gagal memuat data.</td></tr>`;
         return;
     }
 
     if (!data || data.length === 0) {
-        container.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-4">Belum ada data PPK / KPA.</td></tr>`;
+        container.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Belum ada data PPK / KPA.</td></tr>`;
         return;
     }
 
@@ -187,7 +331,37 @@ async function loadPPKOMs() {
         <tr>
             <td class="ps-4 fw-bold text-dark">${item.full_name}</td>
             <td class="text-secondary">${item.nip}</td>
-            <td><span class="badge bg-light text-dark border px-2 py-1">${item.position}</span></td>
+            <td>
+    ${
+        item.signature_url
+        ? `
+        <img
+            src="${item.signature_url}"
+            style="
+                height:50px;
+                max-width:120px;
+                object-fit:contain;
+            ">
+        `
+        : '<span class="text-muted">-</span>'
+    }
+</td>
+
+            <td>
+                ${
+                    item.stamp_url
+                    ? `
+                    <img
+                        src="${item.stamp_url}"
+                        style="
+                            height:50px;
+                            max-width:120px;
+                            object-fit:contain;
+                        ">
+                    `
+                    : '<span class="text-muted">-</span>'
+                }
+            </td>
             <td class="text-end pe-4">
                 <button class="btn btn-sm btn-warning" onclick="openEditModal('${item.id}', '${item.full_name}', '${item.nip}', '${item.position}', '${item.opd_id}')"><i class="bi bi-pencil-square"></i></button>
                 <button class="btn btn-sm btn-danger" onclick="deletePPKOM('${item.id}')"><i class="bi bi-trash"></i></button>
