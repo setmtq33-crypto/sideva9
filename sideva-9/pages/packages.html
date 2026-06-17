@@ -253,7 +253,7 @@ async function initPage(){
         await loadOpds();
     } else {
         document.getElementById("opdWrapper").style.display = "none";
-        currentOpdId = profile.opd_id;
+        const currentOpdId = getCurrentOpdId(profile);
     }
 
     await loadMak();
@@ -281,7 +281,7 @@ async function loadOpds(){
 }
 
 async function loadBidangs(){
-    const opdId = profile.role === "SUPER_ADMIN" ? currentOpdId : profile.opd_id;
+    const opdId = profile.role === "SUPER_ADMIN" ? const currentOpdId : getCurrentOpdId(profile);
     const select = document.getElementById("bidangSelect");
     select.innerHTML = '<option value="">Pilih Bidang</option>';
     
@@ -311,7 +311,7 @@ async function savePackage(){
         return;
     }
 
-    const opdId = profile.role === "SUPER_ADMIN" ? currentOpdId : profile.opd_id;
+    const opdId = profile.role === "SUPER_ADMIN" ? const currentOpdId : getCurrentOpdId(profile);
     if(!opdId){
         alert("Pilih OPD terlebih dahulu");
         return;
@@ -351,7 +351,7 @@ async function savePackage(){
 async function loadPackages() {
     let query = db.from("packages").select("*").order("created_at", { ascending: false });
     
-    const opdId = profile.role === "SUPER_ADMIN" ? currentOpdId : profile.opd_id;
+    const opdId = profile.role === "SUPER_ADMIN" ? const currentOpdId : getCurrentOpdId(profile);
     if (opdId) {
         query = query.eq("opd_id", opdId);
     }
