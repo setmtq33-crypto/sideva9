@@ -52,18 +52,23 @@ async function init() {
     if (!packageId) { alert('ID Paket tidak ditemukan'); location.href = 'packages.html'; return; }
     
     // 1. Ambil data Paket
-    const { data: pkg } = await db.from('packages').select('*').eq('id', packageId).single();
-        if(error){
+    const { data: pkg, error } = await db
+    .from('packages')
+    .select('*')
+    .eq('id', packageId)
+    .single();
     
+    if(error){
         console.error(error);
-    
         return;
+    }
     
-    }
-    if (pkg) {
-        document.getElementById('packageName').innerText = pkg.package_name;
-        document.getElementById('budgetCeiling').innerText = rupiah(pkg.budget_ceiling);
-    }
+    document.getElementById('packageName').innerText =
+        pkg.package_name;
+    
+    document.getElementById('budgetCeiling').innerText =
+        rupiah(pkg.budget_ceiling);
+   
 
     // 2. Kalkulasi HPS
     const { data: items } = await db.from('package_items').select('*').eq('package_id', packageId);
