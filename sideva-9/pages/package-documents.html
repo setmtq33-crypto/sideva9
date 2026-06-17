@@ -94,10 +94,23 @@ body { background: #f5f6fa; display: flex; margin: 0; padding: 0; }
                 <div class="col-lg-4 mb-4">
                     <div class="card p-3 shadow-sm bg-white">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="fw-bold text-secondary small">DAFTAR PILIHAN BERKAS</span>
-                            <button id="btn-print-action" class="btn btn-danger btn-sm px-3" onclick="window.print()" disabled>
-                                <i class="bi bi-printer"></i> Cetak A4
-                            </button>
+                         <div class="col-lg-4 mb-4">
+                           <div class="card p-3 shadow-sm bg-white">
+                               <div class="mb-3">
+                                   <label for="ppkomSelect" class="form-label small fw-bold text-secondary">
+                                       <i class="bi bi-person-badge-fill me-1"></i> PILIH PPKOM PENANDATANGAN
+                                   </label>
+                                   <select id="ppkomSelect" class="form-select form-select-sm shadow-sm" onchange="refreshCurrentDocument()">
+                                       <option value="">-- Gunakan PPKOM Default --</option>
+                                   </select>
+                               </div>
+                               <div class="d-flex justify-content-between align-items-center mb-3">
+                                   <span class="fw-bold text-secondary small">DAFTAR PILIHAN BERKAS</span>
+                                   <button id="btn-print-action" class="btn btn-danger btn-sm px-3" onclick="window.print()" disabled>
+                                       <i class="bi bi-printer"></i> Cetak A4
+                                   </button>
+                               </div>
+                  
                         </div>
                         <div class="list-group" id="auto-doc-list">
                             <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('idkb')">1. Identifikasi Kebutuhan (IDKB)</button>
@@ -107,9 +120,9 @@ body { background: #f5f6fa; display: flex; margin: 0; padding: 0; }
                             <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('dpp')">5. Dokumen Persiapan (DPP)</button>
                             <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('spek')">6. Spesifikasi Teknis (SPEK)</button>
                             <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('riviu')">7. BA Kaji Ulang DPP (RIVIU)</button>
-                            <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('evht')">8. BA Evaluasi Harga (EVHP)</button>
+                            <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('evht')">8. BA Evaluasi Harga (EVHT)</button>
                             <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('evat')">9. BA Evaluasi Admin (EVAT)</button>
-                            <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('baep')">10. BA Hasil Pengadaan (BAHPE)</button>
+                            <button class="list-group-item list-group-item-action py-2" onclick="switchPrintView('baep')">10. BA Hasil Pengadaan (BAEP)</button>
                         </div>
                     </div>
                 </div>
@@ -182,6 +195,7 @@ const documentDb = window.supabaseClient || window.supabase || window.db;
 const urlParams = new URLSearchParams(window.location.search);
 const packageId = urlParams.get('package_id') || urlParams.get('id');
 let documents = [];
+let currentActiveSlug = null; // 1. Tambahkan variabel pelacak dokumen aktif
 
 async function initPackageHeader() {
     if(!packageId) return;
@@ -189,24 +203,54 @@ async function initPackageHeader() {
     if(!error && data) {
         document.getElementById('packageName').innerText = data.package_name;
         document.getElementById('packageRup').innerText = `ID RUP: ${data.rup_id || '-'}`;
+        
+        // 2. Panggil pengisian otomatis dropdown PPKOM berdasarkan OPD paket saat load
+        await loadPpkomDropdown(data.opd_id);
     }
 }
 
-// Fungsi yang sebelumnya hilang
+// 3. Fungsi baru untuk mengambil semua PPKOM milik OPD terkait
+async function loadPpkomDropdown(opdId) {
+    const selectEl = document.getElementById('ppkomSelect');
+    if (!selectEl || !opdId) return;
+    
+    const { data: listPpk, error } = await documentDb.from('ppkoms').select('*').eq('opd_id', opdId);
+    if (!error && listPpk) {
+        selectEl.innerHTML = '<option value="">-- Gunakan PPKOM Default --</option>';
+        listPpk.forEach(ppk => {
+            const opt = document.createElement('option');
+            opt.value = ppk.id;
+            opt.textContent = `${ppk.full_name} (NIP. ${ppk.nip || '-'})`;
+            selectEl.appendChild(opt);
+        });
+    }
+}
+
+// 4. Fungsi baru untuk merender ulang dokumen aktif ketika dropdown PPKOM diubah
+function refreshCurrentDocument() {
+    if (currentActiveSlug) {
+        renderSidevaDocumentInternal(currentActiveSlug, packageId);
+    }
+}
+
 function switchPrintView(slug) {
     console.log("SLUG DIPILIH =", slug);
+    currentActiveSlug = slug; // Simpan nilai slug saat ini agar bisa di-refresh
 
     const listItems = document.querySelectorAll('#auto-doc-list .list-group-item');
     listItems.forEach(el => el.classList.remove('active'));
 
-    // Menandai tombol yang diklik sebagai aktif
-    event.currentTarget.classList.add('active');
+    if (window.event && window.event.currentTarget && window.event.currentTarget.classList) {
+        window.event.currentTarget.classList.add('active');
+    } else {
+        const targetBtn = Array.from(listItems).find(btn => btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`'${slug}'`));
+        if (targetBtn) targetBtn.classList.add('active');
+    }
 
     document.getElementById('btn-print-action').removeAttribute('disabled');
-
-    // Memanggil fungsi render dokumen
     renderSidevaDocumentInternal(slug, packageId);
 }
+
 
 // ─── CORE ENGINE GENERATOR ADMINISTRASI FISIK ───
 function docFmtRp(v) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(v || 0); }
@@ -229,30 +273,39 @@ async function renderSidevaDocumentInternal(slug, pId) {
 
     targetDiv.innerHTML = `<div class="text-center text-white p-5"><div class="spinner-border text-light spinner-border-sm"></div><p class="small mt-2">Menyinkronkan data database...</p></div>`;
 
-    // Helper untuk merapikan kode SIPD
     const formatSipd = (teks) => (!teks ? '-' : teks.replace(/\s+(?=\d{1,2}\.\d{2}\.\d{2})/g, '<br>'));
 
     try {
-        // 1. Ambil data paket utama
         const { data: paket, error: paketError } = await documentDb.from('packages').select('*').eq('id', pId).single();
         if (paketError) throw paketError;
 
-        // 2. Ambil data pendukung (menggunakan maybeSingle agar tidak crash jika kosong)
+        // Ambil ID PPKOM terpilih dari komponen dropdown
+        const ppkomSelectEl = document.getElementById('ppkomSelect');
+        const selectedPpkomId = ppkomSelectEl ? ppkomSelectEl.value : '';
+
+        // Ambil data pendukung
         const [
             { data: akun },
             { data: items, error: itemsError },
-            { data: ppk },
+            { data: ppk }, // Variabel ini digunakan otomatis oleh seluruh 10 dokumen di bawah
             { data: bidang },
             { data: opd }
         ] = await Promise.all([
             documentDb.from('budget_accounts').select('*').eq('id', paket.budget_account_id).maybeSingle(),
             documentDb.from('package_items').select('*,price_surveys(*)').eq('package_id', pId),
-            documentDb.from('ppkoms').select('*').eq('opd_id', paket.opd_id).maybeSingle(),
+            
+            // KONEKSI DINAMIS DROPDOWN KE DOKUMEN:
+            // Jika ada PPKOM terpilih di dropdown, ambil berdasarkan ID. Jika kosong/default, ambil data pertama berdasarkan opd_id.
+            selectedPpkomId 
+                ? documentDb.from('ppkoms').select('*').eq('id', selectedPpkomId).maybeSingle()
+                : documentDb.from('ppkoms').select('*').eq('opd_id', paket.opd_id).maybeSingle(),
+                
             documentDb.from('bidangs').select('*').eq('id', paket.bidang_id).maybeSingle(),
             documentDb.from('opds').select('*').eq('id', paket.opd_id).maybeSingle()
         ]);
 
         if (itemsError) throw itemsError;
+        // ... (Sisa kode render htmlOutput di bawahnya tetap sama tanpa perlu diubah)
 
         const listItems = items || [];
         const tgl = docFmtDate(new Date());
