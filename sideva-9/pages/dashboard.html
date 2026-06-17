@@ -435,9 +435,7 @@ async function loadOpdSummary(){
         .from('dashboard_opd_summary')
         .select('*');
     
-    if(selectedOpd !== 'ALL'){
-        query = query.eq('id', selectedOpd);
-    }
+    
     
     const { data } = await query;
  let html='';
