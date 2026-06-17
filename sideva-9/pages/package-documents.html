@@ -11,6 +11,15 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+
 <script src="../js/config.js"></script>
 <script src="../js/supabase.js"></script>
 <script src="../js/auth.js"></script>
@@ -247,6 +256,43 @@ body { background: #f5f6fa; display: flex; margin: 0; padding: 0; }
     </div>
 </div>
 
+<div class="modal fade" id="signEditorModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title"><i class="bi bi-vector-pen"></i> Editor TTD & Cap Dokumen</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body bg-light p-3">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="card mb-3">
+                            <div class="card-header bg-secondary text-white">Toolbar Aksi</div>
+                            <div class="card-body d-grid gap-2">
+                                <button class="btn btn-outline-primary" onclick="addStampToCanvas()"><i class="bi bi-patch-check"></i> Tambah Cap</button>
+                                <button class="btn btn-outline-success" onclick="addSignatureToCanvas()"><i class="bi bi-pen"></i> Tambah TTD</button>
+                                <hr>
+                                <button class="btn btn-danger" onclick="removeSelectedObject()"><i class="bi bi-trash"></i> Hapus Item</button>
+                            </div>
+                        </div>
+                        <div class="alert alert-info small">
+                            <strong>Petunjuk:</strong> Klik "Tambah", lalu geser gambar ke posisi yang tepat. Tarik ujung gambar untuk mengubah ukuran.
+                        </div>
+                    </div>
+                    <div class="col-md-9" style="overflow: auto; max-height: 70vh; text-align: center; border: 1px solid #ccc; background: gray;">
+                        <canvas id="pdfCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary" onclick="saveSignedDocument()"><i class="bi bi-save"></i> Simpan Dokumen</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+     
 <script>
 // Penyelarasan Variabel Global Supabase Kluster Keamanan V9
 const documentDb = window.supabaseClient || window.supabase || window.db; 
@@ -1537,6 +1583,17 @@ async function loadUploadedDocuments(){
     if(error) return;
     documents = data || [];
     renderUploadedTable();
+
+  const actionButtons = `
+      <button class="btn btn-sm btn-info me-1" onclick="downloadDocument('${doc.file_path}')" title="Unduh"><i class="bi bi-download"></i></button>
+      <button class="btn btn-sm btn-danger me-1" onclick="deleteDocument('${doc.id}', '${doc.file_path}')" title="Hapus"><i class="bi bi-trash"></i></button>
+      
+      <button class="btn btn-sm btn-secondary me-1" onclick="returnDocument('${doc.id}')" title="Kembalikan Dokumen"><i class="bi bi-arrow-return-left"></i></button>
+      <button class="btn btn-sm btn-success me-1" onclick="approveDocument('${doc.id}')" title="Setujui Dokumen"><i class="bi bi-check-lg"></i></button>
+      <button class="btn btn-sm btn-primary me-1" onclick="editDocument('${doc.id}')" title="Beri Catatan"><i class="bi bi-chat-text"></i></button>
+      <button class="btn btn-sm btn-warning" onclick="openSignEditor('${doc.id}', '${doc.file_path}')" title="Bubuhi TTD & Cap"><i class="bi bi-pen"></i> TTD & Cap</button>
+  `;
+ 
 }
 
 function renderUploadedTable(){
@@ -1597,6 +1654,191 @@ window.addEventListener('DOMContentLoaded', () => {
     initPackageHeader();
     loadUploadedDocuments();
 });
+
+// ==========================================
+// 1. FUNGSI STATUS DOKUMEN (SETUJUI, TOLAK, CATATAN)
+// ==========================================
+async function returnDocument(id) {
+    const res = await Swal.fire({ title: 'Kembalikan Dokumen?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Kembalikan' });
+    if (!res.isConfirmed) return;
+    const { error } = await db.from('package_documents').update({ status: 'returned' }).eq('id', id);
+    if (error) return Swal.fire('Error', error.message, 'error');
+    Swal.fire('Sukses', 'Dokumen berhasil dikembalikan.', 'success');
+    loadUploadedDocuments();
+}
+
+async function approveDocument(id) {
+    const res = await Swal.fire({ title: 'Setujui Dokumen?', icon: 'question', showCancelButton: true, confirmButtonText: 'Ya, Setujui' });
+    if (!res.isConfirmed) return;
+    const { error } = await db.from('package_documents').update({ status: 'approved' }).eq('id', id);
+    if (error) return Swal.fire('Error', error.message, 'error');
+    Swal.fire('Sukses', 'Dokumen telah disetujui.', 'success');
+    loadUploadedDocuments();
+}
+
+async function editDocument(id) {
+    const { value: note } = await Swal.fire({ title: 'Catatan Dokumen', input: 'textarea', showCancelButton: true, confirmButtonText: 'Simpan' });
+    if (note) {
+        const { error } = await db.from('package_documents').update({ notes: note }).eq('id', id);
+        if (error) return Swal.fire('Error', error.message, 'error');
+        Swal.fire('Sukses', 'Catatan disimpan.', 'success');
+        loadUploadedDocuments();
+    }
+}
+
+// ==========================================
+// 2. FUNGSI EDITOR TTD & CAP (DENGAN PPKOMS)
+// ==========================================
+let fabricCanvas = null;
+let currentPdfBytes = null;
+let currentDocId = null;
+let currentFilePath = null;
+let pdfScale = 1.2;
+let dynamicUrlCap = null;
+let dynamicUrlTtd = null;
+
+// Fungsi mengambil data dari tabel ppkoms
+// Fungsi mengambil data dari tabel ppkoms (Diperbarui untuk bucket sideva-documents)
+async function loadPpkomsAssets() {
+    try {
+        const { data: ppkom, error } = await db.from('ppkoms').select('signature_url, stamp_url').limit(1).single();
+        if (error) throw error;
+
+        const bucketName = 'sideva-documents'; // Menggunakan bucket yang baru
+
+        // Memproses URL Cap (Stempel)
+        if (ppkom.stamp_url) {
+            if (ppkom.stamp_url.startsWith('http')) {
+                dynamicUrlCap = ppkom.stamp_url;
+            } else {
+                // Pastikan path mengarah ke folder 'stamps/'
+                const pathCap = ppkom.stamp_url.startsWith('stamps/') ? ppkom.stamp_url : `stamps/${ppkom.stamp_url}`;
+                dynamicUrlCap = db.storage.from(bucketName).getPublicUrl(pathCap).data.publicUrl;
+            }
+        }
+        
+        // Memproses URL Tanda Tangan
+        if (ppkom.signature_url) {
+            if (ppkom.signature_url.startsWith('http')) {
+                dynamicUrlTtd = ppkom.signature_url;
+            } else {
+                // Pastikan path mengarah ke folder 'signatures/'
+                const pathTtd = ppkom.signature_url.startsWith('signatures/') ? ppkom.signature_url : `signatures/${ppkom.signature_url}`;
+                dynamicUrlTtd = db.storage.from(bucketName).getPublicUrl(pathTtd).data.publicUrl;
+            }
+        }
+    } catch (err) {
+        console.error("Gagal memuat aset PPKOM:", err);
+    }
+}
+
+// Buka modal editor
+async function openSignEditor(docId, filePath) {
+    currentDocId = docId;
+    currentFilePath = filePath;
+    Swal.fire({ title: 'Memuat Dokumen...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    
+    try {
+        await loadPpkomsAssets();
+
+        const { data: fileData, error } = await db.storage.from('package-documents').download(filePath);
+        if (error) throw error;
+        
+        currentPdfBytes = await fileData.arrayBuffer();
+
+        if (!fabricCanvas) fabricCanvas = new fabric.Canvas('pdfCanvas');
+        else fabricCanvas.clear();
+
+        const pdfDoc = await pdfjsLib.getDocument({ data: currentPdfBytes }).promise;
+        const page = await pdfDoc.getPage(1); 
+        const viewport = page.getViewport({ scale: pdfScale });
+        
+        fabricCanvas.setWidth(viewport.width);
+        fabricCanvas.setHeight(viewport.height);
+
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCanvas.width = viewport.width;
+        tempCanvas.height = viewport.height;
+
+        await page.render({ canvasContext: tempCtx, viewport: viewport }).promise;
+
+        fabric.Image.fromURL(tempCanvas.toDataURL(), function(img) {
+            fabricCanvas.setBackgroundImage(img, fabricCanvas.renderAll.bind(fabricCanvas));
+            Swal.close();
+            new bootstrap.Modal(document.getElementById('signEditorModal')).show();
+        });
+
+    } catch (err) {
+        console.error(err);
+        Swal.fire('Error', 'Gagal memuat PDF (pastikan formatnya PDF): ' + err.message, 'error');
+    }
+}
+
+function addStampToCanvas() {
+    if (!dynamicUrlCap) return Swal.fire('Oops', 'Cap tidak ditemukan di database PPKOM', 'warning');
+    fabric.Image.fromURL(dynamicUrlCap, function(img) {
+        img.scaleToWidth(120); img.set({ left: 100, top: 100, opacity: 0.8, typeId: 'cap' }); 
+        fabricCanvas.add(img); fabricCanvas.setActiveObject(img);
+    }, { crossOrigin: 'anonymous' });
+}
+
+function addSignatureToCanvas() {
+    if (!dynamicUrlTtd) return Swal.fire('Oops', 'TTD tidak ditemukan di database PPKOM', 'warning');
+    fabric.Image.fromURL(dynamicUrlTtd, function(img) {
+        img.scaleToWidth(150); img.set({ left: 150, top: 150, typeId: 'ttd' }); 
+        fabricCanvas.add(img); fabricCanvas.setActiveObject(img);
+    }, { crossOrigin: 'anonymous' });
+}
+
+function removeSelectedObject() {
+    const activeObj = fabricCanvas.getActiveObject();
+    if (activeObj) fabricCanvas.remove(activeObj);
+}
+
+// Simpan Dokumen kembali ke Supabase
+async function saveSignedDocument() {
+    Swal.fire({ title: 'Menyimpan Dokumen...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    try {
+        const objects = fabricCanvas.getObjects('image');
+        const pdfDoc = await PDFLib.PDFDocument.load(currentPdfBytes);
+        const pages = pdfDoc.getPages();
+        const page = pages[0]; 
+
+        let embeddedCap = null, embeddedTtd = null;
+        if (dynamicUrlCap) embeddedCap = await pdfDoc.embedPng(await fetch(dynamicUrlCap).then(r => r.arrayBuffer()));
+        if (dynamicUrlTtd) embeddedTtd = await pdfDoc.embedPng(await fetch(dynamicUrlTtd).then(r => r.arrayBuffer()));
+
+        objects.forEach(obj => {
+            const finalWidth = (obj.width * obj.scaleX) / pdfScale;
+            const finalHeight = (obj.height * obj.scaleY) / pdfScale;
+            const pdfX = obj.left / pdfScale;
+            const pdfY = page.getHeight() - (obj.top / pdfScale) - finalHeight;
+
+            if (obj.typeId === 'cap' && embeddedCap) {
+                page.drawImage(embeddedCap, { x: pdfX, y: pdfY, width: finalWidth, height: finalHeight, opacity: 0.8 });
+            } else if (obj.typeId === 'ttd' && embeddedTtd) {
+                page.drawImage(embeddedTtd, { x: pdfX, y: pdfY, width: finalWidth, height: finalHeight, opacity: 1.0 });
+            }
+        });
+
+        const pdfBytes = await pdfDoc.save();
+        const newFile = new File([pdfBytes], currentFilePath.split('/').pop(), { type: 'application/pdf' });
+
+        const { error: uploadError } = await db.storage.from('package-documents').upload(currentFilePath, newFile, { upsert: true });
+        if (uploadError) throw uploadError;
+
+        bootstrap.Modal.getInstance(document.getElementById('signEditorModal')).hide();
+        Swal.fire('Sukses!', 'Dokumen berhasil ditandatangani.', 'success');
+        loadUploadedDocuments(); 
+
+    } catch (err) {
+        console.error(err);
+        Swal.fire('Error', 'Gagal menyimpan: ' + err.message, 'error');
+    }
+}
+
+ 
 </script>
 </body>
 </html>
