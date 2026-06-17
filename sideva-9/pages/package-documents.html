@@ -237,17 +237,23 @@ function switchPrintView(slug) {
     console.log("SLUG DIPILIH =", slug);
     currentActiveSlug = slug; // Simpan nilai slug saat ini agar bisa di-refresh
 
+    // 1. Bersihkan class 'active' dari semua menu pilihan dokumen
     const listItems = document.querySelectorAll('#auto-doc-list .list-group-item');
     listItems.forEach(el => el.classList.remove('active'));
 
-    if (window.event && window.event.currentTarget && window.event.currentTarget.classList) {
-        window.event.currentTarget.classList.add('active');
-    } else {
-        const targetBtn = Array.from(listItems).find(btn => btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`'${slug}'`));
-        if (targetBtn) targetBtn.classList.add('active');
+    // 2. Cari tombol menu yang diklik berdasarkan nama slug-nya secara spesifik (Anti-Salah-Sasaran)
+    const targetBtn = Array.from(listItems).find(btn => 
+        btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`'${slug}'`)
+    );
+    
+    // 3. Hanya berikan class active pada tombol dokumen yang tepat
+    if (targetBtn) {
+        targetBtn.classList.add('active');
     }
 
     document.getElementById('btn-print-action').removeAttribute('disabled');
+
+    // Memanggil fungsi render dokumen
     renderSidevaDocumentInternal(slug, packageId);
 }
 
