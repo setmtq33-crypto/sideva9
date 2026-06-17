@@ -363,76 +363,11 @@ async function init(){
 }
 
 // ====== TAMBAHKAN FUNGSI ANTIGAGAL INI TEPAT DI BAWAH FUNGSI init() ======
-function injectSuperAdminSelector(profile) {
-    if (!profile || !profile.role) return;
-    
-    // Normalisasi teks string role (Mengamankan format 'SUPER_ADMIN' atau 'super_admin')
-    const normalizedRole = profile.role.toLowerCase().replace(/[^a-z0-9]/g, '');
-    
-    if (normalizedRole === 'superadmin') {
-        let attempts = 0;
-        
-        // Buat loop pemantau DOM untuk menangkap momen tepat ketika loadLayout() selesai menempelkan topbar
-        const watchTopbarDOM = setInterval(async () => {
-            attempts++;
-            const container = document.getElementById('superAdminOpdSelectorContainer');
-            const selector = document.getElementById('globalOpdSelector');
-            
-            // Jika container HTML topbar sudah terdeteksi eksis di halaman
-            if (container && selector) {
-                clearInterval(watchTopbarDOM); // Hentikan loop pemantauan secepatnya
-                
-                try {
-                    // Tarik koleksi daftar data OPD aktif dari Supabase
-                    const { data: opds, error } = await window.supabaseClient
-                        .from('opds')
-                        .select('id, name')
-                        .order('name', { ascending: true });
-                    
-                    if (!error && opds) {
-                        // Bersihkan render agar opsi tidak bertumpuk duplikat
-                        selector.innerHTML = '<option value="ALL">-- Semua OPD (Konsolidasi) --</option>';
-                        
-                        opds.forEach(opd => {
-                            const opt = document.createElement('option');
-                            opt.value = opd.id;
-                            opt.innerText = opd.name;
-                            selector.appendChild(opt);
-                        });
-                        
-                        // Set nilai ke pilihan terakhir yang tersimpan di localStorage
-                        const savedOpdId = localStorage.getItem('selected-opd-id') || 'ALL';
-                        selector.value = savedOpdId;
-                        
-                        // Listener pendeteksi pergantian pilihan OPD oleh Super Admin
-                        selector.addEventListener('change', (e) => {
-                            localStorage.setItem('selected-opd-id', e.target.value);
-                            window.location.reload(); // Refresh halaman agar query filter terpicu ulang
-                        });
-                        
-                        // PAKSA TAMPILKAN DI LAYAR: Lepas kelas penyembunyi d-none
-                        container.classList.remove('d-none');
-                        console.log("SIDEVA ENGINE: Dropdown Selector OPD Berhasil Diinjeksi!");
-                    } else {
-                        console.error("SIDEVA ENGINE: Gagal membaca tabel opds dari database:", error);
-                    }
-                } catch (dbErr) {
-                    console.error("SIDEVA ENGINE: Terjadi kendala internal database:", dbErr);
-                }
-            }
-            
-            // Pengaman batas atas tunggu maksimal 10 detik
-            if (attempts > 100) {
-                clearInterval(watchTopbarDOM);
-                console.error("SIDEVA ENGINE: Waktu tunggu habis, elemen topbar tidak ditemukan.");
-            }
-        }, 100); // Periksa ulang DOM setiap 100 milidetik
-    }
-}
+
 
 // INTEGRASI SELECTOR OPD GLOBAL PADA QUERY KPI
 async function loadKPI(){
- const selectedOpd = localStorage.getItem('selected-opd-id') || 'ALL';
+ const selectedOpd = localStorage.getItem('global_opd_id') || 'ALL';
  
  let packageQuery = dashboardDb.from('packages').select('*');
  let hpsQuery = dashboardDb.from('package_hps').select('*');
@@ -462,7 +397,7 @@ async function loadKPI(){
 // INTEGRASI SELECTOR OPD GLOBAL PADA TABEL STATUS ALUR KERJA
 async function loadStatus(){
  const statuses=['DRAFT','DPP_COMPLETE','ITEMS_COMPLETE','SURVEY_COMPLETE','DOCUMENT_COMPLETE','HPS_COMPLETE','BAHPE_DRAFT','BAHPE_COMPLETE','READY_PROCUREMENT'];
- const selectedOpd = localStorage.getItem('selected-opd-id') || 'ALL';
+ const selectedOpd = localStorage.getItem('global_opd_id') || 'ALL';
 
  let statusQuery = dashboardDb.from('packages').select('package_status');
  if (selectedOpd !== 'ALL') {
@@ -491,7 +426,20 @@ async function loadStatus(){
 }
 
 async function loadOpdSummary(){
- const { data } = await dashboardDb.from('dashboard_opd_summary').select('*');
+ const selectedOpd =
+        localStorage.getItem('global_opd_id')
+        || 'ALL';
+    
+    let query =
+        dashboardDb
+        .from('dashboard_opd_summary')
+        .select('*');
+    
+    if(selectedOpd !== 'ALL'){
+        query = query.eq('id', selectedOpd);
+    }
+    
+    const { data } = await query;
  let html='';
 
  (data||[]).forEach(row=>{
@@ -508,7 +456,7 @@ async function loadOpdSummary(){
 
 // INTEGRASI SELECTOR OPD GLOBAL PADA MONITORING ANTRIAN LOG PAKET TERBARU
 async function loadRecentPackages(){
- const selectedOpd = localStorage.getItem('selected-opd-id') || 'ALL';
+ const selectedOpd = localStorage.getItem('global_opd_id') || 'ALL';
  
  let recentQuery = dashboardDb.from('packages').select('*').order('created_at',{ascending:false}).limit(10);
  if (selectedOpd !== 'ALL') {
