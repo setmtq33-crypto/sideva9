@@ -103,14 +103,58 @@ async function init() {
 }
 
 async function saveHPS() {
-    const total = Number(document.getElementById('totalHps').innerText.replace(/[^\d]/g,''));
-    
-    // Upsert ke package_hps dan update status paket
-    await db.from('package_hps').upsert({ package_id: packageId, total_hps: total });
-    await db.from('packages').update({ package_status: 'HPS_COMPLETE' }).eq('id', packageId);
-    
-    alert('HPS Disimpan & Paket Terkunci!');
-    location.href = 'packages.html';
+
+    const total =
+        Number(
+            document
+            .getElementById('totalHps')
+            .innerText
+            .replace(/[^\d]/g,'')
+        );
+
+    const { data: pkg } =
+        await db
+        .from('packages')
+        .select('*')
+        .eq('id', packageId)
+        .single();
+
+    const { error: hpsError } =
+        await db
+        .from('package_hps')
+        .upsert({
+            tenant_id: pkg.tenant_id,
+            opd_id: pkg.opd_id,
+            package_id: packageId,
+            total_hps: total,
+            efficiency: Number(pkg.budget_ceiling || 0) - total,
+            efficiency_percent: 0,
+            calculated_at: new Date().toISOString()
+        });
+
+    if(hpsError){
+        console.error(hpsError);
+        alert(hpsError.message);
+        return;
+    }
+
+    const { error: pkgError } =
+        await db
+        .from('packages')
+        .update({
+            package_status:'HPS_COMPLETE'
+        })
+        .eq('id', packageId);
+
+    if(pkgError){
+        console.error(pkgError);
+        alert(pkgError.message);
+        return;
+    }
+
+    alert('HPS berhasil disimpan');
+
+    location.href='packages.html';
 }
 
 init();
