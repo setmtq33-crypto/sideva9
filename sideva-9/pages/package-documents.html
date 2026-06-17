@@ -108,6 +108,15 @@ body { background: #f5f6fa; display: flex; margin: 0; padding: 0; }
         margin:10mm;
     }
 }
+
+/* Memastikan tombol aksi terlihat jelas */
+.btn-group {
+    display: inline-flex;
+    gap: 5px;
+}
+.table td {
+    vertical-align: middle;
+}
  
 </style>
 </head>
@@ -1605,29 +1614,28 @@ function renderUploadedTable() {
     let html = '';
 
     if (documents.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="5" class="text-center">Belum ada dokumen.</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Belum ada dokumen yang diunggah.</td></tr>';
         return;
     }
 
-    // Variabel 'doc' didefinisikan di sini
     documents.forEach(doc => {
-        // Buat tombol di sini
+        // Tombol aksi diletakkan di dalam loop agar variabel 'doc' terbaca
         const actionButtons = `
-            <button class="btn btn-sm btn-info me-1" onclick="downloadDocument('${doc.file_path}')" title="Unduh"><i class="bi bi-download"></i></button>
-            <button class="btn btn-sm btn-danger me-1" onclick="deleteDocument('${doc.id}', '${doc.file_path}')" title="Hapus"><i class="bi bi-trash"></i></button>
-            <button class="btn btn-sm btn-secondary me-1" onclick="returnDocument('${doc.id}')" title="Kembalikan"><i class="bi bi-arrow-return-left"></i></button>
-            <button class="btn btn-sm btn-success me-1" onclick="approveDocument('${doc.id}')" title="Setujui"><i class="bi bi-check-lg"></i></button>
-            <button class="btn btn-sm btn-primary me-1" onclick="editDocument('${doc.id}')" title="Catatan"><i class="bi bi-chat-text"></i></button>
-            <button class="btn btn-sm btn-warning" onclick="openSignEditor('${doc.id}', '${doc.file_path}')" title="TTD & Cap"><i class="bi bi-pen"></i></button>
+            <div class="btn-group">
+                <button class="btn btn-sm btn-info" onclick="downloadDocument('${doc.file_path}')" title="Unduh"><i class="bi bi-download"></i></button>
+                <button class="btn btn-sm btn-warning" onclick="openSignEditor('${doc.id}', '${doc.file_path}')" title="TTD & Cap"><i class="bi bi-pen"></i></button>
+                <button class="btn btn-sm btn-danger" onclick="deleteDocument('${doc.id}', '${doc.file_path}')" title="Hapus"><i class="bi bi-trash"></i></button>
+            </div>
         `;
 
-        // Masukkan ke dalam baris tabel
         html += `
             <tr>
+                <td><span class="badge bg-secondary">${doc.document_type}</span></td>
                 <td>${doc.file_name}</td>
+                <td>${formatBytes(doc.file_size)}</td>
+                <td>${new Date(doc.created_at).toLocaleDateString('id-ID')}</td>
                 <td>${actionButtons}</td>
-            </tr>
-        `;
+            </tr>`;
     });
 
     tableBody.innerHTML = html;
@@ -1728,25 +1736,19 @@ async function loadPpkomsAssets() {
     try {
         const { data: ppkom, error } = await db.from('ppkoms').select('signature_url, stamp_url').limit(1).single();
         if (error) throw error;
-        
-        console.log("Data PPKOM ditemukan:", ppkom); // <--- TAMBAHKAN INI
 
-        const bucketName = 'sideva-documents';
+        const bucketName = 'sideva-documents'; 
 
-        if (ppkom.signature_url) {
-            const pathTtd = ppkom.signature_url.startsWith('signatures/') ? ppkom.signature_url : `signatures/${ppkom.signature_url}`;
-            dynamicUrlTtd = db.storage.from(bucketName).getPublicUrl(pathTtd).data.publicUrl;
-            console.log("URL TTD:", dynamicUrlTtd); // <--- TAMBAHKAN INI
-        } else {
-            console.warn("Kolom signature_url kosong!");
-        }
-
+        // Proses Cap
         if (ppkom.stamp_url) {
             const pathCap = ppkom.stamp_url.startsWith('stamps/') ? ppkom.stamp_url : `stamps/${ppkom.stamp_url}`;
             dynamicUrlCap = db.storage.from(bucketName).getPublicUrl(pathCap).data.publicUrl;
-            console.log("URL Cap:", dynamicUrlCap); // <--- TAMBAHKAN INI
-        } else {
-            console.warn("Kolom stamp_url kosong!");
+        }
+        
+        // Proses TTD
+        if (ppkom.signature_url) {
+            const pathTtd = ppkom.signature_url.startsWith('signatures/') ? ppkom.signature_url : `signatures/${ppkom.signature_url}`;
+            dynamicUrlTtd = db.storage.from(bucketName).getPublicUrl(pathTtd).data.publicUrl;
         }
     } catch (err) {
         console.error("Gagal memuat aset PPKOM:", err);
