@@ -52,6 +52,27 @@ body { background: #f5f6fa; display: flex; margin: 0; padding: 0; }
     .local-sidebar, .local-main-content .card:first-child, #documentTab, #auto-doc-list, #btn-print-action, .col-lg-4 { display: none !important; }
     .col-lg-8 { width: 100% !important; margin: 0 !important; }
 }
+
+@media print {
+    /* Sembunyikan semua elemen kecuali area cetak utama */
+    body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    .local-sidebar, .nav-pills, .card:not(#document-render-area), button, select {
+        display: none !important;
+    }
+    #document-render-area {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+    }
+}
+ 
 </style>
 </head>
 <body>
@@ -115,7 +136,7 @@ body { background: #f5f6fa; display: flex; margin: 0; padding: 0; }
 
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <span class="fw-bold text-secondary small">DAFTAR PILIHAN BERKAS</span>
-                            <button id="btn-print-action" class="btn btn-danger btn-sm px-3" onclick="window.print()" disabled>
+                            <button id="btn-print-action" class="btn btn-danger btn-sm px-3" onclick="cetakDokumenAktif()" disabled>
                                 <i class="bi bi-printer"></i> Cetak A4
                             </button>
                         </div>
@@ -269,6 +290,30 @@ function switchPrintView(slug) {
 
     // Memanggil fungsi render dokumen
     renderSidevaDocumentInternal(slug, packageId);
+}
+
+ function cetakDokumenAktif() {
+    // 1. Ambil elemen area dokumen yang sedang dirender
+    const printContents = document.getElementById('document-render-area').innerHTML;
+    
+    // 2. Simpan konten asli seluruh halaman web saat ini
+    const originalContents = document.body.innerHTML;
+
+    // 3. Ganti konten body halaman web hanya dengan isi dokumen saja (menyembunyikan sidebar & menu)
+    document.body.innerHTML = `
+        <div style="background: white; padding: 0; margin: 0; width: 100%;">
+            ${printContents}
+        </div>
+    `;
+
+    // 4. Panggil perintah cetak bawaan browser
+    window.print();
+
+    // 5. Setelah dialog cetak selesai/ditutup, kembalikan tampilan aplikasi ke semula secara otomatis
+    document.body.innerHTML = originalContents;
+    
+    // 6. Reload halaman dengan mempertahankan slug aktif agar fungsi JS tetap berjalan normal kembali
+    window.location.reload();
 }
 
 
