@@ -4,11 +4,14 @@ window.supabaseClient = window.supabase.createClient(
 );
 
 async function sendNotification(
-        eventType,
-        title,
-        message
-    ){
-    
+    eventType,
+    title,
+    message
+){
+
+    try{
+
+        const result =
         await window.supabaseClient
             .from('telegram_notifications')
             .insert([{
@@ -16,21 +19,51 @@ async function sendNotification(
                 title: title,
                 message: message
             }]);
-    
+
+        console.log(
+            'NOTIFICATION DB',
+            result
+        );
+
+    }catch(err){
+
+        console.error(
+            'NOTIFICATION ERROR',
+            err
+        );
+
+    }
+
+    try{
+
         if(
             typeof sendTelegramMessage
             ===
             'function'
         ){
-    
+
+            const telegramResult =
             await sendTelegramMessage(
-    `🔔 ${title}
-    
-    ${message}`
+`🔔 ${title}
+
+${message}`
             );
-    
+
+            console.log(
+                'TELEGRAM',
+                telegramResult
+            );
         }
+
+    }catch(err){
+
+        console.error(
+            'TELEGRAM ERROR',
+            err
+        );
+
     }
+}
 
 window.sendNotification =
     sendNotification;
