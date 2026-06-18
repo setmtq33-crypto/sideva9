@@ -499,11 +499,6 @@ async function renderSidevaDocumentInternal(slug, pId) {
             documentDb.from('opds').select('*').eq('id', paket.opd_id).maybeSingle()
         ]);
         
-        const { data: hpsData } = await documentDb
-            .from('package_hps')
-            .select('*')
-            .eq('package_id', pId)
-            .maybeSingle();
            
 
         if (itemsError) throw itemsError;
