@@ -260,6 +260,37 @@
                 <input type="date" id="dppDate" class="form-control">
             </div>
 
+            <div class="col-md-3">
+                <label class="form-label">Lama Pelaksanaan</label>
+                <input type="number"
+                       id="workDurationDays"
+                       class="form-control"
+                       placeholder="30">
+            </div>
+            
+            <div class="col-md-3">
+                <label class="form-label">Jenis Hari</label>
+                <select id="workDurationType"
+                        class="form-select">
+                    <option value="KALENDER">Hari Kalender</option>
+                    <option value="KERJA">Hari Kerja</option>
+                </select>
+            </div>
+            
+            <div class="col-md-3">
+                <label class="form-label">Tanggal Mulai</label>
+                <input type="date"
+                       id="workStartDate"
+                       class="form-control">
+            </div>
+            
+            <div class="col-md-3">
+                <label class="form-label">Tanggal Selesai</label>
+                <input type="date"
+                       id="workEndDate"
+                       class="form-control">
+            </div>
+
             <div class="col-md-12">
                 <label class="form-label">Uraian Target Keluaran / Output</label>
                 <textarea id="output" rows="3" class="form-control" placeholder="Tulis rincian deskripsi output capaian pekerjaan..."></textarea>
@@ -403,13 +434,21 @@ async function loadMak(){
 }
 
 async function savePackage(){
-    // ATURAN MAIN: SUPER_ADMIN bypass verifikasi canCreatePackage()
-    if(profile.role !== "SUPER_ADMIN" && !await canCreatePackage()){
+
+    if(
+        profile.role !== "SUPER_ADMIN"
+        &&
+        !await canCreatePackage()
+    ){
         alert('Anda tidak memiliki hak membuat paket');
         return;
     }
 
-    const opdId = profile.role === "SUPER_ADMIN" ? currentOpdId : getCurrentOpdId(profile);
+    const opdId =
+        profile.role === "SUPER_ADMIN"
+        ? currentOpdId
+        : getCurrentOpdId(profile);
+
     if(!opdId){
         alert("Pilih OPD terlebih dahulu");
         return;
@@ -418,55 +457,116 @@ async function savePackage(){
     const payload = {
         tenant_id: profile.tenant_id,
         opd_id: opdId,
-        package_name: document.getElementById("packageName").value,
-        fiscal_year: new Date().getFullYear(),
-        procurement_method: document.getElementById("method").value,
-        budget_ceiling: Number(document.getElementById("budget").value || 0),
-        created_by: profile.id,
-        rup_number: document.getElementById("rupNumber").value,
-        bidang_id: document.getElementById("bidangSelect").value,
-        program: document.getElementById("program").value,
-        kegiatan: document.getElementById("kegiatan").value,
-        sub_kegiatan: document.getElementById("subKegiatan").value,
-        budget_account_id: document.getElementById("makSelect").value,
-        output: document.getElementById("output").value,
-        dpp_date: document.getElementById("dppDate").value
+
+        package_name:
+            document.getElementById("packageName").value,
+
+        fiscal_year:
+            new Date().getFullYear(),
+
+        procurement_method:
+            document.getElementById("method").value,
+
+        budget_ceiling:
+            Number(
+                document.getElementById("budget").value || 0
+            ),
+
+        created_by:
+            profile.id,
+
+        rup_number:
+            document.getElementById("rupNumber").value,
+
+        bidang_id:
+            document.getElementById("bidangSelect").value,
+
+        program:
+            document.getElementById("program").value,
+
+        kegiatan:
+            document.getElementById("kegiatan").value,
+
+        sub_kegiatan:
+            document.getElementById("subKegiatan").value,
+
+        budget_account_id:
+            document.getElementById("makSelect").value,
+
+        output:
+            document.getElementById("output").value,
+
+        dpp_date:
+            document.getElementById("dppDate").value,
+
+        /* ===== FIELD BARU ===== */
+
+        work_duration_days:
+            Number(
+                document.getElementById("workDurationDays")?.value || 0
+            ),
+
+        work_duration_type:
+            document.getElementById("workDurationType")?.value || "KALENDER",
+
+        work_start_date:
+            document.getElementById("workStartDate")?.value || null,
+
+        work_end_date:
+            document.getElementById("workEndDate")?.value || null
     };
 
-    let query = editingPackageId ? db.from("packages").update(payload).eq("id", editingPackageId) : db.from("packages").insert(payload);
+    let query;
+
+    if(editingPackageId){
+
+        query = db
+            .from("packages")
+            .update(payload)
+            .eq("id", editingPackageId);
+
+    }else{
+
+        query = db
+            .from("packages")
+            .insert(payload);
+
+    }
+
     const { error } = await query;
 
     if(error){
+        console.error(error);
         alert(error.message);
         return;
     }
-    
+
     if(editingPackageId){
-    
+
         await sendNotification(
             'PACKAGE_UPDATED',
             'Paket Diperbarui',
             payload.package_name
         );
-    
+
     }else{
-    
+
         await sendNotification(
             'PACKAGE_CREATED',
             'Paket Baru',
             payload.package_name
         );
-    
+
     }
-    
+
     alert(
         editingPackageId
-        ? "Paket berhasil diperbarui"
-        : "Paket berhasil disimpan"
+            ? "Paket berhasil diperbarui"
+            : "Paket berhasil disimpan"
     );
-    
+
     clearForm();
-    
+
     await loadPackages();
 }
 
@@ -584,29 +684,77 @@ async function loadPackages() {
 }
 
 async function editPackage(id){
-    const { data, error } = await db.from("packages").select("*").eq("id", id).single();
+
+    const { data, error } = await db
+        .from("packages")
+        .select("*")
+        .eq("id", id)
+        .single();
+
     if(error){
         alert(error.message);
         return;
     }
-    
-    editingPackageId = id;
-    document.getElementById("formTitle").innerHTML = `<i class="fa-solid fa-pen-to-square me-2"></i>Ubah / Edit Data Paket`;
-    document.getElementById("saveBtn").innerHTML = `<i class="fa-solid fa-floppy-disk me-2"></i>Perbarui Paket`;
 
-    document.getElementById("rupNumber").value = data.rup_number || "";
-    document.getElementById("packageName").value = data.package_name || "";
-    document.getElementById("program").value = data.program || "";
-    document.getElementById("kegiatan").value = data.kegiatan || "";
-    document.getElementById("subKegiatan").value = data.sub_kegiatan || "";
-    document.getElementById("budget").value = data.budget_ceiling || "";
-    document.getElementById("method").value = data.procurement_method || "ECATALOG";
-    document.getElementById("bidangSelect").value = data.bidang_id || "";
-    document.getElementById("makSelect").value = data.budget_account_id || "";
-    document.getElementById("output").value = data.output || "";
-    document.getElementById("dppDate").value = data.dpp_date || "";
-    
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    editingPackageId = id;
+
+    document.getElementById("formTitle").innerHTML =
+        `<i class="fa-solid fa-pen-to-square me-2"></i>Ubah / Edit Data Paket`;
+
+    document.getElementById("saveBtn").innerHTML =
+        `<i class="fa-solid fa-floppy-disk me-2"></i>Perbarui Paket`;
+
+    document.getElementById("rupNumber").value =
+        data.rup_number || "";
+
+    document.getElementById("packageName").value =
+        data.package_name || "";
+
+    document.getElementById("program").value =
+        data.program || "";
+
+    document.getElementById("kegiatan").value =
+        data.kegiatan || "";
+
+    document.getElementById("subKegiatan").value =
+        data.sub_kegiatan || "";
+
+    document.getElementById("budget").value =
+        data.budget_ceiling || "";
+
+    document.getElementById("method").value =
+        data.procurement_method || "ECATALOG";
+
+    document.getElementById("bidangSelect").value =
+        data.bidang_id || "";
+
+    document.getElementById("makSelect").value =
+        data.budget_account_id || "";
+
+    document.getElementById("output").value =
+        data.output || "";
+
+    document.getElementById("dppDate").value =
+        data.dpp_date || "";
+
+    /* ===== FIELD BARU ===== */
+
+    document.getElementById("workDurationDays").value =
+        data.work_duration_days || "";
+
+    document.getElementById("workDurationType").value =
+        data.work_duration_type || "KALENDER";
+
+    document.getElementById("workStartDate").value =
+        data.work_start_date || "";
+
+    document.getElementById("workEndDate").value =
+        data.work_end_date || "";
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
 }
 
 async function deletePackage(
@@ -650,9 +798,15 @@ async function deletePackage(
 }
 
 function clearForm(){
+
     editingPackageId = null;
-    document.getElementById("formTitle").innerHTML = `<i class="fa-solid fa-folder-plus me-2"></i>Tambah Paket Baru`;
-    document.getElementById("saveBtn").innerHTML = `<i class="fa-solid fa-floppy-disk me-2"></i>Simpan Paket`;
+
+    document.getElementById("formTitle").innerHTML =
+        `<i class="fa-solid fa-folder-plus me-2"></i>Tambah Paket Baru`;
+
+    document.getElementById("saveBtn").innerHTML =
+        `<i class="fa-solid fa-floppy-disk me-2"></i>Simpan Paket`;
+
     document.getElementById("rupNumber").value = "";
     document.getElementById("packageName").value = "";
     document.getElementById("program").value = "";
@@ -661,6 +815,17 @@ function clearForm(){
     document.getElementById("budget").value = "";
     document.getElementById("output").value = "";
     document.getElementById("dppDate").value = "";
+
+    /* ===== FIELD BARU ===== */
+
+    document.getElementById("workDurationDays").value = "";
+
+    document.getElementById("workDurationType").value =
+        "KALENDER";
+
+    document.getElementById("workStartDate").value = "";
+
+    document.getElementById("workEndDate").value = "";
 }
 
 function canSeeHps(role){ return ['SUPER_ADMIN', 'ADMIN_OPD', 'PPK'].includes(role); }
