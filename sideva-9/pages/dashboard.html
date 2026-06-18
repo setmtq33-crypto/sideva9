@@ -536,43 +536,121 @@ async function init(){
 // INTEGRASI SELECTOR OPD GLOBAL PADA QUERY KPI
 async function loadKPI(){
 
- const profile =
-    await getProfile();
-
- let selectedOpd =
-    localStorage.getItem('global_opd_id')
-    || 'ALL';
-
- if(
-    profile.role === 'ADMIN_OPD'
- ){
-    selectedOpd =
-        profile.opd_id;
- }
-
- let packageQuery =
-    dashboardDb
-    .from('packages')
-    .select('*');
-
- let hpsQuery =
-    dashboardDb
-    .from('package_hps')
-    .select('*');
-
- if(selectedOpd !== 'ALL'){
-    packageQuery =
-        packageQuery.eq(
-            'opd_id',
-            selectedOpd
+     const profile =
+        await getProfile();
+    
+     let selectedOpd =
+        localStorage.getItem(
+            'global_opd_id'
+        ) || 'ALL';
+    
+     if(
+        profile.role === 'ADMIN_OPD'
+     ){
+        selectedOpd =
+            profile.opd_id;
+     }
+    
+     let packageQuery =
+        dashboardDb
+        .from('packages')
+        .select('*');
+    
+     let hpsQuery =
+        dashboardDb
+        .from('package_hps')
+        .select('*');
+    
+     if(
+        selectedOpd !== 'ALL'
+     ){
+        packageQuery =
+            packageQuery.eq(
+                'opd_id',
+                selectedOpd
+            );
+    
+        hpsQuery =
+            hpsQuery.eq(
+                'opd_id',
+                selectedOpd
+            );
+     }
+    
+     const {
+        data: packages
+     } = await packageQuery;
+    
+     const {
+        data: hps
+     } = await hpsQuery;
+    
+     const totalPackages =
+        (packages || []).length;
+    
+     const readyProcurement =
+        (packages || [])
+        .filter(
+            x =>
+            x.package_status ===
+            'READY_PROCUREMENT'
+        )
+        .length;
+    
+     const totalBudget =
+        (packages || [])
+        .reduce(
+            (a,b)=>
+            a +
+            Number(
+                b.budget_ceiling || 0
+            ),
+            0
         );
-
-    hpsQuery =
-        hpsQuery.eq(
-            'opd_id',
-            selectedOpd
+    
+     const totalHps =
+        (hps || [])
+        .reduce(
+            (a,b)=>
+            a +
+            Number(
+                b.total_hps || 0
+            ),
+            0
         );
- }
+    
+     document.getElementById(
+        'totalPackages'
+     ).innerText =
+        totalPackages;
+    
+     document.getElementById(
+        'totalBudget'
+     ).innerText =
+        rupiah(
+            totalBudget
+        );
+    
+     document.getElementById(
+        'totalHps'
+     ).innerText =
+        rupiah(
+            totalHps
+        );
+    
+     document.getElementById(
+        'efficiency'
+     ).innerText =
+        rupiah(
+            totalBudget - totalHps
+        );
+    
+     document.getElementById(
+        'readyProcurement'
+     ).innerText =
+        readyProcurement;
+    
+    }
 
 // INTEGRASI SELECTOR OPD GLOBAL PADA TABEL STATUS ALUR KERJA
 async function loadStatus(){
