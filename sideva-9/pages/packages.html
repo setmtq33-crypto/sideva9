@@ -294,7 +294,11 @@ async function initPage(){
     if(!profile) return;
 
     // ATURAN MAIN: Jika user beralih ke SUPER_ADMIN, paksa hak akses bernilai TRUE tanpa batasan permissions.js
-    if(profile.role !== "SUPER_ADMIN" && !await canCreatePackage()){
+    if(
+        profile.role !== "SUPER_ADMIN"
+        &&
+        profile.role !== "ADMIN_OPD"
+    ){
         document.getElementById('saveBtn').style.display = 'none';
     }
 
