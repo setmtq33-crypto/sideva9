@@ -1896,7 +1896,7 @@ async function ttdCapOtomatis(){
         const filePath = `${packageId}/auto/${currentActiveSlug}-${Date.now()}.pdf`;
         const file = new File([pdfBlob], filePath.split('/').pop(), {type:'application/pdf'});
 
-        const { error: upErr } = await documentDb.storage.from('package-documents').upload(filePath, file, {upsert:true});
+        const { error: upErr } = await documentDb.storage.from('sideva-documents').upload(filePath, file, {upsert:true});
         if(upErr) throw upErr;
 
         Swal.close();
