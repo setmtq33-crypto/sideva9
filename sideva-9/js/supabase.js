@@ -9,7 +9,7 @@ async function sendNotification(
     message
 ){
 
-    return await supabaseClient
+    return await window.supabaseClient
         .from('telegram_notifications')
         .insert([{
             event_type: eventType,
