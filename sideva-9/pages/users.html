@@ -759,14 +759,22 @@ async function tambahUser(event) {
 }
 
 await sendNotification(
-
     'USER_CREATED',
-
     'User Baru',
-
     `${fullName} (${role}) dibuat`
-
 );
+await sendNotification(
+    'USER_UPDATED',
+    'User Diperbarui',
+    `${user.full_name}`
+);
+await sendNotification(
+    'USER_DELETED',
+    'User Dihapus',
+    `${user.full_name}`
+);
+
+    
 
 init();
 
