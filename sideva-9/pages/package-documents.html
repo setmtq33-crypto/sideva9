@@ -484,18 +484,29 @@ async function renderSidevaDocumentInternal(slug, pId) {
         const [
             { data: akun },
             { data: items, error: itemsError },
-            { data: ppk }, // Variabel ini digunakan otomatis oleh seluruh 10 dokumen di bawah
+            { data: ppk },
             { data: bidang },
             { data: opd }
-
-            const { data:hpsData } =
-            await documentDb
+        ] = await Promise.all([
+            documentDb.from('budget_accounts').select('*').eq('id', paket.budget_account_id).maybeSingle(),
+            documentDb.from('package_items').select('*,price_surveys(*)').eq('package_id', pId),
+        
+            selectedPpkomId
+                ? documentDb.from('ppkoms').select('*').eq('id', selectedPpkomId).maybeSingle()
+                : documentDb.from('ppkoms').select('*').eq('opd_id', paket.opd_id).maybeSingle(),
+        
+            documentDb.from('bidangs').select('*').eq('id', paket.bidang_id).maybeSingle(),
+            documentDb.from('opds').select('*').eq('id', paket.opd_id).maybeSingle()
+        ]);
+        
+        const { data:hpsData } =
+        await documentDb
             .from('package_hps')
             .select('*')
             .eq('package_id', pId)
             .maybeSingle();
             
-        ] = await Promise.all([
+        
             documentDb.from('budget_accounts').select('*').eq('id', paket.budget_account_id).maybeSingle(),
             documentDb.from('package_items').select('*,price_surveys(*)').eq('package_id', pId),
             
@@ -1208,21 +1219,21 @@ async function renderSidevaDocumentInternal(slug, pId) {
             <p style="margin:0 0 10px 20px;">Tidak menggunakan merek tertentu / Menyesuaikan ketersediaan e-Katalog.</p>
 
             <div style="font-weight:bold; font-size:10pt; margin-bottom:3px;">c. Spesifikasi Waktu</div>
-            <p style="margin:0 0 10px 20px;"><p style="margin:0 0 10px 20px;">
-                                                Pelaksanaan pekerjaan selama
-                                                <strong>
-                                                ${paket.work_duration_days || 0}
-                                                ${paket.work_duration_type || 'Hari Kalender'}
-                                                </strong>,
-                                                terhitung sejak
-                                                <strong>
-                                                ${paket.work_start_date ? docFmtDate(paket.work_start_date) : '-'}
-                                                </strong>
-                                                sampai dengan
-                                                <strong>
-                                                ${paket.work_end_date ? docFmtDate(paket.work_end_date) : '-'}
-                                                </strong>.
-                                                </p></p>
+            <p style="margin:0 0 10px 20px;">
+            Pelaksanaan pekerjaan selama
+            <strong>
+            ${paket.work_duration_days || 0}
+            ${paket.work_duration_type || 'Hari Kalender'}
+            </strong>,
+            terhitung sejak
+            <strong>
+            ${paket.work_start_date ? docFmtDate(paket.work_start_date) : '-'}
+            </strong>
+            sampai dengan
+            <strong>
+            ${paket.work_end_date ? docFmtDate(paket.work_end_date) : '-'}
+            </strong>.
+            </p>
 
             <div style="font-weight:bold; font-size:10pt; margin-bottom:3px;">d. Spesifikasi Tempat</div>
             <p style="margin:0 0 10px 20px;">Pengiriman langsung ke tempat/lokasi tujuan yang ditentukan oleh Perangkat Daerah. Jarak dan akses lokasi diperhitungkan oleh penyedia tanpa biaya tambahan di luar harga satuan e-Katalog.</p>
