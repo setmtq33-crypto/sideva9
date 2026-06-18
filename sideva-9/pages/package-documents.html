@@ -2069,7 +2069,8 @@ async function renderSidevaDocumentInternal(slug, pId) {
             </thead>
             
             <tbody>
-            
+            ${listItems.map((it, i) => `
+            <tbody>
             ${listItems.map((it,i)=>{
             
                 const survey =
