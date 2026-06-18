@@ -410,34 +410,43 @@ async function init(){
     currentProfile =
         await getProfile();
 
-    if(!currentProfile){
-        return;
-    }
-
     if(
-        currentProfile.role !==
-        'SUPER_ADMIN'
-        &&
-        currentProfile.role !==
+        currentProfile.role
+        ===
         'ADMIN_OPD'
     ){
 
-        alert(
-            'Akses ditolak'
-        );
+        document.querySelector(
+            '#addRole option[value="SUPER_ADMIN"]'
+        )?.remove();
 
-        location.href =
-            'dashboard.html';
+        document.querySelector(
+            '#addRole option[value="ADMIN_OPD"]'
+        )?.remove();
 
-        return;
     }
-
-    await loadOpds();
 
     await loadUsers();
 
-    opdFilter.onchange =
-        loadUsers;
+    await loadOpds();
+
+    if(
+        currentProfile.role
+        ===
+        'ADMIN_OPD'
+    ){
+
+        const opdSelect =
+            document.getElementById(
+                'addOpdId'
+            );
+
+        opdSelect.value =
+            currentProfile.opd_id;
+
+        opdSelect.disabled =
+            true;
+    }
 }
 
 async function loadOpds(){
@@ -735,9 +744,34 @@ async function tambahUser(event) {
         document.getElementById('addRole').value;
 
     const opdId =
-        document.getElementById('addOpdId').value;
+        currentProfile.role === 'SUPER_ADMIN'
+            ? document.getElementById('addOpdId').value
+            : currentProfile.opd_id;
 
     try {
+
+        if (
+            currentProfile.role === 'ADMIN_OPD'
+        ) {
+
+            const allowedRoles = [
+                'PPK',
+                'PPTK',
+                'PBJ',
+                'VIEWER'
+            ];
+
+            if (
+                !allowedRoles.includes(role)
+            ) {
+
+                alert(
+                    'ADMIN OPD hanya dapat membuat PPK, PPTK, PBJ dan VIEWER'
+                );
+
+                return;
+            }
+        }
 
         const {
             data: authData,
@@ -757,45 +791,49 @@ async function tambahUser(event) {
         await usersDb
             .from('profiles')
             .insert([{
-        
+
                 auth_user_id:
                     authData.user.id,
-        
+
                 tenant_id:
                     currentProfile.tenant_id,
-        
+
                 opd_id:
                     opdId,
-        
+
                 full_name:
                     fullName,
-        
+
                 email:
                     email,
-        
+
                 role:
                     role,
-        
+
                 is_active:
                     true
-        
+
             }]);
-        
-        if(profileError)
+
+        if (profileError)
             throw profileError;
-        
+
         await sendNotification(
+
             'USER_CREATED',
+
             'User Baru',
+
             `${fullName} (${role})`
+
         );
-        
+
         alert(
             'User berhasil dibuat.\nSilakan login ulang.'
         );
-        
+
         await usersDb.auth.signOut();
-        
+
         location.href =
             '/pages/login.html';
 
