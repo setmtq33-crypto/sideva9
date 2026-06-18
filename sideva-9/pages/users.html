@@ -409,6 +409,10 @@ async function init(){
     currentProfile =
         await getProfile();
 
+    if(!currentProfile){
+        return;
+    }
+
     if(
         currentProfile.role !==
         'SUPER_ADMIN'
