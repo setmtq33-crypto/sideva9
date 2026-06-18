@@ -13,6 +13,7 @@
 
 <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 <script>
@@ -1743,7 +1744,11 @@ let dynamicUrlTtd = null;
 // Fungsi mengambil data dari tabel ppkoms (Diperbarui untuk bucket sideva-documents)
 async function loadPpkomsAssets() {
     try {
-        const { data: ppkom, error } = await documentDb.from('ppkoms').select('signature_url, stamp_url').limit(1).single();
+        const ppkomId = document.getElementById('ppkomSelect')?.value;
+        let query = documentDb.from('ppkoms').select('signature_url, stamp_url');
+        if (ppkomId) query = query.eq('id', ppkomId);
+        
+        const { data: ppkom, error } = await query.limit(1).single();
         if (error) throw error;
 
         const bucketName = 'sideva-documents'; 
@@ -1752,15 +1757,21 @@ async function loadPpkomsAssets() {
         if (ppkom.stamp_url) {
             const pathCap = ppkom.stamp_url.startsWith('stamps/') ? ppkom.stamp_url : `stamps/${ppkom.stamp_url}`;
             dynamicUrlCap = documentDb.storage.from(bucketName).getPublicUrl(pathCap).data.publicUrl;
+        } else {
+            dynamicUrlCap = null;
         }
         
         // Proses TTD
         if (ppkom.signature_url) {
             const pathTtd = ppkom.signature_url.startsWith('signatures/') ? ppkom.signature_url : `signatures/${ppkom.signature_url}`;
             dynamicUrlTtd = documentDb.storage.from(bucketName).getPublicUrl(pathTtd).data.publicUrl;
+        } else {
+            dynamicUrlTtd = null;
         }
     } catch (err) {
         console.error("Gagal memuat aset PPKOM:", err);
+        dynamicUrlCap = null;
+        dynamicUrlTtd = null;
     }
 }
 
@@ -1830,8 +1841,23 @@ function removeSelectedObject() {
 
 // Simpan Dokumen kembali ke Supabase
 async function saveSignedDocument() {
-    Swal.fire({ title: 'Menyimpan Dokumen...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
     try {
+        // === MODE OTOMATIS (dokumen cetak, tanpa upload) ===
+        if (!currentPdfBytes || currentFilePath === 'AUTO') {
+            const dataUrl = fabricCanvas.toDataURL({ format: 'png', multiplier: 2 });
+            document.getElementById('document-render-area').innerHTML = 
+                `<img src="${dataUrl}" style="width:100%; max-width:100%;">`;
+            
+            bootstrap.Modal.getInstance(document.getElementById('signEditorModal')).hide();
+            Swal.close();
+            
+            // langsung print
+            setTimeout(() => window.print(), 300);
+            return;
+        }
+
+        // === MODE UPLOAD (untuk dokumen dari storage) ===
         const objects = fabricCanvas.getObjects('image');
         const pdfDoc = await PDFLib.PDFDocument.load(currentPdfBytes);
         const pages = pdfDoc.getPages();
@@ -1872,41 +1898,38 @@ async function saveSignedDocument() {
 
 // ===== TTD & CAP UNTUK DOKUMEN OTOMATIS =====
 async function ttdCapOtomatis(){
-    if(!currentActiveSlug ||!packageId){
+    if(!currentActiveSlug || !packageId){
         return Swal.fire('Oops','Pilih dokumen dulu','warning');
     }
 
-    Swal.fire({title:'Menyiapkan PDF...', allowOutsideClick:false, didOpen:()=>Swal.showLoading()});
+    Swal.fire({title:'Menyiapkan halaman...', allowOutsideClick:false, didOpen:()=>Swal.showLoading()});
 
     try {
-        // 1. Ambil HTML yang sedang dirender
+        await loadPpkomsAssets();
+
         const element = document.getElementById('document-render-area');
+        const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+        
+        // set mode auto
+        currentPdfBytes = null;
+        currentFilePath = 'AUTO';
+        currentDocId = null;
+        pdfScale = 1;
 
-        // 2. Convert HTML → PDF (pakai html2pdf)
-        const opt = {
-            margin: 10,
-            filename: `${currentActiveSlug}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-        const pdfBlob = await html2pdf().set(opt).from(element).outputPdf('blob');
+        if(!fabricCanvas) fabricCanvas = new fabric.Canvas('pdfCanvas');
+        else fabricCanvas.clear();
 
-        // 3. Upload ke Supabase (folder auto/)
-        const filePath = `${packageId}/auto/${currentActiveSlug}-${Date.now()}.pdf`;
-        const file = new File([pdfBlob], filePath.split('/').pop(), {type:'application/pdf'});
+        fabricCanvas.setWidth(canvas.width);
+        fabricCanvas.setHeight(canvas.height);
 
-        const { error: upErr } = await documentDb.storage.from('sideva-documents').upload(filePath, file, {upsert:true});
-        if(upErr) throw upErr;
-
-        Swal.close();
-
-        // 4. Langsung buka editor yang sudah kamu punya
-        await openSignEditor(null, filePath); // docId null karena belum ada di tabel
-
+        fabric.Image.fromURL(canvas.toDataURL('image/png'), img => {
+            fabricCanvas.setBackgroundImage(img, fabricCanvas.renderAll.bind(fabricCanvas));
+            Swal.close();
+            new bootstrap.Modal(document.getElementById('signEditorModal')).show();
+        });
     } catch(err){
         console.error(err);
-        Swal.fire('Error','Gagal buat PDF: '+err.message,'error');
+        Swal.fire('Error','Gagal menyiapkan: '+err.message,'error');
     }
 }
 
