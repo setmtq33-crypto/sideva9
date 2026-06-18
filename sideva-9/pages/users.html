@@ -537,8 +537,26 @@ async function loadUsers(){
             : `<span class="badge-status badge-inactive"><i class="fa-solid fa-circle shadow-none" style="font-size:6px;"></i> Nonaktif</span>`;
 
         const toggleBtnHtml = user.is_active
-            ? `<button class="btn btn-sm btn-outline-danger w-100" onclick="toggleUser('${user.id}', ${user.is_active})"><i class="fa-solid fa-user-slash me-1"></i> Nonaktifkan</button>`
-            : `<button class="btn btn-sm btn-outline-success w-100" onclick="toggleUser('${user.id}', ${user.is_active})"><i class="fa-solid fa-user-check me-1"></i> Aktifkan</button>`;
+            ? `<button
+                class="btn btn-sm btn-outline-danger w-100"
+                onclick="toggleUser(
+                    '${user.id}',
+                    ${user.is_active},
+                    '${user.full_name}'
+                )">
+                <i class="fa-solid fa-user-slash me-1"></i>
+                Nonaktifkan
+            </button>`
+            : `<button
+                class="btn btn-sm btn-outline-success w-100"
+                onclick="toggleUser(
+                    '${user.id}',
+                    ${user.is_active},
+                    '${user.full_name}'
+                )">
+                <i class="fa-solid fa-user-check me-1"></i>
+                Aktifkan
+            </button>`;
 
         html += `
 
@@ -646,21 +664,30 @@ async function updateRole(
 
 async function toggleUser(
     userId,
-    currentStatus
+    currentStatus,
+    fullName
 ){
 
+    const { error } =
     await usersDb
-    .from('profiles')
-    .update({
+        .from('profiles')
+        .update({
 
-        is_active:
-            !currentStatus
+            is_active:
+                !currentStatus
 
-    })
-    .eq(
-        'id',
-        userId
-    );
+        })
+        .eq(
+            'id',
+            userId
+        );
+
+    if(error){
+
+        alert(error.message);
+
+        return;
+    }
 
     await writeAuditLog(
 
@@ -672,6 +699,20 @@ async function toggleUser(
 
         'Update status user'
 
+    );
+
+    await sendNotification(
+
+        !currentStatus
+            ? 'USER_ACTIVATED'
+            : 'USER_DEACTIVATED',
+    
+        !currentStatus
+            ? 'User Diaktifkan'
+            : 'User Dinonaktifkan',
+    
+        fullName
+    
     );
 
     await loadUsers();
@@ -712,39 +753,49 @@ async function tambahUser(event) {
         if (authError)
             throw authError;
 
+        const { error: profileError } =
         await usersDb
             .from('profiles')
             .insert([{
-
+        
                 auth_user_id:
                     authData.user.id,
-
+        
                 tenant_id:
                     currentProfile.tenant_id,
-
+        
                 opd_id:
                     opdId,
-
+        
                 full_name:
                     fullName,
-
+        
                 email:
                     email,
-
+        
                 role:
                     role,
-
+        
                 is_active:
                     true
-
+        
             }]);
-
+        
+        if(profileError)
+            throw profileError;
+        
+        await sendNotification(
+            'USER_CREATED',
+            'User Baru',
+            `${fullName} (${role})`
+        );
+        
         alert(
             'User berhasil dibuat.\nSilakan login ulang.'
         );
-
+        
         await usersDb.auth.signOut();
-
+        
         location.href =
             '/pages/login.html';
 
@@ -759,21 +810,6 @@ async function tambahUser(event) {
     }
 }
 
-await sendNotification(
-    'USER_CREATED',
-    'User Baru',
-    `${fullName} (${role}) dibuat`
-);
-await sendNotification(
-    'USER_UPDATED',
-    'User Diperbarui',
-    `${user.full_name}`
-);
-await sendNotification(
-    'USER_DELETED',
-    'User Dihapus',
-    `${user.full_name}`
-);
 
     
 
