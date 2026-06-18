@@ -1829,16 +1829,31 @@ async function openSignEditor(docId, filePath) {
 function addStampToCanvas() {
     if (!dynamicUrlCap) return Swal.fire('Oops', 'Cap tidak ditemukan di database PPKOM', 'warning');
     fabric.Image.fromURL(dynamicUrlCap, function(img) {
-        img.scaleToWidth(120); img.set({ left: 100, top: 100, opacity: 0.8, typeId: 'cap' }); 
-        fabricCanvas.add(img); fabricCanvas.setActiveObject(img);
+        img.scaleToWidth(120);
+        const bottomY = fabricCanvas.height ? fabricCanvas.height - 180 : 600;
+        img.set({ 
+            left: 100, 
+            top: bottomY, 
+            opacity: 0.8, 
+            typeId: 'cap' 
+        }); 
+        fabricCanvas.add(img); 
+        fabricCanvas.setActiveObject(img);
     }, { crossOrigin: 'anonymous' });
 }
 
 function addSignatureToCanvas() {
     if (!dynamicUrlTtd) return Swal.fire('Oops', 'TTD tidak ditemukan di database PPKOM', 'warning');
     fabric.Image.fromURL(dynamicUrlTtd, function(img) {
-        img.scaleToWidth(150); img.set({ left: 150, top: 150, typeId: 'ttd' }); 
-        fabricCanvas.add(img); fabricCanvas.setActiveObject(img);
+        img.scaleToWidth(150);
+        const bottomY = fabricCanvas.height ? fabricCanvas.height - 200 : 650;
+        img.set({ 
+            left: 250, 
+            top: bottomY, 
+            typeId: 'ttd' 
+        }); 
+        fabricCanvas.add(img); 
+        fabricCanvas.setActiveObject(img);
     }, { crossOrigin: 'anonymous' });
 }
 
