@@ -148,20 +148,49 @@ body { background: #f5f6fa; }
     }
 
     async function loadBidangs() {
-        const { data, error } = await client
-            .from('bidangs')
-            .select('*')
-            .order('bidang_name', { ascending: true });
 
-        if (error) {
-            console.error("Gagal memuat bidang:", error.message);
-            document.getElementById('bidangsTable').innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4 small"><i class="bi bi-exclamation-octagon"></i> Gagal sinkronisasi data: ${error.message}</td></tr>`;
-            return;
-        }
+    let query = client
+        .from('bidangs')
+        .select('*')
+        .order('bidang_name', { ascending: true });
 
-        rawBidangsData = data || [];
-        renderBidangsTable(rawBidangsData);
+    if (
+        currentProfile &&
+        currentProfile.role === 'ADMIN_OPD'
+    ) {
+        query = query.eq(
+            'opd_id',
+            currentProfile.opd_id
+        );
     }
+
+    const { data, error } = await query;
+
+    if (error) {
+        console.error(
+            "Gagal memuat bidang:",
+            error.message
+        );
+
+        document.getElementById('bidangsTable').innerHTML =
+            `<tr>
+                <td colspan="6"
+                    class="text-center text-danger py-4 small">
+                    <i class="bi bi-exclamation-octagon"></i>
+                    Gagal sinkronisasi data:
+                    ${error.message}
+                </td>
+            </tr>`;
+
+        return;
+    }
+
+    rawBidangsData = data || [];
+
+    renderBidangsTable(
+        rawBidangsData
+    );
+}
 
     function renderBidangsTable(dataset) {
         const tbody = document.getElementById('bidangsTable');
