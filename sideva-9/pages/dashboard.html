@@ -549,30 +549,73 @@ async function loadStatus(){
 }
 
 async function loadOpdSummary(){
- const selectedOpd =
+
+    const profile =
+        await getProfile();
+
+    const selectedOpd =
         localStorage.getItem('global_opd_id')
         || 'ALL';
-    
+
     let query =
         dashboardDb
         .from('dashboard_opd_summary')
         .select('*');
-    
-    
-    
-    const { data } = await query;
- let html='';
 
- (data||[]).forEach(row=>{
-   html += `
-   <tr>
-     <td class="fw-bold"><i class="fa-solid fa-building-user me-2 opacity-50"></i>${row.opd_name}</td>
-     <td class="fw-semibold text-secondary">${row.total_packages} Paket</td>
-     <td class="fw-bold text-primary">${rupiah(row.total_budget)}</td>
-   </tr>`;
- });
+    if(
+        profile &&
+        profile.role === 'ADMIN_OPD'
+    ){
+        query =
+            query.eq(
+                'opd_id',
+                profile.opd_id
+            );
+    }
+    else if(
+        selectedOpd !== 'ALL'
+    ){
+        query =
+            query.eq(
+                'opd_id',
+                selectedOpd
+            );
+    }
 
- document.getElementById('opdSummaryTable').innerHTML = html;
+    const {
+        data,
+        error
+    } = await query;
+
+    if(error){
+        console.error(error);
+        return;
+    }
+
+    let html='';
+
+    (data||[]).forEach(row=>{
+
+        html += `
+        <tr>
+            <td class="fw-bold">
+                <i class="fa-solid fa-building-user me-2 opacity-50"></i>
+                ${row.opd_name}
+            </td>
+
+            <td class="fw-semibold text-secondary">
+                ${row.total_packages} Paket
+            </td>
+
+            <td class="fw-bold text-primary">
+                ${rupiah(row.total_budget)}
+            </td>
+        </tr>`;
+    });
+
+    document.getElementById(
+        'opdSummaryTable'
+    ).innerHTML = html;
 }
 
 // INTEGRASI SELECTOR OPD GLOBAL PADA MONITORING ANTRIAN LOG PAKET TERBARU
