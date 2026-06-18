@@ -692,16 +692,25 @@ async function tambahUser(event) {
 
     try {
 
-        const {
-            data: authData,
-            error: authError
-        } =
-        await usersDb.auth.signUp({
-
-            email,
-            password
-
-        });
+     
+            const {
+                data: sessionData
+            } = await usersDb.auth.getSession();
+            
+            const adminSession = sessionData.session;
+            
+            const {
+                data: authData,
+                error: authError
+            } =
+            await usersDb.auth.signUp({
+            
+                email,
+                password
+            
+            });
+            
+            if (authError) throw authError;
 
         if (authError)
             throw authError;
@@ -745,6 +754,10 @@ async function tambahUser(event) {
 
         if (error)
             throw error;
+        await usersDb.auth.setSession({
+            access_token: adminSession.access_token,
+            refresh_token: adminSession.refresh_token
+        });
 
         await writeAuditLog(
 
