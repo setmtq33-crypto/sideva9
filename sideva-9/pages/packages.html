@@ -440,9 +440,33 @@ async function savePackage(){
         alert(error.message);
         return;
     }
-
-    alert(editingPackageId ? "Paket berhasil diperbarui" : "Paket berhasil disimpan");
+    
+    if(editingPackageId){
+    
+        await sendNotification(
+            'PACKAGE_UPDATED',
+            'Paket Diperbarui',
+            payload.package_name
+        );
+    
+    }else{
+    
+        await sendNotification(
+            'PACKAGE_CREATED',
+            'Paket Baru',
+            payload.package_name
+        );
+    
+    }
+    
+    alert(
+        editingPackageId
+        ? "Paket berhasil diperbarui"
+        : "Paket berhasil disimpan"
+    );
+    
     clearForm();
+    
     await loadPackages();
 }
 
@@ -616,21 +640,7 @@ function openDpp(id){ location.href = `dpp.html?id=${id}`; }
 window.editPackage = editPackage;
 window.deletePackage = deletePackage;
 
-await sendNotification(
-    'PACKAGE_CREATED',
-    'Paket Baru',
-    packageName
-);
-await sendNotification(
-    'PACKAGE_UPDATED',
-    'Paket Diperbarui',
-    packageName
-);
-await sendNotification(
-    'PACKAGE_DELETED',
-    'Paket Dihapus',
-    packageName
-);
+
 
     
 </script>
