@@ -568,7 +568,15 @@ async function loadPackages() {
                 
                 <div class="d-flex gap-1">
                     <button class="btn btn-sm btn-warning" onclick="editPackage('${pkg.id}')"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-                    <button class="btn btn-sm btn-danger" onclick="deletePackage('${pkg.id}')"><i class="fa-solid fa-trash-can"></i> Hapus</button>
+                    <button
+                        class="btn btn-sm btn-danger"
+                        onclick="deletePackage(
+                            '${pkg.id}',
+                            '${pkg.package_name}'
+                        )">
+                        <i class="fa-solid fa-trash-can"></i>
+                        Hapus
+                    </button>
                 </div>
             </div>
         </div>`;
@@ -601,16 +609,43 @@ async function editPackage(id){
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-async function deletePackage(id){
-    const ok = confirm("Hapus paket ini ?");
+async function deletePackage(
+    id,
+    packageName = ''
+){
+
+    const ok =
+        confirm(
+            "Hapus paket ini ?"
+        );
+
     if(!ok) return;
-    
-    const { error } = await db.from("packages").delete().eq("id", id);
+
+    const { error } =
+        await db
+            .from("packages")
+            .delete()
+            .eq("id", id);
+
     if(error){
-        alert(error.message);
+
+        alert(
+            error.message
+        );
+
         return;
     }
-    alert("Paket berhasil dihapus");
+
+    await sendNotification(
+        'PACKAGE_DELETED',
+        'Paket Dihapus',
+        packageName || id
+    );
+
+    alert(
+        "Paket berhasil dihapus"
+    );
+
     await loadPackages();
 }
 
