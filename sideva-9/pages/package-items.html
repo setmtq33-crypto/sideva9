@@ -157,7 +157,14 @@ function render(rows){
    <td>${rupiah(rowTotal)}</td>
    <td>
    <button class="btn btn-warning btn-sm" onclick="editItem('${r.id}')">Edit</button>
-   <button class="btn btn-danger btn-sm" onclick="deleteItem('${r.id}')">Hapus</button>
+   <button
+        class="btn btn-danger btn-sm"
+        onclick="deleteItem(
+            '${r.id}',
+            '${r.item_name}'
+        )">
+        Hapus
+    </button>
    </td>
   </tr>`;
  });
@@ -281,28 +288,48 @@ async function saveItem(){
     
     if(itemId){
     
-        result =
-            await itemDb
-                .from("package_items")
-                .update(payload)
-                .eq("id", itemId);
+            result =
+                await itemDb
+                    .from("package_items")
+                    .update(payload)
+                    .eq("id", itemId);
+        
+        } else {
+        
+            result =
+                await itemDb
+                    .from("package_items")
+                    .insert(payload);
+        
+        }
+        
+        if(result.error){
+        
+            console.error(result.error);
+        
+            alert(result.error.message);
+        
+            return;
+        }
+        
+        modal.hide();
+        
+        if(itemId){
     
-    } else {
+        await sendNotification(
+            'ITEM_UPDATED',
+            'Rincian Diperbarui',
+            payload.item_name
+        );
     
-        result =
-            await itemDb
-                .from("package_items")
-                .insert(payload);
+    }else{
     
-    }
+        await sendNotification(
+            'ITEM_CREATED',
+            'Rincian Baru',
+            payload.item_name
+        );
     
-    if(result.error){
-    
-        console.error(result.error);
-    
-        alert(result.error.message);
-    
-        return;
     }
     
     modal.hide();
@@ -316,12 +343,45 @@ async function saveItem(){
     );
 }
 
-async function deleteItem(id){
- const ok=await Swal.fire({title:'Hapus?',showCancelButton:true});
+async function deleteItem(
+    id,
+    itemName
+){
+
+ const ok = await Swal.fire({
+     title:'Hapus?',
+     text:itemName,
+     showCancelButton:true
+ });
+
  if(!ok.isConfirmed) return;
- const {error}=await itemDb.from('package_items').delete().eq('id',id);
- if(error) return Swal.fire('Error',error.message,'error');
+
+ const { error } =
+ await itemDb
+     .from('package_items')
+     .delete()
+     .eq('id', id);
+
+ if(error)
+     return Swal.fire(
+         'Error',
+         error.message,
+         'error'
+     );
+
+ await sendNotification(
+     'ITEM_DELETED',
+     'Rincian Dihapus',
+     itemName
+ );
+
  await loadItems();
+
+ Swal.fire(
+     'Berhasil',
+     'Rincian berhasil dihapus',
+     'success'
+ );
 }
 
 document.getElementById('searchInput').addEventListener('input',e=>{
@@ -329,21 +389,7 @@ document.getElementById('searchInput').addEventListener('input',e=>{
  render(items.filter(x=>(x.item_name||'').toLowerCase().includes(q) || (x.specification||'').toLowerCase().includes(q)));
 });
 
-await sendNotification(
-    'ITEM_CREATED',
-    'Rincian Baru',
-    itemName
-);
-await sendNotification(
-    'ITEM_UPDATED',
-    'Rincian Diperbarui',
-    itemName
-);
-await sendNotification(
-    'ITEM_DELETED',
-    'Rincian Dihapus',
-    itemName
-);
+
 
 init();
 </script>
