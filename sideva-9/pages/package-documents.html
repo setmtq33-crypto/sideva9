@@ -1036,8 +1036,21 @@ async function renderSidevaDocumentInternal(slug, pId) {
 
             <p style="font-size:10pt; margin-bottom:30px;">
                 <strong>Link E-Catalog:</strong><br>
-                <a href="https://katalog.inaproc.id" target="_blank" style="color:#0000EE; text-decoration:underline; word-break:break-all;">https://katalog.inaproc.id/search?keyword=nasi&page=1&regionNames=Kab.+Kapuas+Hulu&regionCode=61.06&labels=%2CVerified&sellerTypes=%2CUMKK</a><br>
-                <span style="font-style:italic; font-size:9pt; color:#555;">Diakses tanggal: ${tgl}</span>
+            
+                <a
+                    href="${akun?.ecatalog_url || '#'}"
+                    target="_blank"
+                    style="color:#0000EE;text-decoration:underline;word-break:break-all;"
+                >
+                    ${akun?.ecatalog_url || '-'}
+                </a>
+            
+                <br>
+            
+                <span style="font-style:italic;font-size:9pt;color:#555;">
+                    Diakses tanggal:
+                    ${paket.dpp_date ? docFmtDateShort(paket.dpp_date) : '-'}
+                </span>
             </p>
 
             <table style="width:100%; font-size:10.5pt;">
