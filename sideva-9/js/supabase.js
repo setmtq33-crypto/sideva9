@@ -6,7 +6,9 @@ window.supabaseClient = window.supabase.createClient(
 async function sendNotification(
     eventType,
     title,
-    message
+    message,
+    createdBy = '',
+    opdName = ''
 ){
 
     return await window.supabaseClient
@@ -14,7 +16,9 @@ async function sendNotification(
         .insert([{
             event_type: eventType,
             title: title,
-            message: message
+            message: message,
+            created_by: createdBy,
+            opd_name: opdName
         }]);
 }
 
