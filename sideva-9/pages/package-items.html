@@ -328,6 +328,22 @@ document.getElementById('searchInput').addEventListener('input',e=>{
  render(items.filter(x=>(x.item_name||'').toLowerCase().includes(q) || (x.specification||'').toLowerCase().includes(q)));
 });
 
+await sendNotification(
+    'ITEM_CREATED',
+    'Rincian Baru',
+    itemName
+);
+await sendNotification(
+    'ITEM_UPDATED',
+    'Rincian Diperbarui',
+    itemName
+);
+await sendNotification(
+    'ITEM_DELETED',
+    'Rincian Dihapus',
+    itemName
+);
+
 init();
 </script>
 </body>
