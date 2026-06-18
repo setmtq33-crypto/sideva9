@@ -1755,16 +1755,24 @@ async function loadPpkomsAssets() {
 
         // Proses Cap
         if (ppkom.stamp_url) {
-            const pathCap = ppkom.stamp_url.startsWith('stamps/') ? ppkom.stamp_url : `stamps/${ppkom.stamp_url}`;
-            dynamicUrlCap = documentDb.storage.from(bucketName).getPublicUrl(pathCap).data.publicUrl;
+            if (ppkom.stamp_url.startsWith('http')) {
+                dynamicUrlCap = ppkom.stamp_url;
+            } else {
+                const pathCap = ppkom.stamp_url.startsWith('stamps/') ? ppkom.stamp_url : `stamps/${ppkom.stamp_url}`;
+                dynamicUrlCap = documentDb.storage.from(bucketName).getPublicUrl(pathCap).data.publicUrl;
+            }
         } else {
             dynamicUrlCap = null;
         }
         
         // Proses TTD
         if (ppkom.signature_url) {
-            const pathTtd = ppkom.signature_url.startsWith('signatures/') ? ppkom.signature_url : `signatures/${ppkom.signature_url}`;
-            dynamicUrlTtd = documentDb.storage.from(bucketName).getPublicUrl(pathTtd).data.publicUrl;
+            if (ppkom.signature_url.startsWith('http')) {
+                dynamicUrlTtd = ppkom.signature_url;
+            } else {
+                const pathTtd = ppkom.signature_url.startsWith('signatures/') ? ppkom.signature_url : `signatures/${ppkom.signature_url}`;
+                dynamicUrlTtd = documentDb.storage.from(bucketName).getPublicUrl(pathTtd).data.publicUrl;
+            }
         } else {
             dynamicUrlTtd = null;
         }
