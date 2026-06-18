@@ -1689,6 +1689,15 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 if (!teks) return '-';
                 return teks.replace(/\s+(?=\d{1,2}\.\d{2}\.\d{2})/g, '<br>');
             };
+            const vendors = [
+                ...new Set(
+                    allSurveys.map(x => x.survey.vendor_name).filter(Boolean)
+                )
+            ].slice(0,3);
+            
+            const v1 = vendors[0] || '-';
+            const v2 = vendors[1] || '-';
+            const v3 = vendors[2] || '-';
 
             const vendorMap = {};
 
@@ -1732,96 +1741,226 @@ async function renderSidevaDocumentInternal(slug, pId) {
 
             htmlOutput = `
             ${kopHtml}
-            <div style="text-align:center; font-size:14pt; font-weight:bold; text-decoration:underline; margin-bottom:15px;">BERITA ACARA HASIL EVALUASI PENYEDIA E-PURCHASING</div>
             
-            <table style="width:100%; font-size:10.5pt; margin-bottom:20px; border-collapse:collapse;">
-                <tr>
-                    <td width="220" style="padding:3px; vertical-align:top;"><strong>Nomor</strong></td>
-                    <td width="15" style="padding:3px; vertical-align:top; text-align:center;">:</td>
-                    <td style="padding:3px; vertical-align:top; text-align:justify;">PP/${paket.rup_number || '........'}/BAHEV-AT/${opd?.code || '...'}/2026</td>
-                </tr>
-                <tr>
-                    <td style="padding:3px; vertical-align:top;"><strong>Program</strong></td>
-                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
-                    <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.program)}</td>
-                </tr>
-                <tr>
-                    <td style="padding:3px; vertical-align:top;"><strong>Kegiatan</strong></td>
-                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
-                    <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.kegiatan)}</td>
-                </tr>
-                <tr>
-                    <td style="padding:3px; vertical-align:top;"><strong>Sub Kegiatan</strong></td>
-                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
-                    <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.sub_kegiatan)}</td>
-                </tr>
-                <tr>
-                    <td style="padding:3px; vertical-align:top;"><strong>Nama Paket</strong></td>
-                    <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
-                    <td style="padding:3px; vertical-align:top; text-align:justify;">${paket.package_name || '-'}</td>
-                </tr>
-            </table>
-
-            <div style="font-weight:bold; margin-bottom:10px;">A. DATA UMUM</div>
-            <table style="width:100%; border-collapse:collapse; font-size:10pt; margin-bottom:20px;">
-                <tr>
-                    <td style="border:1px solid #000; padding:8px; width:40%;">Kode RUP</td>
-                    <td style="border:1px solid #000; padding:8px;">${paket.rup_number || '-'}</td>
-                </tr>
-                <tr>
-                    <td style="border:1px solid #000; padding:8px;">Metode</td>
-                    <td style="border:1px solid #000; padding:8px;">E-Purchasing dengan Negosiasi Harga</td>
-                </tr>
-            </table>
-
-            <div style="font-weight:bold; margin-bottom:10px;">B. EVALUASI ADMINISTRASI DAN TEKNIS</div>
-            <div style="font-size:10.5pt; text-align:justify; margin-bottom:15px;">
-                Verifikasi Penyedia Jasa (Berdasarkan Syarat dan Ketentuan Katalog Elektronik Versi 6):
+            <div style="text-align:center;font-size:14pt;font-weight:bold;text-decoration:underline;margin-bottom:5px;">
+            BERITA ACARA HASIL EVALUASI PENYEDIA E-PURCHASING
             </div>
-            <table style="width:100%; border-collapse:collapse; font-size:9.5pt; margin-bottom:20px;">
-                <thead style="background:#eee;">
-                    <tr>
-                        <th style="border:1px solid #000; padding:6px;">No</th>
-                        <th style="border:1px solid #000; padding:6px;">Kriteria Evaluasi</th>
-                        <th style="border:1px solid #000; padding:6px;">Hasil</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="border:1px solid #000; padding:6px; text-align:center;">1</td>
-                        <td style="border:1px solid #000; padding:6px;">Alamat penyedia di Kab. Kapuas Hulu</td>
-                        <td style="border:1px solid #000; padding:6px; text-align:center;">Ya</td>
-                    </tr>
-                    <tr>
-                        <td style="border:1px solid #000; padding:6px; text-align:center;">2</td>
-                        <td style="border:1px solid #000; padding:6px;">Barang di Etalase lengkap (Nama, Harga, Satuan, dll)</td>
-                        <td style="border:1px solid #000; padding:6px; text-align:center;">Ya</td>
-                    </tr>
-                    <tr>
-                        <td style="border:1px solid #000; padding:6px; text-align:center;">3</td>
-                        <td style="border:1px solid #000; padding:6px;">Spesifikasi sesuai kebutuhan</td>
-                        <td style="border:1px solid #000; padding:6px; text-align:center;">Sesuai</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div style="font-size:10.5pt; text-align:justify; margin-bottom:30px;">
-                Berdasarkan hasil verifikasi dan evaluasi terhadap penyedia yang tercantum dalam Katalog Elektronik, maka dinyatakan bahwa penyedia yang dipilih telah memenuhi persyaratan administratif dan teknis yang ditetapkan.
+            
+            <div style="text-align:center;font-size:11pt;margin-bottom:20px;">
+            Nomor : PP/${paket.rup_number || '........'}/BAHEV-AT/${opd?.code || '...'}/2026
             </div>
-
-            <table style="width:100%; margin-top:20px; border-collapse:collapse;">
-                <tr>
-                    <td style="width:50%; text-align:center; vertical-align:top;">
-                        &nbsp;
-                    </td>
-                    <td style="width:50%; text-align:center; vertical-align:top;">
-                        Putussibau, ${tgl}<br>
-                        Pejabat Pengadaan<br><br><br><br><br>
-                        <strong>${ppk?.full_name || '-'}</strong><br>
-                        NIP. ${ppk?.nip || '-'}
-                    </td>
-                </tr>
-            </table>`;
+            
+            <div style="font-size:10.5pt;text-align:justify;line-height:1.6;margin-bottom:20px;">
+            Pada hari ini ${tgl}, yang bertandatangan dibawah ini selaku Pejabat Pengadaan pada
+            ${opd?.name || 'Perangkat Daerah'} telah melaksanakan verifikasi penyedia jasa melalui
+            E-Purchasing, dengan hasil sebagai berikut:
+            </div>
+            
+            <div style="font-weight:bold;margin-bottom:10px;">
+            A. DATA UMUM
+            </div>
+            
+            <table style="width:100%;font-size:10pt;border-collapse:collapse;margin-bottom:20px;">
+            <tr>
+            <td width="220">Kode RUP</td>
+            <td width="20">:</td>
+            <td>${paket.rup_number || '-'}</td>
+            </tr>
+            
+            <tr>
+            <td>Nama Paket</td>
+            <td>:</td>
+            <td>${paket.package_name || '-'}</td>
+            </tr>
+            
+            <tr>
+            <td>Pagu</td>
+            <td>:</td>
+            <td>${docFmtRp(paket.budget_ceiling)}</td>
+            </tr>
+            
+            <tr>
+            <td>Mata Anggaran Belanja</td>
+            <td>:</td>
+            <td>${akun ? `${akun.account_code} - ${akun.account_name}` : '-'}</td>
+            </tr>
+            
+            <tr>
+            <td>Metode</td>
+            <td>:</td>
+            <td>E-Purchasing dengan Negosiasi Harga</td>
+            </tr>
+            </table>
+            
+            <div style="font-weight:bold;margin-bottom:10px;">
+            B. EVALUASI ADMINISTRASI DAN TEKNIS
+            </div>
+            
+            <div style="font-size:10pt;margin-bottom:10px;">
+            Verifikasi Penyedia Jasa (Berdasarkan Syarat dan Ketentuan Katalog Elektronik Versi 6)
+            </div>
+            
+            <table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:20px;">
+            <thead>
+            
+            <tr>
+            <th rowspan="2" style="border:1px solid #000;padding:6px;">No</th>
+            <th rowspan="2" style="border:1px solid #000;padding:6px;">Aspek Penilaian</th>
+            <th colspan="3" style="border:1px solid #000;padding:6px;">Nama Penyedia</th>
+            <th rowspan="2" style="border:1px solid #000;padding:6px;">Ket</th>
+            </tr>
+            
+            <tr>
+            <th style="border:1px solid #000;padding:6px;">${v1}</th>
+            <th style="border:1px solid #000;padding:6px;">${v2}</th>
+            <th style="border:1px solid #000;padding:6px;">${v3}</th>
+            </tr>
+            
+            </thead>
+            
+            <tbody>
+            
+            <tr>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">1</td>
+            <td style="border:1px solid #000;padding:6px;">NIB/OSS; NPWP</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ada</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ada</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ada</td>
+            <td style="border:1px solid #000;"></td>
+            </tr>
+            
+            <tr>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">2</td>
+            <td style="border:1px solid #000;padding:6px;">KBLI</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ada</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ada</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ada</td>
+            <td style="border:1px solid #000;"></td>
+            </tr>
+            
+            <tr>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">3</td>
+            <td style="border:1px solid #000;padding:6px;">Tidak sedang dikenakan Sanksi Daftar Hitam</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;"></td>
+            </tr>
+            
+            <tr>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">4</td>
+            <td style="border:1px solid #000;padding:6px;">Status Penyedia Terdaftar aktif di katalog elektronik LKPP</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Aktif</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Aktif</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Aktif</td>
+            <td style="border:1px solid #000;"></td>
+            </tr>
+            
+            <tr>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">5</td>
+            <td style="border:1px solid #000;padding:6px;">Jenis Penyedia UMKM</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;"></td>
+            </tr>
+            
+            <tr>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">6</td>
+            <td style="border:1px solid #000;padding:6px;">Alamat penyedia di Kab. Kapuas Hulu</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;"></td>
+            </tr>
+            
+            <tr>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">7</td>
+            <td style="border:1px solid #000;padding:6px;">Barang di Etalase minimal menampilkan (Nama produk, harga, no KBKI, satuan produk, berat produk dan dimensi produk)</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;"></td>
+            </tr>
+            
+            <tr>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">8</td>
+            <td style="border:1px solid #000;padding:6px;">Jenis Produk PDN</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;"></td>
+            </tr>
+            
+            <tr>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">9</td>
+            <td style="border:1px solid #000;padding:6px;">Menjamin ketersediaan Barang dan/atau Jasa yang sesuai dengan spesifikasi</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Sesuai Kebutuhan</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Sesuai Kebutuhan</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Sesuai Kebutuhan</td>
+            <td style="border:1px solid #000;"></td>
+            </tr>
+            
+            <tr>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">10</td>
+            <td style="border:1px solid #000;padding:6px;">Jaminan Bebas Cacat Mutu dan Garansi purna jual</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;"></td>
+            </tr>
+            
+            <tr>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">11</td>
+            <td style="border:1px solid #000;padding:6px;">Memastikan kesesuaian informasi Barang/Jasa pada Katalog Elektronik</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;"></td>
+            </tr>
+            
+            <tr>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">12</td>
+            <td style="border:1px solid #000;padding:6px;">Penyedia bersedia memberikan layanan tambahan</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;"></td>
+            </tr>
+            
+            <tr>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">13</td>
+            <td style="border:1px solid #000;padding:6px;">Layanan jasa pengiriman disiapkan oleh Penyedia</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;padding:6px;text-align:center;">Ya</td>
+            <td style="border:1px solid #000;"></td>
+            </tr>
+            
+            </tbody>
+            </table>
+            
+            <div style="font-size:10.5pt;text-align:justify;margin-bottom:15px;">
+            Dari beberapa penyedia produk pada E-Katalog lokal Kabupaten Kapuas Hulu yang produknya sesuai dengan kebutuhan dan spesifikasi pada paket pekerjaan tersebut dipilih untuk pembanding sebanyak 3 penyedia serta dari hasil verifikasi dan evaluasi memenuhi persyaratan Administrasi dan Teknis.
+            </div>
+            
+            <div style="font-size:10.5pt;text-align:justify;margin-bottom:35px;">
+            Demikian Berita Acara Pemilihan Calon Penyedia ini dibuat untuk dapat digunakan sebagaimana mestinya.
+            </div>
+            
+            <table style="width:100%;">
+            <tr>
+            <td style="width:50%;"></td>
+            <td style="width:50%;text-align:center;">
+            ${opd?.name || ''}<br>
+            Pejabat Pengadaan
+            <br><br><br><br><br>
+            <strong><u>${ppk?.full_name || '-'}</u></strong><br>
+            NIP. ${ppk?.nip || '-'}
+            </td>
+            </tr>
+            </table>
+            `;
 
          
          
