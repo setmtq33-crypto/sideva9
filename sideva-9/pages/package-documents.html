@@ -1593,7 +1593,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
     }
 }
 
-const db = documentDb;
+
 // ─── STORAGE HANDLING BAWAAN ASLI ANDA ───
 // Hapus kode actionButtons di loadUploadedDocuments
 // Pastikan loadUploadedDocuments Anda hanya seperti ini:
@@ -1671,7 +1671,7 @@ document.getElementById('uploadForm').addEventListener('submit', async (e)=>{
 });
 
 async function downloadDocument(path){
-    const {data,error} = await db.storage.from('package-documents').createSignedUrl(path,60);
+    const {data,error} = await documentDb.storage.from('package-documents').createSignedUrl(path,60);
     if(error) return Swal.fire('Error',error.message,'error');
     window.open(data.signedUrl,'_blank');
 }
@@ -1679,8 +1679,8 @@ async function downloadDocument(path){
 async function deleteDocument(id,path){
     const res = await Swal.fire({ title:'Hapus berkas?', text:'File akan dihapus permanen dari storage', icon:'warning', showCancelButton:true });
     if(!res.isConfirmed) return;
-    await db.storage.from('package-documents').remove([path]);
-    await db.from('package_documents').delete().eq('id',id);
+    await documentDb.storage.from('package-documents').remove([path]);
+    await documentDb.from('package_documents').delete().eq('id',id);
     loadUploadedDocuments();
 }
 
@@ -1703,7 +1703,7 @@ window.addEventListener('DOMContentLoaded', () => {
 async function returnDocument(id) {
     const res = await Swal.fire({ title: 'Kembalikan Dokumen?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Kembalikan' });
     if (!res.isConfirmed) return;
-    const { error } = await db.from('package_documents').update({ status: 'returned' }).eq('id', id);
+    const { error } = await documentDb.from('package_documents').update({ status: 'returned' }).eq('id', id);
     if (error) return Swal.fire('Error', error.message, 'error');
     Swal.fire('Sukses', 'Dokumen berhasil dikembalikan.', 'success');
     loadUploadedDocuments();
@@ -1712,7 +1712,7 @@ async function returnDocument(id) {
 async function approveDocument(id) {
     const res = await Swal.fire({ title: 'Setujui Dokumen?', icon: 'question', showCancelButton: true, confirmButtonText: 'Ya, Setujui' });
     if (!res.isConfirmed) return;
-    const { error } = await db.from('package_documents').update({ status: 'approved' }).eq('id', id);
+    const { error } = await documentDb.from('package_documents').update({ status: 'approved' }).eq('id', id);
     if (error) return Swal.fire('Error', error.message, 'error');
     Swal.fire('Sukses', 'Dokumen telah disetujui.', 'success');
     loadUploadedDocuments();
@@ -1721,7 +1721,7 @@ async function approveDocument(id) {
 async function editDocument(id) {
     const { value: note } = await Swal.fire({ title: 'Catatan Dokumen', input: 'textarea', showCancelButton: true, confirmButtonText: 'Simpan' });
     if (note) {
-        const { error } = await db.from('package_documents').update({ notes: note }).eq('id', id);
+        const { error } = await documentDb.from('package_documents').update({ notes: note }).eq('id', id);
         if (error) return Swal.fire('Error', error.message, 'error');
         Swal.fire('Sukses', 'Catatan disimpan.', 'success');
         loadUploadedDocuments();
@@ -1743,7 +1743,7 @@ let dynamicUrlTtd = null;
 // Fungsi mengambil data dari tabel ppkoms (Diperbarui untuk bucket sideva-documents)
 async function loadPpkomsAssets() {
     try {
-        const { data: ppkom, error } = await db.from('ppkoms').select('signature_url, stamp_url').limit(1).single();
+        const { data: ppkom, error } = await documentDb.from('ppkoms').select('signature_url, stamp_url').limit(1).single();
         if (error) throw error;
 
         const bucketName = 'sideva-documents'; 
@@ -1751,13 +1751,13 @@ async function loadPpkomsAssets() {
         // Proses Cap
         if (ppkom.stamp_url) {
             const pathCap = ppkom.stamp_url.startsWith('stamps/') ? ppkom.stamp_url : `stamps/${ppkom.stamp_url}`;
-            dynamicUrlCap = db.storage.from(bucketName).getPublicUrl(pathCap).data.publicUrl;
+            dynamicUrlCap = documentDb.storage.from(bucketName).getPublicUrl(pathCap).data.publicUrl;
         }
         
         // Proses TTD
         if (ppkom.signature_url) {
             const pathTtd = ppkom.signature_url.startsWith('signatures/') ? ppkom.signature_url : `signatures/${ppkom.signature_url}`;
-            dynamicUrlTtd = db.storage.from(bucketName).getPublicUrl(pathTtd).data.publicUrl;
+            dynamicUrlTtd = documentDb.storage.from(bucketName).getPublicUrl(pathTtd).data.publicUrl;
         }
     } catch (err) {
         console.error("Gagal memuat aset PPKOM:", err);
@@ -1773,7 +1773,7 @@ async function openSignEditor(docId, filePath) {
     try {
         await loadPpkomsAssets();
 
-        const { data: fileData, error } = await db.storage.from('package-documents').download(filePath);
+        const { data: fileData, error } = await documentDb.storage.from('package-documents').download(filePath);
         if (error) throw error;
         
         currentPdfBytes = await fileData.arrayBuffer();
@@ -1857,7 +1857,7 @@ async function saveSignedDocument() {
         const pdfBytes = await pdfDoc.save();
         const newFile = new File([pdfBytes], currentFilePath.split('/').pop(), { type: 'application/pdf' });
 
-        const { error: uploadError } = await db.storage.from('package-documents').upload(currentFilePath, newFile, { upsert: true });
+        const { error: uploadError } = await documentDb.storage.from('package-documents').upload(currentFilePath, newFile, { upsert: true });
         if (uploadError) throw uploadError;
 
         bootstrap.Modal.getInstance(document.getElementById('signEditorModal')).hide();
@@ -1896,7 +1896,7 @@ async function ttdCapOtomatis(){
         const filePath = `${packageId}/auto/${currentActiveSlug}-${Date.now()}.pdf`;
         const file = new File([pdfBlob], filePath.split('/').pop(), {type:'application/pdf'});
 
-        const { error: upErr } = await db.storage.from('package-documents').upload(filePath, file, {upsert:true});
+        const { error: upErr } = await documentDb.storage.from('package-documents').upload(filePath, file, {upsert:true});
         if(upErr) throw upErr;
 
         Swal.close();
