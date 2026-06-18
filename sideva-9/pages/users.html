@@ -511,20 +511,30 @@ async function loadUsers(){
     }
 
     const {
-        data
+        data,
+        error
     } =
     await query;
+
+    console.log(
+        'LOAD USERS',
+        data,
+        error
+    );
+
+    console.log(
+        'JUMLAH USER',
+        data?.length
+    );
 
     let html = '';
 
     data?.forEach(user => {
 
-        // Konversi tampilan status agar menggunakan badge berwarna professional
-        const badgeStatusHtml = user.is_active 
+        const badgeStatusHtml = user.is_active
             ? `<span class="badge-status badge-active"><i class="fa-solid fa-circle shadow-none" style="font-size:6px;"></i> Aktif</span>`
             : `<span class="badge-status badge-inactive"><i class="fa-solid fa-circle shadow-none" style="font-size:6px;"></i> Nonaktif</span>`;
 
-        // Konversi tombol toggle memakai icon pendukung modern
         const toggleBtnHtml = user.is_active
             ? `<button class="btn btn-sm btn-outline-danger w-100" onclick="toggleUser('${user.id}', ${user.is_active})"><i class="fa-solid fa-user-slash me-1"></i> Nonaktifkan</button>`
             : `<button class="btn btn-sm btn-outline-success w-100" onclick="toggleUser('${user.id}', ${user.is_active})"><i class="fa-solid fa-user-check me-1"></i> Aktifkan</button>`;
@@ -534,15 +544,11 @@ async function loadUsers(){
         <tr>
 
             <td class="fw-semibold text-dark">
-
                 ${user.full_name}
-
             </td>
 
             <td class="text-muted">
-
                 ${user.email}
-
             </td>
 
             <td>
@@ -590,15 +596,11 @@ async function loadUsers(){
             </td>
 
             <td class="text-center">
-
                 ${badgeStatusHtml}
-
             </td>
 
             <td class="text-center">
-
                 ${toggleBtnHtml}
-
             </td>
 
         </tr>
@@ -606,8 +608,7 @@ async function loadUsers(){
         `;
     });
 
-    userTable.innerHTML =
-        html;
+    userTable.innerHTML = html;
 }
 
 async function updateRole(
