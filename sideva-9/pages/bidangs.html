@@ -155,12 +155,12 @@ body { background: #f5f6fa; }
         .order('bidang_name', { ascending: true });
 
     if (
-        currentProfile &&
-        currentProfile.role === 'ADMIN_OPD'
+        profile &&
+        profile.role === 'ADMIN_OPD'
     ) {
         query = query.eq(
             'opd_id',
-            currentProfile.opd_id
+            profile.opd_id
         );
     }
 
