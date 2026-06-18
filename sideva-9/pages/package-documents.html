@@ -499,26 +499,12 @@ async function renderSidevaDocumentInternal(slug, pId) {
             documentDb.from('opds').select('*').eq('id', paket.opd_id).maybeSingle()
         ]);
         
-        const { data:hpsData } =
-        await documentDb
+        const { data: hpsData } = await documentDb
             .from('package_hps')
             .select('*')
             .eq('package_id', pId)
             .maybeSingle();
-            
-        
-            documentDb.from('budget_accounts').select('*').eq('id', paket.budget_account_id).maybeSingle(),
-            documentDb.from('package_items').select('*,price_surveys(*)').eq('package_id', pId),
-            
-            // KONEKSI DINAMIS DROPDOWN KE DOKUMEN:
-            // Jika ada PPKOM terpilih di dropdown, ambil berdasarkan ID. Jika kosong/default, ambil data pertama berdasarkan opd_id.
-            selectedPpkomId 
-                ? documentDb.from('ppkoms').select('*').eq('id', selectedPpkomId).maybeSingle()
-                : documentDb.from('ppkoms').select('*').eq('opd_id', paket.opd_id).maybeSingle(),
-                
-            documentDb.from('bidangs').select('*').eq('id', paket.bidang_id).maybeSingle(),
-            documentDb.from('opds').select('*').eq('id', paket.opd_id).maybeSingle()
-        ]);
+           
 
         if (itemsError) throw itemsError;
         // ... (Sisa kode render htmlOutput di bawahnya tetap sama tanpa perlu diubah)
