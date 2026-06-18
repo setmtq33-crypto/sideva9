@@ -487,6 +487,14 @@ async function renderSidevaDocumentInternal(slug, pId) {
             { data: ppk }, // Variabel ini digunakan otomatis oleh seluruh 10 dokumen di bawah
             { data: bidang },
             { data: opd }
+
+            const { data:hpsData } =
+            await documentDb
+            .from('package_hps')
+            .select('*')
+            .eq('package_id', pId)
+            .maybeSingle();
+            
         ] = await Promise.all([
             documentDb.from('budget_accounts').select('*').eq('id', paket.budget_account_id).maybeSingle(),
             documentDb.from('package_items').select('*,price_surveys(*)').eq('package_id', pId),
@@ -505,6 +513,26 @@ async function renderSidevaDocumentInternal(slug, pId) {
         // ... (Sisa kode render htmlOutput di bawahnya tetap sama tanpa perlu diubah)
 
         const listItems = items || [];
+
+        const allSurveys = [];
+
+        listItems.forEach(it => {
+            (it.price_surveys || []).forEach(ps => {
+                allSurveys.push({
+                    item: it,
+                    survey: ps
+                });
+            });
+        });
+        
+        const winnerRows =
+            allSurveys.filter(x => x.survey.is_winner);
+        
+        const winnerVendor =
+            winnerRows.length
+            ? winnerRows[0].survey.vendor_name
+            : '-';
+        
         const tgl = docFmtDate(new Date());
         const kopHtml = `<div style="text-align:center; margin-bottom:20px;"><img src="${opd?.kop_url || ''}" style="width:100%;max-width:900px;height:auto;"></div>`;
         
@@ -1442,6 +1470,46 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 if (!teks) return '-';
                 return teks.replace(/\s+(?=\d{1,2}\.\d{2}\.\d{2})/g, '<br>');
             };
+
+            const vendorMap = {};
+
+            allSurveys.forEach(r => {
+            
+                const vendor =
+                    r.survey.vendor_name || 'Penyedia';
+            
+                const price =
+                    Number(
+                        r.survey.negotiated_price ||
+                        r.survey.survey_price ||
+                        0
+                    );
+            
+                if(!vendorMap[vendor]){
+            
+                    vendorMap[vendor] = {
+                        total:0,
+                        itemCount:0
+                    };
+                }
+            
+                vendorMap[vendor].total +=
+                    price * Number(r.item.quantity || 1);
+            
+                vendorMap[vendor].itemCount++;
+            });
+            
+            const ranking =
+                Object.entries(vendorMap)
+                .sort((a,b)=>a[1].total-b[1].total);
+            
+            const winnerRank =
+                ranking[0];
+            
+            const winnerTotal =
+                winnerRank
+                ? winnerRank[1].total
+                : 0;
 
             htmlOutput = `
             ${kopHtml}
