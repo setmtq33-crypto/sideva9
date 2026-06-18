@@ -441,6 +441,22 @@ function docFmtDate(dateStr) {
     return `${d.getDate()} ${bulan[d.getMonth()]} ${d.getFullYear()}`;
 }
 
+function docFmtDateShort(dateStr){
+
+    if(!dateStr) return "-";
+
+    const d = new Date(dateStr);
+
+    return d.toLocaleDateString(
+        'id-ID',
+        {
+            day:'2-digit',
+            month:'long',
+            year:'numeric'
+        }
+    );
+}
+
 function buildTtdHtml(ppk, bidang, tgl){
    return `...`;
 }
@@ -981,9 +997,33 @@ async function renderSidevaDocumentInternal(slug, pId) {
                     <tr>
                         <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;">3.</td>
                         <td style="border:1px solid #000; padding:8px; vertical-align:top;"><strong>Waktu</strong></td>
-                        <td style="border:1px solid #000; padding:8px; vertical-align:top;">1 Hari Kalender (atau disesuaikan sejak diterbitkannya Surat Pesanan)</td>
-                        <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;"></td>
-                    </tr>
+                        <tr>
+                            <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;">3.</td>
+                        
+                            <td style="border:1px solid #000; padding:8px; vertical-align:top;">
+                                <strong>Waktu</strong>
+                            </td>
+                        
+                            <td style="border:1px solid #000; padding:8px; vertical-align:top; text-align:justify;">
+                        
+                                Jangka waktu pelaksanaan pekerjaan adalah
+                                <strong>
+                                    ${paket.work_duration_days || 0}
+                                    ${paket.work_duration_type || 'Hari Kalender'}
+                                </strong>
+                                terhitung sejak tanggal
+                                <strong>
+                                    ${paket.work_start_date ? docFmtDateShort(paket.work_start_date) : '-'}
+                                </strong>
+                                sampai dengan tanggal
+                                <strong>
+                                    ${paket.work_end_date ? docFmtDateShort(paket.work_end_date) : '-'}
+                                </strong>.
+                        
+                            </td>
+                        
+                            <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;"></td>
+                        </tr>
                     <tr>
                         <td style="border:1px solid #000; padding:8px; text-align:center; vertical-align:top;">4.</td>
                         <td style="border:1px solid #000; padding:8px; vertical-align:top;"><strong>Tingkat Layanan</strong></td>
@@ -1129,7 +1169,21 @@ async function renderSidevaDocumentInternal(slug, pId) {
             <p style="margin:0 0 10px 20px;">Tidak menggunakan merek tertentu / Menyesuaikan ketersediaan e-Katalog.</p>
 
             <div style="font-weight:bold; font-size:10pt; margin-bottom:3px;">c. Spesifikasi Waktu</div>
-            <p style="margin:0 0 10px 20px;">Pelaksanaan pekerjaan mulai dari diterbitkannya Surat Pesanan (SP) sampai dengan jadwal penyelesaian yang disepakati.</p>
+            <p style="margin:0 0 10px 20px;"><p style="margin:0 0 10px 20px;">
+                                                Pelaksanaan pekerjaan selama
+                                                <strong>
+                                                ${paket.work_duration_days || 0}
+                                                ${paket.work_duration_type || 'Hari Kalender'}
+                                                </strong>,
+                                                terhitung sejak
+                                                <strong>
+                                                ${paket.work_start_date ? docFmtDate(paket.work_start_date) : '-'}
+                                                </strong>
+                                                sampai dengan
+                                                <strong>
+                                                ${paket.work_end_date ? docFmtDate(paket.work_end_date) : '-'}
+                                                </strong>.
+                                                </p></p>
 
             <div style="font-weight:bold; font-size:10pt; margin-bottom:3px;">d. Spesifikasi Tempat</div>
             <p style="margin:0 0 10px 20px;">Pengiriman langsung ke tempat/lokasi tujuan yang ditentukan oleh Perangkat Daerah. Jarak dan akses lokasi diperhitungkan oleh penyedia tanpa biaya tambahan di luar harga satuan e-Katalog.</p>
