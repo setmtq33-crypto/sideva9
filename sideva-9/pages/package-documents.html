@@ -322,7 +322,7 @@ async function initPackageHeader() {
     const { data, error } = await documentDb.from('packages').select('*').eq('id', packageId).single();
     if(!error && data) {
         document.getElementById('packageName').innerText = data.package_name;
-        document.getElementById('packageRup').innerText = `ID RUP: ${data.rup_id || '-'}`;
+        document.getElementById('packageRup').innerText = `ID RUP: ${data.rup_number || '-'}`;
         
         // 2. Panggil pengisian otomatis dropdown PPKOM berdasarkan OPD paket saat load
         await loadPpkomDropdown(data.opd_id);
@@ -507,7 +507,13 @@ async function renderSidevaDocumentInternal(slug, pId) {
            
 
         if (itemsError) throw itemsError;
-        // ... (Sisa kode render htmlOutput di bawahnya tetap sama tanpa perlu diubah)
+
+        const { data: hpsData } = await documentDb
+            .from('package_hps')
+            .select('*')
+            .eq('package_id', pId)
+            .maybeSingle();
+        
 
         const listItems = items || [];
 
