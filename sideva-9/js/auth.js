@@ -41,7 +41,7 @@ async function getProfile() {
             .from('profiles')
             .select('*')
             .eq('auth_user_id', user.id)
-            .single();
+            .maybeSingle();
 
     if (error) {
 
