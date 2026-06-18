@@ -614,6 +614,24 @@ function openDpp(id){ location.href = `dpp.html?id=${id}`; }
 
 window.editPackage = editPackage;
 window.deletePackage = deletePackage;
+
+await sendNotification(
+    'PACKAGE_CREATED',
+    'Paket Baru',
+    packageName
+);
+await sendNotification(
+    'PACKAGE_UPDATED',
+    'Paket Diperbarui',
+    packageName
+);
+await sendNotification(
+    'PACKAGE_DELETED',
+    'Paket Dihapus',
+    packageName
+);
+
+    
 </script>
 </body>
 </html>
