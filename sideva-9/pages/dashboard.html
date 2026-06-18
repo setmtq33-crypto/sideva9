@@ -343,49 +343,94 @@ function rupiah(v){
 
 async function loadBudgetChart(){
 
- const selectedOpd = localStorage.getItem('global_opd_id') || 'ALL';
+ const profile =
+    await getProfile();
 
- let packageQuery = dashboardDb
-   .from('packages')
-   .select('package_name,budget_ceiling,opd_id')
-   .limit(10);
+ let selectedOpd =
+    localStorage.getItem(
+        'global_opd_id'
+    ) || 'ALL';
 
- let hpsQuery = dashboardDb
-   .from('package_hps')
-   .select('package_id,total_hps,opd_id');
-
- if(selectedOpd !== 'ALL'){
-   packageQuery = packageQuery.eq('opd_id', selectedOpd);
-   hpsQuery = hpsQuery.eq('opd_id', selectedOpd);
+ if(
+    profile.role === 'ADMIN_OPD'
+ ){
+    selectedOpd =
+        profile.opd_id;
  }
 
- const { data: packages } = await packageQuery;
- const { data: hps } = await hpsQuery;
+ let packageQuery =
+    dashboardDb
+    .from('packages')
+    .select(
+        'id,package_name,budget_ceiling,opd_id'
+    )
+    .limit(10);
+
+ let hpsQuery =
+    dashboardDb
+    .from('package_hps')
+    .select(
+        'package_id,total_hps,opd_id'
+    );
+
+ if(
+    selectedOpd !== 'ALL'
+ ){
+    packageQuery =
+        packageQuery.eq(
+            'opd_id',
+            selectedOpd
+        );
+
+    hpsQuery =
+        hpsQuery.eq(
+            'opd_id',
+            selectedOpd
+        );
+ }
+
+ const {
+    data: packages
+ } = await packageQuery;
+
+ const {
+    data: hps
+ } = await hpsQuery;
 
  const labels = [];
  const paguData = [];
  const hpsData = [];
 
- (packages || []).forEach(pkg => {
+ (packages||[]).forEach(pkg=>{
 
    const hpsRow =
-      (hps || []).find(
-         x => x.package_id === pkg.id
+      (hps||[])
+      .find(
+         x =>
+         x.package_id === pkg.id
       );
 
-   labels.push(pkg.package_name);
+   labels.push(
+      pkg.package_name
+   );
 
    paguData.push(
-      Number(pkg.budget_ceiling || 0)
+      Number(
+         pkg.budget_ceiling || 0
+      )
    );
 
    hpsData.push(
-      Number(hpsRow?.total_hps || 0)
+      Number(
+         hpsRow?.total_hps || 0
+      )
    );
  });
 
  const ctx =
- document.getElementById('chartPaguHps');
+    document.getElementById(
+        'chartPaguHps'
+    );
 
  new Chart(ctx,{
    type:'bar',
@@ -490,62 +535,139 @@ async function init(){
 
 // INTEGRASI SELECTOR OPD GLOBAL PADA QUERY KPI
 async function loadKPI(){
- const selectedOpd = localStorage.getItem('global_opd_id') || 'ALL';
- 
- let packageQuery = dashboardDb.from('packages').select('*');
- let hpsQuery = dashboardDb.from('package_hps').select('*');
- 
- // Jika super admin menargetkan OPD spesifik, paksa penyaringan data
- if (selectedOpd !== 'ALL') {
-     packageQuery = packageQuery.eq('opd_id', selectedOpd);
-     hpsQuery = hpsQuery.eq('opd_id', selectedOpd);
+
+ const profile =
+    await getProfile();
+
+ let selectedOpd =
+    localStorage.getItem('global_opd_id')
+    || 'ALL';
+
+ if(
+    profile.role === 'ADMIN_OPD'
+ ){
+    selectedOpd =
+        profile.opd_id;
  }
 
- const {data:packages} = await packageQuery;
- const {data:hps} = await hpsQuery;
+ let packageQuery =
+    dashboardDb
+    .from('packages')
+    .select('*');
 
- const totalPackages = (packages||[]).length;
- const readyProcurement = (packages||[]).filter(x => x.package_status === 'READY_PROCUREMENT').length;
+ let hpsQuery =
+    dashboardDb
+    .from('package_hps')
+    .select('*');
 
- const totalBudget = (packages||[]).reduce((a,b)=> a + Number(b.budget_ceiling||0),0);
- const totalHps = (hps||[]).reduce((a,b)=> a + Number(b.total_hps||0),0);
+ if(selectedOpd !== 'ALL'){
+    packageQuery =
+        packageQuery.eq(
+            'opd_id',
+            selectedOpd
+        );
 
- document.getElementById('totalPackages').innerText = totalPackages;
- document.getElementById('totalBudget').innerText = rupiah(totalBudget);
- document.getElementById('totalHps').innerText = rupiah(totalHps);
- document.getElementById('efficiency').innerText = rupiah(totalBudget-totalHps);
- document.getElementById('readyProcurement').innerText = readyProcurement;
-}
+    hpsQuery =
+        hpsQuery.eq(
+            'opd_id',
+            selectedOpd
+        );
+ }
 
 // INTEGRASI SELECTOR OPD GLOBAL PADA TABEL STATUS ALUR KERJA
 async function loadStatus(){
- const statuses=['DRAFT','DPP_COMPLETE','ITEMS_COMPLETE','SURVEY_COMPLETE','DOCUMENT_COMPLETE','HPS_COMPLETE','BAHPE_DRAFT','BAHPE_COMPLETE','READY_PROCUREMENT'];
- const selectedOpd = localStorage.getItem('global_opd_id') || 'ALL';
 
- let statusQuery = dashboardDb.from('packages').select('package_status');
- if (selectedOpd !== 'ALL') {
-     statusQuery = statusQuery.eq('opd_id', selectedOpd);
+ const profile =
+    await getProfile();
+
+ let selectedOpd =
+    localStorage.getItem(
+        'global_opd_id'
+    ) || 'ALL';
+
+ if(
+    profile.role === 'ADMIN_OPD'
+ ){
+    selectedOpd =
+        profile.opd_id;
  }
 
- const {data} = await statusQuery;
+ const statuses=[
+    'DRAFT',
+    'DPP_COMPLETE',
+    'ITEMS_COMPLETE',
+    'SURVEY_COMPLETE',
+    'DOCUMENT_COMPLETE',
+    'HPS_COMPLETE',
+    'BAHPE_DRAFT',
+    'BAHPE_COMPLETE',
+    'READY_PROCUREMENT'
+ ];
+
+ let statusQuery =
+    dashboardDb
+    .from('packages')
+    .select('package_status');
+
+ if(
+    selectedOpd !== 'ALL'
+ ){
+    statusQuery =
+        statusQuery.eq(
+            'opd_id',
+            selectedOpd
+        );
+ }
+
+ const {data} =
+    await statusQuery;
+
  let html='';
 
  statuses.forEach(status=>{
-   const count = (data||[]).filter(x=> x.package_status===status).length;
-   
-   let badgeStyle = "background-color: var(--bs-secondary-bg); color: var(--bs-secondary-color);";
-   if(status === 'DRAFT') badgeStyle = "background-color: rgba(217, 119, 6, 0.15); color: #d97706;";
-   if(status === 'READY_PROCUREMENT') badgeStyle = "background-color: rgba(21, 128, 61, 0.15); color: #15803d;";
-   if(status === 'HPS_COMPLETE') badgeStyle = "background-color: rgba(3, 105, 161, 0.15); color: #0369a1;";
+
+   const count =
+      (data||[])
+      .filter(
+         x =>
+         x.package_status===status
+      )
+      .length;
+
+   let badgeStyle =
+      "background-color: var(--bs-secondary-bg); color: var(--bs-secondary-color);";
+
+   if(status==='DRAFT')
+      badgeStyle =
+      "background-color: rgba(217,119,6,.15); color:#d97706;";
+
+   if(status==='READY_PROCUREMENT')
+      badgeStyle =
+      "background-color: rgba(21,128,61,.15); color:#15803d;";
+
+   if(status==='HPS_COMPLETE')
+      badgeStyle =
+      "background-color: rgba(3,105,161,.15); color:#0369a1;";
 
    html += `
    <tr>
-     <td class="fw-semibold text-secondary"><i class="fa-regular fa-circle-dot me-2 small opacity-50"></i>${status}</td>
-     <td><span class="badge-status fw-bold" style="${badgeStyle}">${count} Paket</span></td>
+     <td class="fw-semibold text-secondary">
+       <i class="fa-regular fa-circle-dot me-2 small opacity-50"></i>
+       ${status}
+     </td>
+
+     <td>
+       <span class="badge-status fw-bold"
+             style="${badgeStyle}">
+             ${count} Paket
+       </span>
+     </td>
    </tr>`;
  });
 
- document.getElementById('statusTable').innerHTML=html;
+ document.getElementById(
+    'statusTable'
+ ).innerHTML = html;
 }
 
 async function loadOpdSummary(){
@@ -620,30 +742,100 @@ async function loadOpdSummary(){
 
 // INTEGRASI SELECTOR OPD GLOBAL PADA MONITORING ANTRIAN LOG PAKET TERBARU
 async function loadRecentPackages(){
- const selectedOpd = localStorage.getItem('global_opd_id') || 'ALL';
- 
- let recentQuery = dashboardDb.from('packages').select('*').order('created_at',{ascending:false}).limit(10);
- if (selectedOpd !== 'ALL') {
-     recentQuery = recentQuery.eq('opd_id', selectedOpd);
+
+ const profile =
+    await getProfile();
+
+ let selectedOpd =
+    localStorage.getItem(
+        'global_opd_id'
+    ) || 'ALL';
+
+ if(
+    profile.role === 'ADMIN_OPD'
+ ){
+    selectedOpd =
+        profile.opd_id;
  }
 
- const {data} = await recentQuery;
+ let recentQuery =
+    dashboardDb
+    .from('packages')
+    .select('*')
+    .order(
+        'created_at',
+        {
+            ascending:false
+        }
+    )
+    .limit(10);
+
+ if(
+    selectedOpd !== 'ALL'
+ ){
+    recentQuery =
+        recentQuery.eq(
+            'opd_id',
+            selectedOpd
+        );
+ }
+
+ const {data} =
+    await recentQuery;
+
  let html='';
 
  (data||[]).forEach(pkg=>{
-   let badgeClass = "bg-secondary text-white";
-   if(pkg.package_status === 'READY_PROCUREMENT') badgeClass = "bg-success text-white";
-   if(pkg.package_status === 'DRAFT') badgeClass = "bg-warning text-dark";
 
- html += `
- <tr>
-   <td class="fw-semibold"><i class="fa-regular fa-file-lines me-2 opacity-50"></i>${pkg.package_name}</td>
-   <td class="fw-bold">${rupiah(pkg.budget_ceiling)}</td>
-   <td><span class="badge ${badgeClass} fw-bold px-2 py-1.5" style="font-size:0.75rem;">${pkg.package_status||'DRAFT'}</span></td>
- </tr>`;
+   let badgeClass =
+      "bg-secondary text-white";
+
+   if(
+      pkg.package_status
+      ===
+      'READY_PROCUREMENT'
+   ){
+      badgeClass =
+      "bg-success text-white";
+   }
+
+   if(
+      pkg.package_status
+      ===
+      'DRAFT'
+   ){
+      badgeClass =
+      "bg-warning text-dark";
+   }
+
+   html += `
+   <tr>
+
+      <td class="fw-semibold">
+         <i class="fa-regular fa-file-lines me-2 opacity-50"></i>
+         ${pkg.package_name}
+      </td>
+
+      <td class="fw-bold">
+         ${rupiah(
+            pkg.budget_ceiling
+         )}
+      </td>
+
+      <td>
+         <span
+            class="badge ${badgeClass} fw-bold px-2 py-1.5"
+            style="font-size:.75rem;">
+            ${pkg.package_status||'DRAFT'}
+         </span>
+      </td>
+
+   </tr>`;
  });
 
- document.getElementById('recentPackages').innerHTML=html;
+ document.getElementById(
+    'recentPackages'
+ ).innerHTML = html;
 }
 
 init();
