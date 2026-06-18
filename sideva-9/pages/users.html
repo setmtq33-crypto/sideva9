@@ -692,104 +692,55 @@ async function tambahUser(event) {
 
     try {
 
-     
-            const {
-                data: sessionData
-            } = await usersDb.auth.getSession();
-            
-            const adminSession = sessionData.session;
-            
-            const {
-                data: authData,
-                error: authError
-            } =
-            await usersDb.auth.signUp({
-            
-                email,
-                password
-            
-            });
-            
-            if (authError) throw authError;
+        const {
+            data: authData,
+            error: authError
+        } =
+        await usersDb.auth.signUp({
+
+            email,
+            password
+
+        });
 
         if (authError)
             throw authError;
 
-        if (!authData.user)
-            throw new Error(
-                'Gagal membuat Auth User'
-            );
-
-        const {
-            data,
-            error
-        } =
         await usersDb
-        .from('profiles')
-        .insert([{
+            .from('profiles')
+            .insert([{
 
-            auth_user_id:
-                authData.user.id,
+                auth_user_id:
+                    authData.user.id,
 
-            tenant_id:
-                currentProfile.tenant_id,
+                tenant_id:
+                    currentProfile.tenant_id,
 
-            full_name:
-                fullName,
+                opd_id:
+                    opdId,
 
-            email:
-                email,
+                full_name:
+                    fullName,
 
-            role:
-                role,
+                email:
+                    email,
 
-            opd_id:
-                opdId,
+                role:
+                    role,
 
-            is_active:
-                true
+                is_active:
+                    true
 
-        }])
-        .select();
-
-        if (error)
-            throw error;
-        await usersDb.auth.setSession({
-            access_token: adminSession.access_token,
-            refresh_token: adminSession.refresh_token
-        });
-
-        await writeAuditLog(
-
-            'USER',
-
-            'INSERT_USER',
-
-            data[0].id,
-
-            `Menambahkan user baru: ${fullName}`
-
-        );
+            }]);
 
         alert(
-            'User berhasil dibuat\n\n' +
-            'Email : ' + email + '\n' +
-            'Password : ' + password
+            'User berhasil dibuat.\nSilakan login ulang.'
         );
 
-        const modalEl =
-            document.getElementById(
-                'modalTambahUser'
-            );
+        await usersDb.auth.signOut();
 
-        bootstrap
-        .Modal
-        .getInstance(modalEl)
-        .hide();
-
-        event.target.reset();
-
-        await loadUsers();
+        location.href =
+            '/pages/login.html';
 
     } catch (err) {
 
