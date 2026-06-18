@@ -758,6 +758,16 @@ async function tambahUser(event) {
     }
 }
 
+await sendNotification(
+
+    'USER_CREATED',
+
+    'User Baru',
+
+    `${fullName} (${role}) dibuat`
+
+);
+
 init();
 
 </script>
