@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "sideva9-sync",
+  "name": "sideva9",
   "compatibility_date": "2026-06-18",
   "observability": {
     "enabled": true
