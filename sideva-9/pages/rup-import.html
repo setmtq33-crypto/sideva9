@@ -245,7 +245,9 @@ textarea.form-control:focus {
 
                 <div class="mb-3">
                     <label class="form-label">Nama OPD SIRUP</label>
-                    <input id="opdName" class="form-control" placeholder="Masukkan nama organisasi perangkat daerah">
+                    <select id="opdName" class="form-select">
+                        <option value="">Pilih OPD</option>
+                    </select>
                 </div>
 
                 <div class="mb-3">
@@ -441,6 +443,7 @@ async function init(){
 
     await loadRupImports();
     await loadOpdFilter();
+    await loadOpdDropdown();
 
     document
     .getElementById(
@@ -601,6 +604,35 @@ async function loadOpdFilter(){
 
     document
         .getElementById('filterOpd')
+        .innerHTML = html;
+}
+
+async function loadOpdDropdown(){
+
+    const { data, error } =
+        await rupDb
+        .from('opds')
+        .select('name,sirup_name')
+        .order('name');
+
+    if(error){
+        console.error(error);
+        return;
+    }
+
+    let html =
+        '<option value="">Pilih OPD</option>';
+
+    (data || []).forEach(opd => {
+
+        html += `
+        <option value="${opd.sirup_name || opd.name}">
+            ${opd.name}
+        </option>`;
+    });
+
+    document
+        .getElementById('opdName')
         .innerHTML = html;
 }
 
