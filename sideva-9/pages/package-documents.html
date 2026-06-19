@@ -221,6 +221,13 @@ h1,h2,h3,h4,h5{
                                 <option value="">-- Gunakan PPKOM Default --</option>
                             </select>
                         </div>
+                        
+                        <div class="mb-4">
+                            <label for="docDateInput" class="form-label small fw-bold text-secondary">
+                                <i class="bi bi-calendar-date-fill me-1"></i> TANGGAL DOKUMEN
+                            </label>
+                            <input type="date" id="docDateInput" class="form-control form-control-sm shadow-sm" onchange="refreshCurrentDocument()">
+                        </div>
 
                         <div class="d-flex justify-content-between align-items-center mb-3">
                            <span class="fw-bold text-secondary small">DAFTAR PILIHAN BERKAS</span>
@@ -302,8 +309,7 @@ h1,h2,h3,h4,h5{
                                 <th>Tanggal Unggah</th>
                                 <th width="180">Aksi</th>
                             </tr>
-                        </thead> <!-- Perbaikan: Gunakan </thead>, bukan </table> di sini -->
-                        <tbody id="documentsTable">
+                        </thead> <tbody id="documentsTable">
                             <tr><td colspan="5" class="text-center text-muted">Memuat database storage...</td></tr>
                         </tbody>
                     </table>
@@ -580,8 +586,17 @@ async function renderSidevaDocumentInternal(slug, pId) {
             winnerRows.length
             ? winnerRows[0].survey.vendor_name
             : '-';
+            
+        // PENGATURAN TANGGAL SESUAI INPUT FORM
+        const docDateInputEl = document.getElementById('docDateInput');
+        let activeDate = new Date(); // default hari ini
+        if (docDateInputEl && docDateInputEl.value) {
+            // Pecah secara manual agar tidak bergeser gara-gara timezone
+            const [yyyy, mm, dd] = docDateInputEl.value.split('-');
+            activeDate = new Date(yyyy, mm - 1, dd);
+        }
+        const tgl = docFmtDate(activeDate);
         
-        const tgl = docFmtDate(new Date());
         const kopHtml = `<div style="text-align:center; margin-bottom:20px;"><img src="${opd?.kop_url || ''}" style="width:100%;max-width:900px;height:auto;"></div>`;
         
         let htmlOutput = "";
