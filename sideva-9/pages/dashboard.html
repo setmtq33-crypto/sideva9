@@ -415,6 +415,27 @@ body {
                         </div>
                     
                     </div>
+
+                    <div class="col-lg-6">
+
+                        <div class="card h-100">
+                    
+                            <div class="card-header">
+                                <i class="fa-solid fa-rocket text-primary"></i>
+                                Progress Pengadaan per OPD
+                            </div>
+                    
+                            <div class="card-body">
+                    
+                                <div id="procurementProgress">
+                    
+                                </div>
+                    
+                            </div>
+                    
+                        </div>
+                    
+                    </div>
                     
                 
                     <div class="col-lg-6">
@@ -749,6 +770,8 @@ async function init(){
     await loadPackageRanking();
 
     await loadEfficiencyRanking();
+
+    await loadProcurementProgress();
     
     await loadStatus();
     
@@ -1276,6 +1299,118 @@ async function loadEfficiencyRanking(){
 
         console.error(
             'loadEfficiencyRanking',
+            err
+        );
+    }
+}
+
+async function loadProcurementProgress(){
+
+    try{
+
+        const { data: opds } =
+        await dashboardDb
+        .from('opds')
+        .select(
+            'id,name'
+        );
+
+        const { data: packages } =
+        await dashboardDb
+        .from('packages')
+        .select(
+            'opd_id,package_status'
+        );
+
+        let html = '';
+
+        (opds || []).forEach(opd=>{
+
+            const opdPackages =
+            (packages || [])
+            .filter(
+                p =>
+                p.opd_id === opd.id
+            );
+
+            const total =
+                opdPackages.length;
+
+            const completed =
+                opdPackages.filter(
+                    p =>
+                    p.package_status ===
+                    'READY_PROCUREMENT'
+                ).length;
+
+            const progress =
+                total > 0
+                ? Math.round(
+                    (completed / total) * 100
+                )
+                : 0;
+
+            let color =
+                'bg-danger';
+
+            if(progress >= 75)
+                color = 'bg-success';
+
+            else if(progress >= 50)
+                color = 'bg-info';
+
+            else if(progress >= 25)
+                color = 'bg-warning';
+
+            html += `
+                <div class="mb-3">
+
+                    <div class="d-flex justify-content-between mb-1">
+
+                        <strong>
+                            ${opd.name}
+                        </strong>
+
+                        <span class="fw-bold">
+                            ${progress}%
+                        </span>
+
+                    </div>
+
+                    <div class="progress">
+
+                        <div
+                            class="progress-bar ${color}"
+                            role="progressbar"
+                            style="width:${progress}%">
+
+                        </div>
+
+                    </div>
+
+                    <small class="text-muted">
+
+                        ${completed}
+                        dari
+                        ${total}
+                        paket selesai
+
+                    </small>
+
+                </div>
+            `;
+
+        });
+
+        document.getElementById(
+            'procurementProgress'
+        ).innerHTML =
+            html;
+
+    }catch(err){
+
+        console.error(
+            'loadProcurementProgress',
             err
         );
     }
