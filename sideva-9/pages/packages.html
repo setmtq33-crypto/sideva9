@@ -812,8 +812,7 @@ async function editPackage(id){
         .eq("id", id);
 
     if(
-        profile.role !==
-        "SUPER_ADMIN"
+        profile.role !== "SUPER_ADMIN"
     ){
         query =
             query.eq(
@@ -835,7 +834,8 @@ async function editPackage(id){
         return;
     }
 
-    editingPackageId = id;
+    editingPackageId =
+        data.id;
 
     document.getElementById("formTitle").innerHTML =
         `<i class="fa-solid fa-pen-to-square me-2"></i>Ubah / Edit Data Paket`;
@@ -896,80 +896,50 @@ async function editPackage(id){
 
 async function deletePackage(id){
 
-    const ok =
-        confirm(
-            "Hapus paket ini ?"
-        );
-
-    if(!ok){
+    if(
+        !confirm(
+            "Hapus paket ini?"
+        )
+    ){
         return;
     }
 
-    try{
+    const profile =
+        await getProfile();
 
-        const profile =
-            await getProfile();
+    let query =
+        db
+        .from("packages")
+        .delete()
+        .eq("id", id);
 
-        let query =
-            db
-            .from("packages")
-            .delete()
-            .eq("id", id);
-
-        if(
-            profile.role !==
-            "SUPER_ADMIN"
-        ){
-            query =
-                query.eq(
-                    "opd_id",
-                    profile.opd_id
-                );
-        }
-
-        const {
-            error
-        } =
-        await query;
-
-        if(error){
-
-            alert(
-                error.message
+    if(
+        profile.role !== "SUPER_ADMIN"
+    ){
+        query =
+            query.eq(
+                "opd_id",
+                profile.opd_id
             );
-
-            return;
-        }
-
-        await writeAuditLog(
-
-            "PACKAGES",
-
-            "DELETE",
-
-            id,
-
-            `Hapus paket ${id}`
-
-        );
-
-        await loadPackages();
-
-        alert(
-            "Paket berhasil dihapus"
-        );
-
-    }catch(err){
-
-        console.error(
-            "deletePackage",
-            err
-        );
-
-        alert(
-            err.message
-        );
     }
+
+    const {
+        error
+    } =
+    await query;
+
+    if(error){
+        alert(
+            error.message
+        );
+        return;
+    }
+
+    await loadPackages();
+
+    alert(
+        "Paket berhasil dihapus"
+    );
 }
 
 function clearForm(){
