@@ -660,11 +660,18 @@ function canCreatePackage(role){
 async function savePackage(){
 
     if(
-        profile.role !== "SUPER_ADMIN"
-        &&
-        !await canCreatePackage()
+        ![
+            "SUPER_ADMIN",
+            "ADMIN_OPD",
+            "PPK",
+            "PPTK"
+        ].includes(
+            profile.role
+        )
     ){
-        alert('Anda tidak memiliki hak membuat paket');
+        alert(
+            'Anda tidak memiliki hak membuat paket'
+        );
         return;
     }
 
