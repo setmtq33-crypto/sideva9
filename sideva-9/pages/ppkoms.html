@@ -311,41 +311,100 @@ async function savePPKOM() {
 }
 
 async function loadPPKOMs() {
-    let query = window.supabaseClient.from("ppkoms").select("*").order("full_name");
-    if (profile.role !== "SUPER_ADMIN") query = query.eq("opd_id", profile.opd_id);
 
-    const { data, error } = await query;
-    const container = document.getElementById("ppkomList");
+    let query =
+        window.supabaseClient
+        .from("ppkoms")
+        .select("*")
+        .order(
+            "full_name"
+        );
 
-    if (error) {
-        container.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">Gagal memuat data.</td></tr>`;
-        return;
+    if(
+        profile.role !==
+        "SUPER_ADMIN"
+    ){
+        query =
+            query.eq(
+                "opd_id",
+                profile.opd_id
+            );
     }
 
-    if (!data || data.length === 0) {
-        container.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Belum ada data PPK / KPA.</td></tr>`;
-        return;
-    }
+    const {
+        data,
+        error
+    } = await query;
 
-    container.innerHTML = data.map(item => `
-        <tr>
-            <td class="ps-4 fw-bold text-dark">${item.full_name}</td>
-            <td class="text-secondary">${item.nip}</td>
-            <td>
-    ${
-        item.signature_url
-        ? `
-        <img
-            src="${item.signature_url}"
-            style="
-                height:50px;
-                max-width:120px;
-                object-fit:contain;
-            ">
+    const container =
+        document.getElementById(
+            "ppkomList"
+        );
+
+    if(error){
+
+        container.innerHTML =
         `
-        : '<span class="text-muted">-</span>'
+        <tr>
+            <td colspan="6"
+                class="text-center text-danger py-4">
+                Gagal memuat data.
+            </td>
+        </tr>
+        `;
+
+        return;
     }
-</td>
+
+    if(
+        !data ||
+        data.length === 0
+    ){
+
+        container.innerHTML =
+        `
+        <tr>
+            <td colspan="6"
+                class="text-center text-muted py-4">
+                Belum ada data PPK / KPA.
+            </td>
+        </tr>
+        `;
+
+        return;
+    }
+
+    container.innerHTML =
+    data.map(item => `
+        <tr>
+
+            <td class="ps-4 fw-bold text-dark">
+                ${item.full_name || '-'}
+            </td>
+
+            <td class="text-secondary">
+                ${item.nip || '-'}
+            </td>
+
+            <td>
+                ${item.position || '-'}
+            </td>
+
+            <td>
+                ${
+                    item.signature_url
+                    ? `
+                    <img
+                        src="${item.signature_url}"
+                        style="
+                            height:50px;
+                            max-width:120px;
+                            object-fit:contain;
+                        ">
+                    `
+                    : '<span class="text-muted">-</span>'
+                }
+            </td>
 
             <td>
                 ${
@@ -362,10 +421,33 @@ async function loadPPKOMs() {
                     : '<span class="text-muted">-</span>'
                 }
             </td>
+
             <td class="text-end pe-4">
-                <button class="btn btn-sm btn-warning" onclick="openEditModal('${item.id}', '${item.full_name}', '${item.nip}', '${item.position}', '${item.opd_id}')"><i class="bi bi-pencil-square"></i></button>
-                <button class="btn btn-sm btn-danger" onclick="deletePPKOM('${item.id}')"><i class="bi bi-trash"></i></button>
+
+                <button
+                    class="btn btn-sm btn-warning"
+                    onclick="openEditModal(
+                        '${item.id}',
+                        '${item.full_name}',
+                        '${item.nip}',
+                        '${item.position}',
+                        '${item.opd_id}'
+                    )">
+
+                    <i class="bi bi-pencil-square"></i>
+
+                </button>
+
+                <button
+                    class="btn btn-sm btn-danger"
+                    onclick="deletePPKOM('${item.id}')">
+
+                    <i class="bi bi-trash"></i>
+
+                </button>
+
             </td>
+
         </tr>
     `).join('');
 }
