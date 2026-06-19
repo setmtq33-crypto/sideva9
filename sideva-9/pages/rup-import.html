@@ -436,15 +436,16 @@ async function init(){
 
     // ADMIN OPD tidak perlu filter OPD
     if(
-        profile.role ===
-        'ADMIN_OPD'
-    ){
+        profile.role !==
+        'SUPER_ADMIN'
+    )
+    {
         document
             .getElementById('filterOpd')
             .closest('.col-md-6')
             .style.display =
             'none';
-
+    
         document
             .getElementById('searchRup')
             .closest('.col-md-6')
@@ -518,8 +519,9 @@ async function loadRupImports(){
         // Admin OPD hanya melihat data OPD sendiri
         if(
             profile &&
-            profile.role === 'ADMIN_OPD'
-        ){
+            profile.role !== 'SUPER_ADMIN'
+        )
+        {
             query =
                 query.eq(
                     'opd_id',
@@ -658,6 +660,13 @@ async function loadRupImports(){
 
 async function loadOpdFilter(){
 
+    if(
+        profile.role !==
+        'SUPER_ADMIN'
+    ){
+        return;
+    }
+    
     const {
         data
     } = await rupDb
@@ -683,6 +692,21 @@ async function loadOpdFilter(){
 
 async function loadOpdDropdown(){
 
+    if(
+        profile.role !==
+        'SUPER_ADMIN'
+    ){
+        document
+            .getElementById(
+                'opdName'
+            )
+            .closest('.mb-3')
+            .style.display =
+            'none';
+    
+        return;
+    }
+    
     const { data, error } =
         await rupDb
         .from('opds')
@@ -713,14 +737,14 @@ async function loadOpdDropdown(){
 
 async function saveRup(){
 
-        const rupNumber =
+    const rupNumber =
         document
         .getElementById(
             'rupNumber'
         )
         .value
         .trim();
-    
+
     const opdName =
         document
         .getElementById(
@@ -728,7 +752,7 @@ async function saveRup(){
         )
         .value
         .trim();
-    
+
     const packageName =
         document
         .getElementById(
@@ -736,21 +760,21 @@ async function saveRup(){
         )
         .value
         .trim();
-    
+
     const fiscalYear =
         document
         .getElementById(
             'fiscalYear'
         )
         .value;
-    
+
     const budgetCeiling =
         document
         .getElementById(
             'budgetCeiling'
         )
         .value;
-    
+
     const procurementMethod =
         document
         .getElementById(
@@ -758,7 +782,7 @@ async function saveRup(){
         )
         .value
         .trim();
-    
+
     const sourceUrl =
         document
         .getElementById(
@@ -766,134 +790,197 @@ async function saveRup(){
         )
         .value
         .trim();
-    
+
     if(
         !rupNumber ||
         !packageName
     ){
-    
         alert(
             'Kode RUP dan Nama Paket wajib diisi'
         );
-    
         return;
     }
-    
+
+    let opd_id = profile.opd_id;
+    let finalOpdName = opdName;
+
+    // SUPER ADMIN boleh pilih OPD
+    if(
+        profile.role ===
+        'SUPER_ADMIN'
+    ){
+
+        const {
+            data: opd
+        } = await rupDb
+        .from('opds')
+        .select(
+            'id,name,sirup_name'
+        )
+        .or(
+            `name.eq.${opdName},sirup_name.eq.${opdName}`
+        )
+        .single();
+
+        if(!opd){
+
+            alert(
+                'OPD tidak ditemukan'
+            );
+
+            return;
+        }
+
+        opd_id =
+            opd.id;
+
+        finalOpdName =
+            opd.name;
+
+    }else{
+
+        // selain SUPER_ADMIN pakai OPD login
+        const {
+            data: opd
+        } = await rupDb
+        .from('opds')
+        .select(
+            'id,name'
+        )
+        .eq(
+            'id',
+            profile.opd_id
+        )
+        .single();
+
+        if(opd){
+
+            finalOpdName =
+                opd.name;
+        }
+    }
+
     let query;
-    
+
     if(editingRupId){
-    
+
         query =
         rupDb
         .from('rup_imports')
         .update({
-    
+
+            opd_id:
+                opd_id,
+
             opd_name:
-                opdName,
-    
+                finalOpdName,
+
             rup_number:
                 rupNumber,
-    
+
             package_name:
                 packageName,
-    
+
             fiscal_year:
                 fiscalYear,
-    
+
             budget_ceiling:
                 budgetCeiling,
-    
+
             procurement_method:
                 procurementMethod,
-    
+
             source_url:
                 sourceUrl
-    
+
         })
         .eq(
             'id',
             editingRupId
         );
-    
+
     }else{
-    
+
         query =
         rupDb
         .from('rup_imports')
         .insert({
-    
+
             tenant_id:
                 profile.tenant_id,
-    
+
+            opd_id:
+                opd_id,
+
             opd_name:
-                opdName,
-    
+                finalOpdName,
+
             rup_number:
                 rupNumber,
-    
+
             package_name:
                 packageName,
-    
+
             fiscal_year:
                 fiscalYear,
-    
+
             budget_ceiling:
                 budgetCeiling,
-    
+
             procurement_method:
                 procurementMethod || 'ECATALOG',
-    
+
             source_url:
                 sourceUrl,
-    
+
             imported_by:
                 profile.id
-    
+
         });
-    
+
     }
-    
+
     const {
         error
-    } =
-    await query;
-    
+    } = await query;
+
     if(error){
-    
+
         alert(
             error.message
         );
-    
+
         return;
     }
-    
+
     await writeAuditLog(
-    
+
         'RUP_IMPORT',
-    
+
         editingRupId
             ? 'UPDATE'
             : 'CREATE',
-    
+
         editingRupId,
-    
+
         editingRupId
             ? `Update RUP ${rupNumber}`
             : `Import RUP ${rupNumber}`
-    
+
     );
 
-    
     clearForm();
-    
+
+    editingRupId = null;
+
     await loadRupImports();
-    
+
     alert(
-    
+
         editingRupId
         ? 'RUP berhasil diperbarui'
         : 'RUP berhasil disimpan'
-    
+
     );
 }
 
