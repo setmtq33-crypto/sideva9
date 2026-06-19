@@ -503,6 +503,15 @@ async function renderSidevaDocumentInternal(slug, pId) {
 
         if (itemsError) throw itemsError;
 
+        // TAMBAH DI SINI
+        const { data: procurementOfficer } = await documentDb
+            .from('procurement_officers')
+            .select('*')
+            .eq('opd_id', paket.opd_id);
+        
+        const pengadaan =
+            procurementOfficer?.[0] || null;
+        
         const { data: hpsData } = await documentDb
             .from('package_hps')
             .select('*')
@@ -1675,8 +1684,8 @@ async function renderSidevaDocumentInternal(slug, pId) {
                         Putussibau, ${tgl}<br>
                         Pejabat Pengadaan
                         <br><br><br><br><br>
-                        <strong>${ppk?.full_name || '-'}</strong><br>
-                        NIP. ${ppk?.nip || '-'}
+                        <strong>${pengadaan?.full_name || '-'}</strong><br>
+                        NIP. ${pengadaan?.nip || '-'}
                     </td>
                 </tr>
             </table>`;
