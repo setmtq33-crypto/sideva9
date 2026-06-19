@@ -2101,6 +2101,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 
                 <div style="font-size:10.5pt;text-align:justify;margin-bottom:30px;">Demikian Berita Acara Hasil Penetapan E-Purchasing ini dibuat dengan sebenarnya.</div>
         
+                // GANTI MULAI DARI SINI (Di akhir blok else if (slug === 'baep'))
                 <table style="width:100%;margin-top:30px;">
                     <tr>
                         <td style="width:50%;text-align:center;vertical-align:top;">
@@ -2116,6 +2117,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
                     </tr>
                 </table>`;
         } else {
+            // Ini adalah SATU-SATUNYA blok else penutup
             htmlOutput = `${kopHtml}
                 <div style="text-align:center; font-weight:bold; font-size:12pt; text-decoration:underline; margin-bottom:15px;">BERITA ACARA ADMINISTRASI ALUR KERJA (SIDEVA-V9)</div>
                 <p>Menerangkan dengan sah bahwa dokumen pengadaan instansi untuk paket <strong>${paket.package_name}</strong> dengan alokasi HPS senilai <strong>${docFmtRp(paket.budget_ceiling)}</strong> telah diperiksa melalui sistem otomasi berkas fisik.</p>
@@ -2127,22 +2129,8 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 </div>`;
         }
 
-        } else {
-            htmlOutput = `${kopHtml}
-                <div style="text-align:center; font-weight:bold; font-size:12pt; text-decoration:underline; margin-bottom:15px;">BERITA ACARA ADMINISTRASI ALUR KERJA (SIDEVA-V9)</div>
-                <p>Menerangkan dengan sah bahwa dokumen pengadaan instansi untuk paket <strong>${paket.package_name}</strong> dengan alokasi HPS senilai <strong>${docFmtRp(paket.budget_ceiling)}</strong> telah diperiksa melalui sistem otomasi berkas fisik.</p>
-                <p>Status Kelayakan administrasi dinyatakan: <strong style="color:green;">MEMENUHI SYARAT (VALID)</strong></p>
-                
-                <div style="margin-top:50px;display:flex;justify-content:space-between;">
-                    <div style="width:200px;"><strong>PPKom</strong><br><br><br><br>(........................)</div>
-                    <div style="width:200px;text-align:right;"><strong>Pejabat Pengadaan</strong><br><br><br><br>(........................)</div>
-                </div>`;
-        }
-
-        // ==========================================
-        // TAMBAHKAN KODE INI UNTUK MENUTUP FUNGSI
-        // ==========================================
-        targetDiv.innerHTML = htmlOutput; // Menampilkan hasil ke layar
+        // Tampilkan hasil ke layar
+        targetDiv.innerHTML = htmlOutput; 
 
     } catch (error) {
         console.error("Error rendering document:", error);
@@ -2153,14 +2141,10 @@ async function renderSidevaDocumentInternal(slug, pId) {
 // BATAS PENUTUP FUNGSI renderSidevaDocumentInternal
 // ==========================================
 
-
-// ─── STORAGE HANDLING BAWAAN ASLI ANDA ───
-// Hapus kode actionButtons di loadUploadedDocuments
-
-
 // ─── STORAGE HANDLING BAWAAN ASLI ANDA ───
 // Hapus kode actionButtons di loadUploadedDocuments
 // Pastikan loadUploadedDocuments Anda hanya seperti ini:
+
 async function loadUploadedDocuments() {
     if (!packageId) return;
     
