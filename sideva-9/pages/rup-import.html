@@ -494,7 +494,6 @@ async function loadRupImports(){
             .from('rup_imports')
             .select('*');
 
-        // ADMIN OPD hanya lihat RUP OPD sendiri
         if(
             profile &&
             profile.role === 'ADMIN_OPD'
@@ -506,7 +505,6 @@ async function loadRupImports(){
                 );
         }
 
-        // SUPER ADMIN lihat semua
         const {
             data,
             error
@@ -517,33 +515,100 @@ async function loadRupImports(){
             }
         );
 
-        if(error) throw error;
+        if(error){
+            throw error;
+        }
 
-        rupImports =
-            data || [];
+        let html = '';
 
-        renderRupTable();
+        if(
+            !data ||
+            data.length === 0
+        ){
+            html = `
+            <tr>
+                <td colspan="6"
+                    class="text-center text-muted">
+                    Tidak ada data RUP
+                </td>
+            </tr>`;
+        }
+        else{
 
-    }catch(err){
+            data.forEach(row => {
+
+                html += `
+                <tr>
+
+                    <td>
+                        ${row.rup_number || '-'}
+                    </td>
+
+                    <td>
+                        ${row.opd_name || '-'}
+                    </td>
+
+                    <td>
+                        ${row.package_name || '-'}
+                    </td>
+
+                    <td>
+                        ${new Intl.NumberFormat(
+                            'id-ID'
+                        ).format(
+                            row.budget_ceiling || 0
+                        )}
+                    </td>
+
+                    <td>
+                        ${row.procurement_method || '-'}
+                    </td>
+
+                    <td>
+
+                        <button
+                            class="btn btn-sm btn-warning"
+                            onclick="editRup('${row.id}')">
+
+                            Edit
+
+                        </button>
+
+                        <button
+                            class="btn btn-sm btn-danger"
+                            onclick="deleteRup('${row.id}')">
+
+                            Hapus
+
+                        </button>
+
+                    </td>
+
+                </tr>`;
+            });
+        }
+
+        document.getElementById(
+            'rupTable'
+        ).innerHTML = html;
+
+    }
+    catch(err){
 
         console.error(
             'loadRupImports error:',
             err
         );
 
-        rupImports = [];
-
-        renderRupTable();
-
-        if(
-            typeof showToast ===
-            'function'
-        ){
-            showToast(
-                'Gagal memuat data RUP',
-                'danger'
-            );
-        }
+        document.getElementById(
+            'rupTable'
+        ).innerHTML = `
+        <tr>
+            <td colspan="6"
+                class="text-center text-danger">
+                Gagal memuat data
+            </td>
+        </tr>`;
     }
 }
 
