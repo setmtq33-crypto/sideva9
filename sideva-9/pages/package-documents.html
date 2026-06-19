@@ -1991,14 +1991,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
             const efisiensi = Number(paket.budget_ceiling || 0) - totalNego;
         
             htmlOutput = kopHtml + `
-                <div style="text-align:center; font-size:14pt; font-weight:bold; text-decoration:underline; margin-bottom:15px;">BERITA ACARA HASIL PENETAPAN E-PURCHASING</div>
-                <table style="width:100%; font-size:10.5pt; margin-bottom:20px; border-collapse:collapse;">
-                    <tr>
-                        <td><strong>Nomor</strong></td>
-                        <td>:</td>
-                        <td>PP/${paket.rup_number || '...'}/BAHPE/${opd?.code || '...'}/2026</td>
-                    </tr>
-                </table>
+                
                     <div style="text-align:center;font-size:14pt;font-weight:bold;text-decoration:underline;margin-bottom:5px;">
                     BERITA ACARA HASIL PENETAPAN E-PURCHASING
                     </div>
