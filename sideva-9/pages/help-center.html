@@ -231,8 +231,11 @@ body{
         <i class="fa-solid fa-circle-question section-icon"></i>
         Frequently Asked Questions
     </div>
+
     <div class="card-body">
+
         <div class="accordion" id="faqAccordion">
+
             <div class="accordion-item">
                 <h2 class="accordion-header">
                     <button class="accordion-button"
@@ -241,6 +244,7 @@ body{
                         Siapa yang dapat menambah user?
                     </button>
                 </h2>
+
                 <div id="faq1"
                      class="accordion-collapse collapse show">
                     <div class="accordion-body">
@@ -248,6 +252,7 @@ body{
                     </div>
                 </div>
             </div>
+
             <div class="accordion-item">
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed"
@@ -256,6 +261,7 @@ body{
                         Mengapa menu berbeda?
                     </button>
                 </h2>
+
                 <div id="faq2"
                      class="accordion-collapse collapse">
                     <div class="accordion-body">
@@ -263,6 +269,7 @@ body{
                     </div>
                 </div>
             </div>
+
             <div class="accordion-item">
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed"
@@ -271,6 +278,7 @@ body{
                         Mengapa halaman tidak bisa dibuka?
                     </button>
                 </h2>
+
                 <div id="faq3"
                      class="accordion-collapse collapse">
                     <div class="accordion-body">
@@ -278,56 +286,86 @@ body{
                     </div>
                 </div>
             </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#faq4">
+                        Import JSON gagal, apa penyebabnya?
+                    </button>
+                </h2>
+
+                <div id="faq4"
+                     class="accordion-collapse collapse">
+                    <div class="accordion-body">
+
+                        Penyebab paling umum:
+
+                        <ul>
+                            <li>Data dicopy dari tab Preview.</li>
+                            <li>Data tidak dicopy dari tab Response.</li>
+                            <li>JSON tidak lengkap.</li>
+                            <li>Kurung pembuka { atau penutup } hilang.</li>
+                            <li>Response SIRUP belum selesai dimuat.</li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#faq5">
+                        Bagaimana cara Import RUP dari SIRUP?
+                    </button>
+                </h2>
+
+                <div id="faq5"
+                     class="accordion-collapse collapse">
+                    <div class="accordion-body">
+
+                        <ol>
+                            <li>Buka portal SIRUP.</li>
+                            <li>Tekan F12.</li>
+                            <li>Buka tab Network.</li>
+                            <li>Refresh halaman.</li>
+                            <li>Cari request data RUP.</li>
+                            <li>Klik tab Response.</li>
+                            <li>Copy Response.</li>
+                            <li>Paste ke Import JSON SI-DEVA9.</li>
+                            <li>Klik Import Data JSON.</li>
+                        </ol>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#faq6">
+                        Mengapa sidebar tidak muncul di PWA?
+                    </button>
+                </h2>
+
+                <div id="faq6"
+                     class="accordion-collapse collapse">
+                    <div class="accordion-body">
+
+                        Pada perangkat iPhone dan Android dengan layar kecil,
+                        sistem akan mengutamakan area kerja aplikasi.
+                        Gunakan Quick Action atau menu navigasi yang tersedia.
+
+                    </div>
+                </div>
+            </div>
+
         </div>
-    </div>
-</div>
 
-<div class="accordion-item">
-    <h2 class="accordion-header">
-        <button class="accordion-button collapsed"
-                data-bs-toggle="collapse"
-                data-bs-target="#faq4">
-            Import JSON gagal, apa penyebabnya?
-        </button>
-    </h2>
-
-    <div id="faq4"
-         class="accordion-collapse collapse">
-
-        <div class="accordion-body">
-
-            Penyebab paling umum:
-
-            <ul>
-                <li>Data dicopy dari tab Preview.</li>
-                <li>JSON tidak lengkap.</li>
-                <li>Kurung pembuka { atau penutup } hilang.</li>
-                <li>Response SIRUP belum selesai dimuat.</li>
-            </ul>
-
-        </div>
-    </div>
-</div>
-
-<div class="accordion-item">
-    <h2 class="accordion-header">
-        <button class="accordion-button collapsed"
-                data-bs-toggle="collapse"
-                data-bs-target="#faq5">
-            Mengapa sidebar tidak muncul di PWA?
-        </button>
-    </h2>
-
-    <div id="faq5"
-         class="accordion-collapse collapse">
-
-        <div class="accordion-body">
-
-            Pada layar kecil (iPhone dan Android),
-            beberapa menu disederhanakan untuk menghemat ruang layar.
-            Gunakan Quick Action dan menu navigasi yang tersedia.
-
-        </div>
     </div>
 </div>
     
