@@ -2228,43 +2228,112 @@ async function renderSidevaDocumentInternal(slug, pId) {
             </div>
 
             <table style="width:100%;margin-top:30px;">
+
             <tr>
             
             <td style="width:50%;text-align:center;vertical-align:top;">
+            
             Pejabat Pembuat Komitmen (PPKom)
+            
             <br>
+            
             ${opd?.name || ''}
+            
             <br><br><br><br><br>
             
             <strong><u>${ppkom?.full_name || ppk?.full_name || '-'}</u></strong>
+            
             <br>
+            
             NIP. ${ppkom?.nip || ppk?.nip || '-'}
+            
             </td>
             
             <td style="width:50%;text-align:center;vertical-align:top;">
+            
             Pejabat Pengadaan
+            
             <br>
+            
             ${opd?.name || ''}
+            
             <br><br><br><br><br>
             
             <strong><u>${ppk?.full_name || '-'}</u></strong>
+            
             <br>
+            
             NIP. ${ppk?.nip || '-'}
+            
             </td>
             
             </tr>
+            
             </table>
+            
+            `;
 
-         } else {
-            // Berkas Berita Acara Rangkuman Administrasi Umum Lainnya
-            htmlOutput = `${kopHtml}<div style="text-align:center; font-weight:bold; font-size:12pt; text-decoration:underline; margin-bottom:15px;">BERITA ACARA ADMINISTRASI ALUR KERJA (SIDEVA-V9)</div><p>Menerangkan dengan sah bahwa dokumen pengadaan instansi untuk paket <strong>${paket.package_name}</strong> dengan alokasi HPS senilai <strong>${docFmtRp(paket.budget_ceiling)}</strong> telah diperiksa melalui sistem otomasi berkas fisik.</p><p>Status Kelayakan administrasi dinyatakan: <strong style="color:green;">MEMENUHI SYARAT (VALID)</strong></p><div style="margin-top:50px; display:flex; justify-content:between;"><div style="width:200px;"><strong>PPKom</strong><br><br><br><br>(........................)</div><div style="width:200px; text-align:right;"><strong>Pejabat Pengadaan</strong><br><br><br><br>(........................)</div></div>`;
-        }
-
-        targetDiv.innerHTML = `<div class="bg-white text-dark p-5 mx-auto text-start shadow-lg" style="width:100%; max-width:760px; min-height:900px; font-family:'Times New Roman',Times,serif; font-size:11pt; line-height:1.5; color:#000;">${htmlOutput}</div>`;
-    } catch (e) { 
-        targetDiv.innerHTML = `<div class="alert alert-danger m-2 small">❌ Gagal memproses draf kertas: ${e.message}</div>`; 
-    }
-}
+             } else {
+    
+                htmlOutput = `${kopHtml}
+            
+                <div style="text-align:center; font-weight:bold; font-size:12pt; text-decoration:underline; margin-bottom:15px;">
+            
+                    BERITA ACARA ADMINISTRASI ALUR KERJA (SIDEVA-V9)
+            
+                </div>
+            
+                <p>
+            
+                    Menerangkan dengan sah bahwa dokumen pengadaan instansi untuk paket
+            
+                    <strong>${paket.package_name}</strong>
+            
+                    dengan alokasi HPS senilai
+            
+                    <strong>${docFmtRp(paket.budget_ceiling)}</strong>
+            
+                    telah diperiksa melalui sistem otomasi berkas fisik.
+            
+                </p>
+            
+                <p>
+            
+                    Status Kelayakan administrasi dinyatakan:
+            
+                    <strong style="color:green;">
+            
+                        MEMENUHI SYARAT (VALID)
+            
+                    </strong>
+            
+                </p>
+            
+                <div style="margin-top:50px;display:flex;justify-content:space-between;">
+            
+                    <div style="width:200px;">
+            
+                        <strong>PPKom</strong>
+            
+                        <br><br><br><br>
+            
+                        (........................)
+            
+                    </div>
+            
+                    <div style="width:200px;text-align:right;">
+            
+                        <strong>Pejabat Pengadaan</strong>
+            
+                        <br><br><br><br>
+            
+                        (........................)
+            
+                    </div>
+            
+                </div>`;
+            
+            }
 
 
 // ─── STORAGE HANDLING BAWAAN ASLI ANDA ───
