@@ -138,6 +138,50 @@
     </div>
 </nav>
 
+<div class="mobile-bottom-nav d-lg-none">
+
+    <a href="/pages/dashboard.html">
+
+        <i class="bi bi-speedometer2"></i>
+
+        <span>Home</span>
+
+    </a>
+
+    <a href="/pages/packages.html">
+
+        <i class="bi bi-box-seam"></i>
+
+        <span>Paket</span>
+
+    </a>
+
+    <a href="/pages/package-documents.html">
+
+        <i class="bi bi-file-earmark-text"></i>
+
+        <span>Dokumen</span>
+
+    </a>
+
+    <a href="/pages/rup-import.html">
+
+        <i class="bi bi-lightning-charge-fill"></i>
+
+        <span>RUP</span>
+
+    </a>
+
+    <a href="/pages/pengaturan.html">
+
+        <i class="bi bi-person-circle"></i>
+
+        <span>Akun</span>
+
+    </a>
+
+</div>
+
 <div class="mobile-sidebar-backdrop"
      onclick="closeSidebar()">
 </div>
@@ -331,6 +375,79 @@
 .notification-badge.has-alert{
     animation:notifPulse 2s infinite;
 }
+
+.mobile-bottom-nav{
+    display:none;
+}
+
+@media(max-width:991.98px){
+
+    .mobile-bottom-nav{
+
+        display:flex;
+
+        position:fixed;
+
+        bottom:0;
+
+        left:0;
+
+        right:0;
+
+        height:65px;
+
+        background:#ffffff;
+
+        border-top:1px solid #e5e7eb;
+
+        z-index:9999;
+
+        justify-content:space-around;
+
+        align-items:center;
+
+        box-shadow:0 -3px 10px rgba(0,0,0,.08);
+    }
+
+    .mobile-bottom-nav a{
+
+        flex:1;
+
+        text-decoration:none;
+
+        color:#64748b;
+
+        text-align:center;
+
+        font-size:.72rem;
+
+        display:flex;
+
+        flex-direction:column;
+
+        align-items:center;
+
+        justify-content:center;
+
+        gap:4px;
+    }
+
+    .mobile-bottom-nav i{
+
+        font-size:1.15rem;
+    }
+
+    .mobile-bottom-nav a:hover{
+
+        color:#1e3c72;
+    }
+
+    .content-body{
+
+        padding-bottom:90px;
+    }
+}
+    
     
 
 </style>
