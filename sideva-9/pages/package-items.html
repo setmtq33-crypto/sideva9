@@ -163,25 +163,96 @@ async function init(){
 }
 
 async function loadPackage(){
- const activeOpdId = getCurrentOpdId(profile);
 
-    const {data,error}=await itemDb
-    .from('packages')
-    .select('*')
-    .eq('id',packageId)
-   
-    .single();
- if(error) return console.error(error);
- packageData=data;
- document.getElementById('packageName').innerText=data.package_name;
- document.getElementById('budgetCeiling').innerText=rupiah(data.budget_ceiling);
+    let query =
+        itemDb
+        .from('packages')
+        .select('*')
+        .eq(
+            'id',
+            packageId
+        );
+
+    if(
+        profile.role !==
+        'SUPER_ADMIN'
+    ){
+        query =
+            query.eq(
+                'opd_id',
+                profile.opd_id
+            );
+    }
+
+    const {
+        data,
+        error
+    } =
+    await query.single();
+
+    if(error){
+
+        alert(
+            'Paket tidak ditemukan atau akses ditolak'
+        );
+
+        location.href =
+            'packages.html';
+
+        return;
+    }
+
+    packageData = data;
+
+    document.getElementById(
+        'packageName'
+    ).innerText =
+        data.package_name;
+
+    document.getElementById(
+        'budgetCeiling'
+    ).innerText =
+        rupiah(
+            data.budget_ceiling
+        );
 }
 
 async function loadItems(){
- const {data,error}=await itemDb.from('package_items').select('*').eq('package_id',packageId);
- if(error) return console.error(error);
- items=data||[];
- render(items);
+
+    let query =
+        itemDb
+        .from('package_items')
+        .select('*')
+        .eq(
+            'package_id',
+            packageId
+        );
+
+    if(
+        profile.role !==
+        'SUPER_ADMIN'
+    ){
+        query =
+            query.eq(
+                'opd_id',
+                profile.opd_id
+            );
+    }
+
+    const {
+        data,
+        error
+    } = await query;
+
+    if(error){
+        console.error(error);
+        return;
+    }
+
+    items =
+        data || [];
+
+    render(items);
 }
 
 function render(rows){
@@ -284,99 +355,114 @@ function editItem(id){
 }
 
 async function saveItem(){
-     const itemId =
+
+    const itemId =
         document.getElementById(
             "itemId"
         ).value;
-    
+
     const payload = {
-    
+
+        tenant_id:
+            profile.tenant_id,
+
+        opd_id:
+            packageData.opd_id,
+
         package_id:
             packageId,
-    
+
         item_name:
             document.getElementById(
                 "itemName"
             ).value,
-    
+
         specification:
             document.getElementById(
                 "specification"
             ).value,
-    
+
         quantity:
             Number(
                 document.getElementById(
                     "quantity"
                 ).value || 0
             ),
-    
+
         unit:
             document.getElementById(
                 "unit"
             ).value,
-    
+
         estimated_price:
             Number(
                 document.getElementById(
                     "estimatedPrice"
                 ).value || 0
             )
-    
+
     };
-    
+
     let result;
-    
+
     if(itemId){
-    
-            result =
-                await itemDb
-                    .from("package_items")
-                    .update(payload)
-                    .eq("id", itemId);
-        
-        } else {
-        
-            result =
-                await itemDb
-                    .from("package_items")
-                    .insert(payload);
-        
-        }
-        
-        if(result.error){
-        
-            console.error(result.error);
-        
-            alert(result.error.message);
-        
-            return;
-        }
-        
-        modal.hide();
-        
-        if(itemId){
-    
-        await sendNotification(
-            'ITEM_UPDATED',
-            'Rincian Diperbarui',
-            payload.item_name
-        );
-    
+
+        result =
+            await itemDb
+                .from("package_items")
+                .update(payload)
+                .eq("id", itemId);
+
     }else{
-    
-        await sendNotification(
-            'ITEM_CREATED',
-            'Rincian Baru',
-            payload.item_name
-        );
-    
+
+        result =
+            await itemDb
+                .from("package_items")
+                .insert(payload);
+
     }
-    
+
+    if(result.error){
+
+        console.error(
+            result.error
+        );
+
+        alert(
+            result.error.message
+        );
+
+        return;
+    }
+
+    try{
+
+        if(itemId){
+
+            await sendNotification(
+                'ITEM_UPDATED',
+                'Rincian Diperbarui',
+                payload.item_name
+            );
+
+        }else{
+
+            await sendNotification(
+                'ITEM_CREATED',
+                'Rincian Baru',
+                payload.item_name
+            );
+
+        }
+
+    }catch(e){
+        console.warn(e);
+    }
+
     modal.hide();
-    
+
     await loadItems();
-    
+
     alert(
         itemId
         ? "Item berhasil diperbarui"
