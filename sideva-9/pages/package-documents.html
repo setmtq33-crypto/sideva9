@@ -1999,23 +1999,20 @@ async function renderSidevaDocumentInternal(slug, pId) {
                         <td>PP/${paket.rup_number || '...'}/BAHPE/${opd?.code || '...'}/2026</td>
                     </tr>
                 </table>
-                    <tr>
-                    <td><strong>Program</strong></td>
-                    <td style="text-align:center;">:</td>
-                    <td>${formatSipd(paket.program)}</td>
-                </tr>
-        
-                <tr>
-                    <td><strong>Kegiatan</strong></td>
-                    <td style="text-align:center;">:</td>
-                    <td>${formatSipd(paket.kegiatan)}</td>
-                </tr>
-        
-                <tr>
-                    <td><strong>Sub Kegiatan</strong></td>
-                    <td style="text-align:center;">:</td>
-                    <td>${formatSipd(paket.sub_kegiatan)}</td>
-                </tr>
+                    <div style="text-align:center;font-size:14pt;font-weight:bold;text-decoration:underline;margin-bottom:5px;">
+                    BERITA ACARA HASIL PENETAPAN E-PURCHASING
+                    </div>
+                    
+                    <div style="text-align:center;font-size:11pt;margin-bottom:20px;">
+                    Nomor : PP/${paket.rup_number || '........'}/BAHPE/${opd?.code || '...'}/2026
+                    </div>
+                    
+                    <div style="font-size:10.5pt;text-align:justify;line-height:1.6;margin-bottom:20px;">
+                    Pada hari ini ${tgl}, yang bertandatangan di bawah ini selaku
+                    Pejabat Pengadaan pada <strong>${opd?.name || '-'}</strong>
+                    telah melaksanakan Penetapan Penyedia melalui E-Purchasing,
+                    dengan hasil sebagai berikut :
+                    </div>
         
                 <tr>
                     <td><strong>Nama Paket</strong></td>
