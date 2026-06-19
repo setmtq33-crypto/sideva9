@@ -102,6 +102,18 @@ async function loadLayout() {
 }
 window.loadLayout = loadLayout;
 
+document.addEventListener('click', function(e){
+
+    if(e.target.closest('#sidebarToggle')){
+        document.body.classList.toggle('sidebar-open');
+    }
+
+});
+
+window.closeSidebar = function(){
+    document.body.classList.remove('sidebar-open');
+}
+
 // Fungsi terpicu otomatis saat dropdown topbar diubah
 window.handleGlobalOpdChange = function() {
     const opdSelect = document.getElementById('globalOpdSelect');
