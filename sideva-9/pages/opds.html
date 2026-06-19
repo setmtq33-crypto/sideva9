@@ -89,16 +89,26 @@ class="form-control">
 
 </div>
 
-<div class="col-md-6">
+<div class="col-md-4">
 
 <label>
-
 Nama OPD
-
 </label>
 
 <input
 id="name"
+class="form-control">
+
+</div>
+
+<div class="col-md-5">
+
+<label>
+Nama SIRUP
+</label>
+
+<input
+id="sirup_name"
 class="form-control">
 
 </div>
@@ -224,6 +234,26 @@ async function init(){
     await loadOpds();
 }
 
+document
+.getElementById('name')
+.addEventListener(
+    'input',
+    function(){
+
+        const sirup =
+        document.getElementById(
+            'sirup_name'
+        );
+
+        if(
+            !sirup.value
+        ){
+            sirup.value =
+                this.value;
+        }
+    }
+);
+
 async function loadOpds(){
 
     const {
@@ -284,7 +314,8 @@ async function loadOpds(){
                 onclick="editOpd(
                     '${opd.id}',
                     '${opd.code}',
-                    '${opd.name}'
+                    '${opd.name}',
+                    '${opd.sirup_name || ''}'
                 )">
 
                 Edit
@@ -340,17 +371,19 @@ async function saveOpd(){
 
     const opdCode =
         document
-        .getElementById(
-            'code'
-        )
+        .getElementById('code')
         .value
         .trim();
 
     const opdName =
         document
-        .getElementById(
-            'name'
-        )
+        .getElementById('name')
+        .value
+        .trim();
+
+    const sirupName =
+        document
+        .getElementById('sirup_name')
         .value
         .trim();
 
@@ -358,11 +391,9 @@ async function saveOpd(){
         !opdCode ||
         !opdName
     ){
-
         alert(
             'Kode dan Nama OPD wajib diisi'
         );
-
         return;
     }
 
@@ -379,7 +410,10 @@ async function saveOpd(){
                 opdCode,
 
             name:
-                opdName
+                opdName,
+
+            sirup_name:
+                sirupName || opdName
 
         })
         .eq(
@@ -388,15 +422,10 @@ async function saveOpd(){
         );
 
         await writeAuditLog(
-
             'OPD',
-
             'UPDATE',
-
             editId,
-
             'Update OPD'
-
         );
 
     }else{
@@ -407,8 +436,7 @@ async function saveOpd(){
         .insert({
 
             tenant_id:
-                currentProfile
-                .tenant_id,
+                currentProfile.tenant_id,
 
             code:
                 opdCode,
@@ -416,27 +444,23 @@ async function saveOpd(){
             name:
                 opdName,
 
+            sirup_name:
+                sirupName || opdName,
+
             is_active:
                 true
 
         });
 
         await writeAuditLog(
-
             'OPD',
-
             'CREATE',
-
             null,
-
             'Tambah OPD'
-
         );
     }
 
-    if(
-        result.error
-    ){
+    if(result.error){
 
         alert(
             result.error.message
@@ -445,17 +469,17 @@ async function saveOpd(){
         return;
     }
 
-    document
-    .getElementById(
+    document.getElementById(
         'code'
-    )
-    .value = '';
+    ).value='';
 
-    document
-    .getElementById(
+    document.getElementById(
         'name'
-    )
-    .value = '';
+    ).value='';
+
+    document.getElementById(
+        'sirup_name'
+    ).value='';
 
     editId = null;
 
@@ -469,32 +493,30 @@ async function saveOpd(){
 function editOpd(
     id,
     codeValue,
-    nameValue
+    nameValue,
+    sirupValue
 ){
 
-    editId =
-        id;
+    editId = id;
 
     document
-    .getElementById(
-        'code'
-    )
+    .getElementById('code')
     .value =
         codeValue;
 
     document
-    .getElementById(
-        'name'
-    )
+    .getElementById('name')
     .value =
         nameValue;
 
+    document
+    .getElementById('sirup_name')
+    .value =
+        sirupValue || '';
+
     window.scrollTo({
-
         top:0,
-
         behavior:'smooth'
-
     });
 }
 
