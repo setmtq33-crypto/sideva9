@@ -2101,7 +2101,7 @@ async function renderSidevaDocumentInternal(slug, pId) {
                 
                 <div style="font-size:10.5pt;text-align:justify;margin-bottom:30px;">Demikian Berita Acara Hasil Penetapan E-Purchasing ini dibuat dengan sebenarnya.</div>
         
-                // GANTI MULAI DARI SINI (Di akhir blok else if (slug === 'baep'))
+                
                 <table style="width:100%;margin-top:30px;">
                     <tr>
                         <td style="width:50%;text-align:center;vertical-align:top;">
@@ -2111,8 +2111,8 @@ async function renderSidevaDocumentInternal(slug, pId) {
                         </td>
                         <td style="width:50%;text-align:center;vertical-align:top;">
                             Pejabat Pengadaan<br>${opd?.name || ''}<br><br><br><br><br>
-                            <strong><u>${ppk?.full_name || '-'}</u></strong><br>
-                            NIP. ${ppk?.nip || '-'}
+                            <strong><u>${pengadaan?.full_name || '-'}</u></strong><br>
+                            NIP. ${pengadaan?.nip || '-'}
                         </td>
                     </tr>
                 </table>`;
