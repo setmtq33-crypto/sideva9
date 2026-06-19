@@ -375,6 +375,47 @@ body {
                         </div>
                     
                     </div>
+
+
+                    <div class="col-lg-6">
+
+                        <div class="card h-100">
+                    
+                            <div class="card-header">
+                                <i class="fa-solid fa-chart-line text-success"></i>
+                                Efisiensi per OPD
+                            </div>
+                    
+                            <div class="card-body p-0">
+                    
+                                <div class="table-responsive">
+                    
+                                    <table class="table table-hover mb-0">
+                    
+                                        <thead class="table-light">
+                    
+                                            <tr>
+                                                <th width="60">Rank</th>
+                                                <th>OPD</th>
+                                                <th>Efisiensi</th>
+                                            </tr>
+                    
+                                        </thead>
+                    
+                                        <tbody id="efficiencyTable">
+                    
+                                        </tbody>
+                    
+                                    </table>
+                    
+                                </div>
+                    
+                            </div>
+                    
+                        </div>
+                    
+                    </div>
+                    
                 
                     <div class="col-lg-6">
                 
@@ -706,6 +747,8 @@ async function init(){
     await loadOpdRanking();
 
     await loadPackageRanking();
+
+    await loadEfficiencyRanking();
     
     await loadStatus();
     
@@ -1118,6 +1161,121 @@ async function loadPackageRanking(){
 
         console.error(
             'loadPackageRanking:',
+            err
+        );
+    }
+}
+
+
+async function loadEfficiencyRanking(){
+
+    try{
+
+        const { data: opds } =
+        await dashboardDb
+        .from('opds')
+        .select('id,name');
+
+        const { data: packages } =
+        await dashboardDb
+        .from('packages')
+        .select(
+            'opd_id,budget_ceiling'
+        );
+
+        const { data: hps } =
+        await dashboardDb
+        .from('package_hps')
+        .select(
+            'opd_id,total_hps'
+        );
+
+        const ranking = [];
+
+        (opds || []).forEach(opd=>{
+
+            const totalBudget =
+            (packages || [])
+            .filter(
+                p =>
+                p.opd_id === opd.id
+            )
+            .reduce(
+                (a,b)=>
+                a +
+                Number(
+                    b.budget_ceiling || 0
+                ),
+                0
+            );
+
+            const totalHps =
+            (hps || [])
+            .filter(
+                h =>
+                h.opd_id === opd.id
+            )
+            .reduce(
+                (a,b)=>
+                a +
+                Number(
+                    b.total_hps || 0
+                ),
+                0
+            );
+
+            ranking.push({
+
+                opd_name:
+                    opd.name,
+
+                efficiency:
+                    totalBudget - totalHps
+
+            });
+
+        });
+
+        ranking.sort(
+            (a,b)=>
+            b.efficiency -
+            a.efficiency
+        );
+
+        document.getElementById(
+            'efficiencyTable'
+        ).innerHTML =
+
+        ranking.map(
+            (row,index)=>`
+            <tr>
+
+                <td>
+                    <span class="badge bg-success">
+                        ${index+1}
+                    </span>
+                </td>
+
+                <td>
+                    <strong>
+                        ${row.opd_name}
+                    </strong>
+                </td>
+
+                <td class="fw-bold text-success">
+                    ${rupiah(
+                        row.efficiency
+                    )}
+                </td>
+
+            </tr>
+            `
+        ).join('');
+
+    }catch(err){
+
+        console.error(
+            'loadEfficiencyRanking',
             err
         );
     }
