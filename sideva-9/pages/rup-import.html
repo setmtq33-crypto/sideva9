@@ -359,7 +359,8 @@ textarea.form-control:focus {
     <div class="card-body">
 
         <div class="row mb-3">
-            <div class="col-md-6">
+
+            <div class="col-md-6 mb-2">
                 <input
                     type="text"
                     id="searchRup"
@@ -367,6 +368,15 @@ textarea.form-control:focus {
                     placeholder="Cari Kode RUP / Nama Paket..."
                 >
             </div>
+        
+            <div class="col-md-6 mb-2">
+                <select
+                    id="filterOpd"
+                    class="form-select">
+                    <option value="">Semua OPD</option>
+                </select>
+            </div>
+        
         </div>
     
         <div class="table-responsive">
@@ -430,6 +440,7 @@ async function init(){
         saveRup;
 
     await loadRupImports();
+    await loadOpdFilter();
 
     document
     .getElementById(
@@ -458,6 +469,13 @@ async function init(){
         'input',
         filterRupTable
     )
+
+    document
+    .getElementById('filterOpd')
+    ?.addEventListener(
+        'change',
+        filterRupTable
+    );
     
 }
 
@@ -560,6 +578,32 @@ async function loadRupImports(){
         .innerHTML =
         html;
 }
+
+async function loadOpdFilter(){
+
+    const {
+        data
+    } = await rupDb
+        .from('opds')
+        .select('name')
+        .order('name');
+
+    let html =
+        '<option value="">Semua OPD</option>';
+
+    (data || []).forEach(opd => {
+
+        html += `
+        <option value="${opd.name}">
+            ${opd.name}
+        </option>`;
+    });
+
+    document
+        .getElementById('filterOpd')
+        .innerHTML = html;
+}
+
 
 async function saveRup(){
 
@@ -905,21 +949,31 @@ function filterRupTable(){
         .value
         .toLowerCase();
 
+    const opdFilter =
+        document
+        .getElementById('filterOpd')
+        .value
+        .toLowerCase();
+
     document
         .querySelectorAll('#rupTable tr')
-        .forEach(row=>{
+        .forEach(row => {
 
             const text =
-                row.innerText
-                .toLowerCase();
+                row.innerText.toLowerCase();
+
+            const cocokCari =
+                text.includes(keyword);
+
+            const cocokOpd =
+                !opdFilter ||
+                text.includes(opdFilter);
 
             row.style.display =
-                text.includes(keyword)
+                (cocokCari && cocokOpd)
                 ? ''
                 : 'none';
-
         });
-
 }
 
 async function editRup(id){
