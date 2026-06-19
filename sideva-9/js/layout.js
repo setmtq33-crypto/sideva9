@@ -134,6 +134,20 @@ window.getActiveOpdId = function(profile) {
     return profile.opd_id; // Ambil dari asal instansi jika bukan Super Admin
 }
 
+function toggleMobileFab(){
+
+    const menu =
+    document.getElementById(
+        'mobileFabMenu'
+    );
+
+    if(!menu) return;
+
+    menu.classList.toggle(
+        'show'
+    );
+}
+
 function toggleAppTheme() {
     const body = document.body;
     body.classList.toggle('dark-mode');
