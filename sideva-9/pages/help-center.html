@@ -162,7 +162,7 @@ body{
 <div class="card" id="workflow">
     <div class="card-header bg-warning">
         <i class="fa-solid fa-diagram-project section-icon"></i>
-        Alur Kerja SI-DEVA9
+        Alur Kerja SI-DEVA v9
     </div>
     <div class="card-body">
         <ol>
@@ -178,6 +178,40 @@ body{
         </ol>
     </div>
 </div>
+
+<div class="card">
+    <div class="card-header bg-danger text-white">
+        <i class="fa-solid fa-screwdriver-wrench section-icon"></i>
+        Panduan Teknis SI-DEVA9
+    </div>
+
+    <div class="card-body">
+
+        <h6 class="fw-bold">Import RUP dari SIRUP</h6>
+
+        <ol>
+            <li>Buka portal SIRUP LKPP.</li>
+            <li>Cari paket RUP yang akan diimpor.</li>
+            <li>Tekan F12 pada browser.</li>
+            <li>Buka tab <strong>Network</strong>.</li>
+            <li>Refresh halaman RUP.</li>
+            <li>Cari request yang berisi data RUP.</li>
+            <li>Klik request tersebut.</li>
+            <li>Buka tab <strong>Response</strong>.</li>
+            <li>Klik kanan → <strong>Copy Response</strong>.</li>
+            <li>Buka menu Import RUP SI-DEVA9.</li>
+            <li>Paste ke kolom <strong>Import JSON SIRUP</strong>.</li>
+            <li>Klik <strong>Import Data JSON</strong>.</li>
+        </ol>
+
+        <div class="alert alert-warning mt-3">
+            Jangan menyalin data dari tab Preview.
+            Gunakan tab Response agar format JSON tetap valid.
+        </div>
+
+    </div>
+</div>
+    
 <div class="card" id="status">
     <div class="card-header bg-info text-white">
         <i class="fa-solid fa-list-check section-icon"></i>
@@ -247,6 +281,57 @@ body{
         </div>
     </div>
 </div>
+
+<div class="accordion-item">
+    <h2 class="accordion-header">
+        <button class="accordion-button collapsed"
+                data-bs-toggle="collapse"
+                data-bs-target="#faq4">
+            Import JSON gagal, apa penyebabnya?
+        </button>
+    </h2>
+
+    <div id="faq4"
+         class="accordion-collapse collapse">
+
+        <div class="accordion-body">
+
+            Penyebab paling umum:
+
+            <ul>
+                <li>Data dicopy dari tab Preview.</li>
+                <li>JSON tidak lengkap.</li>
+                <li>Kurung pembuka { atau penutup } hilang.</li>
+                <li>Response SIRUP belum selesai dimuat.</li>
+            </ul>
+
+        </div>
+    </div>
+</div>
+
+<div class="accordion-item">
+    <h2 class="accordion-header">
+        <button class="accordion-button collapsed"
+                data-bs-toggle="collapse"
+                data-bs-target="#faq5">
+            Mengapa sidebar tidak muncul di PWA?
+        </button>
+    </h2>
+
+    <div id="faq5"
+         class="accordion-collapse collapse">
+
+        <div class="accordion-body">
+
+            Pada layar kecil (iPhone dan Android),
+            beberapa menu disederhanakan untuk menghemat ruang layar.
+            Gunakan Quick Action dan menu navigasi yang tersedia.
+
+        </div>
+    </div>
+</div>
+    
+    
 <div class="card">
     <div class="card-header bg-dark text-white">
         <i class="fa-solid fa-headset section-icon"></i>
@@ -258,5 +343,9 @@ body{
 </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
+
 </body>
 </html>
