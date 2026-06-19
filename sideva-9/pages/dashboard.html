@@ -338,6 +338,43 @@ body {
                         </div>
                 
                     </div>
+
+                    <div class="col-lg-6">
+
+                        <div class="card h-100">
+                    
+                            <div class="card-header">
+                                <i class="fa-solid fa-boxes-stacked text-success"></i>
+                                Ranking OPD Berdasarkan Jumlah Paket
+                            </div>
+                    
+                            <div class="card-body p-0">
+                    
+                                <div class="table-responsive">
+                    
+                                    <table class="table table-hover mb-0">
+                    
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th width="60">Rank</th>
+                                                <th>OPD</th>
+                                                <th>Jumlah Paket</th>
+                                            </tr>
+                                        </thead>
+                    
+                                        <tbody id="rankingPackageTable">
+                    
+                                        </tbody>
+                    
+                                    </table>
+                    
+                                </div>
+                    
+                            </div>
+                    
+                        </div>
+                    
+                    </div>
                 
                     <div class="col-lg-6">
                 
@@ -667,6 +704,8 @@ async function init(){
     await loadTopPackages();
 
     await loadOpdRanking();
+
+    await loadPackageRanking();
     
     await loadStatus();
     
@@ -1026,6 +1065,65 @@ async function loadOpdRanking(){
         );
     }
 }
+
+async function loadPackageRanking(){
+
+    try{
+
+        const { data, error } =
+        await dashboardDb
+        .from('dashboard_opd_summary')
+        .select('*')
+        .order(
+            'total_packages',
+            { ascending:false }
+        );
+
+        if(error) throw error;
+
+        let html = '';
+
+        (data || []).forEach(
+            (row,index)=>{
+
+                html += `
+                <tr>
+
+                    <td>
+                        <span class="badge bg-success">
+                            ${index + 1}
+                        </span>
+                    </td>
+
+                    <td>
+                        <strong>
+                            ${row.opd_name}
+                        </strong>
+                    </td>
+
+                    <td class="fw-bold">
+                        ${row.total_packages || 0}
+                    </td>
+
+                </tr>
+                `;
+            }
+        );
+
+        document.getElementById(
+            'rankingPackageTable'
+        ).innerHTML = html;
+
+    }catch(err){
+
+        console.error(
+            'loadPackageRanking:',
+            err
+        );
+    }
+}
+
+    
 
 // INTEGRASI SELECTOR OPD GLOBAL PADA TABEL STATUS ALUR KERJA
 async function loadStatus(){
