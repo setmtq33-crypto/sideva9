@@ -434,6 +434,24 @@ async function init(){
         return;
     }
 
+    // ADMIN OPD tidak perlu filter OPD
+    if(
+        profile.role ===
+        'ADMIN_OPD'
+    ){
+        document
+            .getElementById('filterOpd')
+            .closest('.col-md-6')
+            .style.display =
+            'none';
+
+        document
+            .getElementById('searchRup')
+            .closest('.col-md-6')
+            .className =
+            'col-md-12 mb-2';
+    }
+
     document
         .getElementById(
             'saveBtn'
@@ -446,40 +464,43 @@ async function init(){
     await loadOpdDropdown();
 
     document
-    .getElementById(
-        'syncSirupBtn'
-    )
-    .onclick =
-    syncSirup;
+        .getElementById(
+            'syncSirupBtn'
+        )
+        .onclick =
+        syncSirup;
 
     document
-    .getElementById(
-        'importJsonBtn'
-    )
-    .onclick =
-    importSirupJson;
+        .getElementById(
+            'importJsonBtn'
+        )
+        .onclick =
+        importSirupJson;
 
     document
-    .getElementById(
-        'searchSatkerBtn'
-    )
-    .onclick =
-    tarikSatker;
+        .getElementById(
+            'searchSatkerBtn'
+        )
+        .onclick =
+        tarikSatker;
 
     document
-    .getElementById('searchRup')
-    ?.addEventListener(
-        'input',
-        filterRupTable
-    )
+        .getElementById(
+            'searchRup'
+        )
+        ?.addEventListener(
+            'input',
+            filterRupTable
+        );
 
     document
-    .getElementById('filterOpd')
-    ?.addEventListener(
-        'change',
-        filterRupTable
-    );
-    
+        .getElementById(
+            'filterOpd'
+        )
+        ?.addEventListener(
+            'change',
+            filterRupTable
+        );
 }
 
 async function loadRupImports(){
