@@ -123,6 +123,10 @@
     </div>
 </nav>
 
+<div class="mobile-sidebar-backdrop"
+     onclick="closeSidebar()">
+</div>
+
 <style>
     :root { --sidebar-width: 256px; }
     
@@ -231,6 +235,37 @@
             transform: translate3d(0, 0, 0); 
         }
     }
+
+.mobile-sidebar-backdrop{
+    display:none;
+}
+
+@media (max-width:991.98px){
+
+    .mobile-sidebar-backdrop{
+        display:block;
+        position:fixed;
+        top:0;
+        left:0;
+        right:0;
+        bottom:0;
+        background:rgba(0,0,0,.45);
+        z-index:1040;
+
+        opacity:0;
+        pointer-events:none;
+
+        transition:.25s;
+    }
+
+    body.sidebar-open .mobile-sidebar-backdrop{
+        opacity:1;
+        pointer-events:auto;
+    }
+
+}
+
+
 </style>
 
 <script>
