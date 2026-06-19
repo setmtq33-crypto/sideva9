@@ -2000,30 +2000,34 @@ async function renderSidevaDocumentInternal(slug, pId) {
                     </tr>
                 </table>
                     <tr>
-                        <td style="padding:3px; vertical-align:top;"><strong>Program</strong></td>
-                        <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
-                        <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.program)}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding:3px; vertical-align:top;"><strong>Kegiatan</strong></td>
-                        <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
-                        <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.kegiatan)}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding:3px; vertical-align:top;"><strong>Sub Kegiatan</strong></td>
-                        <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
-                        <td style="padding:3px; vertical-align:top; text-align:justify;">${formatSipd(paket.sub_kegiatan)}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding:3px; vertical-align:top;"><strong>Nama Paket</strong></td>
-                        <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
-                        <td style="padding:3px; vertical-align:top; text-align:justify;">${paket.package_name || '-'}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding:3px; vertical-align:top;"><strong>Pagu Anggaran</strong></td>
-                        <td style="padding:3px; vertical-align:top; text-align:center;">:</td>
-                        <td style="padding:3px; vertical-align:top; text-align:justify;">${docFmtRp(paket.budget_ceiling)}</td>
-                    </tr>
+                    <td><strong>Program</strong></td>
+                    <td style="text-align:center;">:</td>
+                    <td>${formatSipd(paket.program)}</td>
+                </tr>
+        
+                <tr>
+                    <td><strong>Kegiatan</strong></td>
+                    <td style="text-align:center;">:</td>
+                    <td>${formatSipd(paket.kegiatan)}</td>
+                </tr>
+        
+                <tr>
+                    <td><strong>Sub Kegiatan</strong></td>
+                    <td style="text-align:center;">:</td>
+                    <td>${formatSipd(paket.sub_kegiatan)}</td>
+                </tr>
+        
+                <tr>
+                    <td><strong>Nama Paket</strong></td>
+                    <td style="text-align:center;">:</td>
+                    <td>${paket.package_name || '-'}</td>
+                </tr>
+        
+                <tr>
+                    <td><strong>Pagu</strong></td>
+                    <td style="text-align:center;">:</td>
+                    <td>${docFmtRp(paket.budget_ceiling)}</td>
+                </tr>
                 </table>
         
                 <div style="font-weight:bold; margin-bottom:10px;">A. DATA UMUM</div>
