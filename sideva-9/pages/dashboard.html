@@ -614,11 +614,17 @@ async function init(){
 
     // Jalankan pemuatan data bawaan dashboard Anda
     await loadKPI();
-    await loadStatus();
-    await loadOpdSummary();
-    await loadRecentPackages();
 
+    await loadTopPackages();
+    
+    await loadStatus();
+    
+    await loadOpdSummary();
+    
+    await loadRecentPackages();
+    
     await loadBudgetChart();
+    
     await loadStatusChart();
 
 
@@ -790,6 +796,126 @@ async function loadKPI(){
         bidangCount || 0;
     
     }
+
+async function loadTopPackages(){
+
+    try{
+
+        let selectedOpd =
+            localStorage.getItem(
+                'global_opd_id'
+            ) || 'ALL';
+
+        const profile =
+            await getProfile();
+
+        if(
+            profile?.role ===
+            'ADMIN_OPD'
+        ){
+            selectedOpd =
+                profile.opd_id;
+        }
+
+        let query =
+            dashboardDb
+            .from('packages')
+            .select(`
+                package_name,
+                budget_ceiling,
+                package_status,
+                opd_id
+            `)
+            .order(
+                'budget_ceiling',
+                { ascending:false }
+            )
+            .limit(10);
+
+        if(
+            selectedOpd !== 'ALL'
+        ){
+            query =
+                query.eq(
+                    'opd_id',
+                    selectedOpd
+                );
+        }
+
+        const {
+            data: packages,
+            error
+        } = await query;
+
+        if(error) throw error;
+
+        const {
+            data: opds
+        } = await dashboardDb
+        .from('opds')
+        .select(
+            'id,name'
+        );
+
+        const opdMap = {};
+
+        (opds || []).forEach(
+            o => {
+                opdMap[o.id] =
+                    o.name;
+            }
+        );
+
+        document.getElementById(
+            'topPackagesTable'
+        ).innerHTML =
+        (packages || [])
+        .map(pkg => `
+            <tr>
+                <td>
+                    <strong>
+                        ${pkg.package_name || '-'}
+                    </strong>
+                </td>
+
+                <td>
+                    ${opdMap[pkg.opd_id] || '-'}
+                </td>
+
+                <td class="fw-bold text-primary">
+                    ${rupiah(
+                        pkg.budget_ceiling || 0
+                    )}
+                </td>
+
+                <td>
+                    <span class="badge bg-secondary">
+                        ${pkg.package_status || 'DRAFT'}
+                    </span>
+                </td>
+            </tr>
+        `).join('');
+
+    }catch(err){
+
+        console.error(
+            'loadTopPackages error:',
+            err
+        );
+
+        document.getElementById(
+            'topPackagesTable'
+        ).innerHTML =
+        `
+        <tr>
+            <td colspan="4"
+                class="text-center text-danger">
+                Gagal memuat data paket
+            </td>
+        </tr>
+        `;
+    }
+}
 
 // INTEGRASI SELECTOR OPD GLOBAL PADA TABEL STATUS ALUR KERJA
 async function loadStatus(){
