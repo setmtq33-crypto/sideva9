@@ -97,3 +97,76 @@ body {
   .adaptive-sidebar, .topbar-fluid { display: none !important; }
   .main-content { margin-left: 0 !important; }
 }
+
+/* ===== SIDEVA9 MOBILE OPTIMIZATION ===== */
+
+@media (max-width:768px){
+
+.container-fluid{
+    padding:10px !important;
+}
+
+.card{
+    border-radius:12px !important;
+}
+
+.card-header{
+    padding:12px !important;
+    font-size:.9rem !important;
+}
+
+.kpi{
+    font-size:1.2rem !important;
+}
+
+.table th,
+.table td{
+    padding:8px !important;
+    font-size:.8rem !important;
+}
+
+.action-grid-item{
+    min-height:70px;
+    font-size:.8rem !important;
+    flex-direction:column;
+    text-align:center;
+    gap:6px;
+}
+
+.action-grid-item i{
+    width:28px;
+    height:28px;
+    font-size:1rem;
+}
+
+canvas{
+    max-width:100% !important;
+}
+
+.btn{
+    min-height:44px;
+}
+
+.form-control,
+.form-select{
+    min-height:44px;
+}
+
+}
+
+/* Iphone 13-16 Pro Max */
+@media (max-width:430px){
+
+.kpi{
+    font-size:1rem !important;
+}
+
+.card-body{
+    padding:.8rem !important;
+}
+
+.table{
+    font-size:.75rem !important;
+}
+
+}
