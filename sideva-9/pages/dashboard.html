@@ -221,6 +221,56 @@ body {
                     </div>
                 </div>
 
+                <div class="col-xl-2 col-md-6 col-12">
+
+                    <div class="card h-100 kpi-card">
+                
+                        <div class="card-body">
+                
+                            <small class="text-muted text-uppercase fw-bold d-block" style="font-size:0.7rem; letter-spacing:0.5px;">
+                
+                                OPD Aktif
+                
+                            </small>
+                
+                            <div id="totalOpd" class="kpi">
+                
+                                0
+                
+                            </div>
+                
+                        </div>
+                
+                    </div>
+                
+                </div>
+                
+                <div class="col-xl-2 col-md-6 col-12">
+                
+                    <div class="card h-100 kpi-card kpi-success">
+                
+                        <div class="card-body">
+                
+                            <small class="text-muted text-uppercase fw-bold d-block" style="font-size:0.7rem; letter-spacing:0.5px;">
+                
+                                Bidang Aktif
+                
+                            </small>
+                
+                            <div id="totalBidang" class="kpi">
+                
+                                0
+                
+                            </div>
+                
+                        </div>
+                
+                    </div>
+                
+                </div>
+                
+                </div>
+
                 <div class="row mb-4 g-4">
                     <div class="col-lg-8">
                         <div class="card h-100">
@@ -649,6 +699,47 @@ async function loadKPI(){
         'readyProcurement'
      ).innerText =
         readyProcurement;
+
+    const {
+        count: opdCount
+    } = await dashboardDb
+    .from('opds')
+    .select('*',{
+        count:'exact',
+        head:true
+    });
+    
+    let bidangQuery =
+        dashboardDb
+        .from('bidangs')
+        .select('*',{
+            count:'exact',
+            head:true
+        });
+    
+    if(
+        selectedOpd !== 'ALL'
+    ){
+        bidangQuery =
+            bidangQuery.eq(
+                'opd_id',
+                selectedOpd
+            );
+    }
+    
+    const {
+        count: bidangCount
+    } = await bidangQuery;
+    
+    document.getElementById(
+        'totalOpd'
+    ).innerText =
+        opdCount || 0;
+    
+    document.getElementById(
+        'totalBidang'
+    ).innerText =
+        bidangCount || 0;
     
     }
 
