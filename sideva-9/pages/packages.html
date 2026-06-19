@@ -310,6 +310,52 @@
 
     <div class="card-form-custom">
         <div class="section-title" id="formTitle"><i class="fa-solid fa-folder-plus me-2"></i>Tambah Paket Baru</div>
+
+        <div class="row g-3 mb-4">
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <small class="text-muted">Nomor RUP</small>
+                        <h6 id="summaryRup" class="mb-0">-</h6>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <small class="text-muted">Metode</small>
+                        <h6 id="summaryMethod" class="mb-0">E-Catalog</h6>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <small class="text-muted">Pagu</small>
+                        <h6 id="summaryBudget"
+                            class="mb-0 text-success">
+                            Rp 0
+                        </h6>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <small class="text-muted">Status</small>
+                        <h6 class="mb-0 text-primary">
+                            DRAFT
+                        </h6>
+                    </div>
+                </div>
+            </div>
+        
+        </div>
+
         
         <div class="row g-3">
             <div class="col-md-6" id="opdWrapper">
@@ -369,12 +415,39 @@
 
             <div class="col-md-4">
                 <label class="form-label">Pagu Dana Anggaran (Rp)</label>
-                <input type="number" id="budget" class="form-control" placeholder="0">
+                <div class="input-group">
+
+                    <span class="input-group-text">
+                        Rp
+                    </span>
+                
+                    <input type="number"
+                           id="budget"
+                           class="form-control"
+                           placeholder="0">
+                
+                </div>
+                
+                <small
+                    id="budgetPreview"
+                    class="text-success fw-bold mt-1 d-block">
+                    Rp 0
+                </small>
             </div>
 
             <div class="col-md-4">
                 <label class="form-label">Tanggal Dokumen DPP</label>
-                <input type="date" id="dppDate" class="form-control">
+                <div class="input-group">
+
+                    <span class="input-group-text">
+                        <i class="fa-solid fa-calendar-days"></i>
+                    </span>
+                
+                    <input type="date"
+                           id="dppDate"
+                           class="form-control">
+                
+                </div>
             </div>
 
             <div class="col-md-3">
@@ -396,16 +469,32 @@
             
             <div class="col-md-3">
                 <label class="form-label">Tanggal Mulai</label>
-                <input type="date"
-                       id="workStartDate"
-                       class="form-control">
+                <div class="input-group">
+
+                    <span class="input-group-text">
+                        <i class="fa-solid fa-calendar-days"></i>
+                    </span>
+                
+                    <input type="date"
+                           id="workStartDate"
+                           class="form-control">
+                
+                </div>
             </div>
             
             <div class="col-md-3">
                 <label class="form-label">Tanggal Selesai</label>
-                <input type="date"
-                       id="workEndDate"
-                       class="form-control">
+                <div class="input-group">
+
+                    <span class="input-group-text">
+                        <i class="fa-solid fa-calendar-days"></i>
+                    </span>
+                
+                    <input type="date"
+                           id="workEndDate"
+                           class="form-control">
+                
+                </div>
             </div>
 
             <div class="col-md-12">
@@ -992,7 +1081,77 @@ function openDpp(id){ location.href = `dpp.html?id=${id}`; }
 window.editPackage = editPackage;
 window.deletePackage = deletePackage;
 
+function formatRupiah(nilai){
 
+    return new Intl.NumberFormat(
+        'id-ID'
+    ).format(
+        Number(nilai || 0)
+    );
+
+}
+
+function updatePackageSummary(){
+
+    document.getElementById(
+        'summaryRup'
+    ).innerText =
+        document.getElementById(
+            'rupNumber'
+        ).value || '-';
+
+    document.getElementById(
+        'summaryMethod'
+    ).innerText =
+        document.getElementById(
+            'method'
+        ).value || '-';
+
+    const budget =
+        document.getElementById(
+            'budget'
+        ).value;
+
+    document.getElementById(
+        'summaryBudget'
+    ).innerText =
+        'Rp ' +
+        formatRupiah(
+            budget
+        );
+
+    document.getElementById(
+        'budgetPreview'
+    ).innerText =
+        'Rp ' +
+        formatRupiah(
+            budget
+        );
+}
+
+[
+    'rupNumber',
+    'budget',
+    'method'
+].forEach(id => {
+
+    document
+    .getElementById(id)
+    ?.addEventListener(
+        'input',
+        updatePackageSummary
+    );
+
+    document
+    .getElementById(id)
+    ?.addEventListener(
+        'change',
+        updatePackageSummary
+    );
+
+});
+
+updatePackageSummary();
 
     
 </script>
