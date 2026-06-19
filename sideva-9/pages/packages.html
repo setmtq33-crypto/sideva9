@@ -35,6 +35,7 @@
             box-shadow: 0 4px 15px rgba(30, 60, 114, 0.12);
             margin-bottom: 25px;
         }
+        
         /* Sections Layout Border Marker */
         .section-title {
             font-size: 1.1rem;
@@ -46,6 +47,7 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
+        
         /* Custom Workspace Card Panel */
         .card-form-custom {
             border: none;
@@ -55,6 +57,7 @@
             padding: 24px;
             margin-bottom: 30px;
         }
+        
         /* Refined Package Blocks Box Row */
         .card-package {
             border: none;
@@ -65,27 +68,34 @@
             margin-bottom: 20px;
             border-left: 5px solid #2a5298;
         }
+        
         .card-package:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
         }
+        
         .form-label {
             font-weight: 600;
             color: #4a5568;
             font-size: 0.85rem;
             margin-bottom: 6px;
         }
-        .form-control, .form-select {
+        
+        .form-control,
+        .form-select {
             border-radius: 8px;
             border: 1px solid #cbd5e1;
             padding: 10px 14px;
             font-size: 0.9rem;
             transition: all 0.2s ease;
         }
-        .form-control:focus, .form-select:focus {
+        
+        .form-control:focus,
+        .form-select:focus {
             border-color: #2a5298;
             box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.12);
         }
+        
         .btn {
             border-radius: 8px;
             font-weight: 500;
@@ -93,6 +103,7 @@
             padding: 8px 16px;
             transition: all 0.2s;
         }
+        
         .btn-group-actions .btn {
             padding: 6px 12px;
             font-size: 0.8rem;
@@ -100,6 +111,7 @@
             align-items: center;
             gap: 6px;
         }
+        
         .badge-pagu {
             background-color: #e2e8f0;
             color: #1e293b;
@@ -108,24 +120,28 @@
             padding: 6px 14px;
             border-radius: 6px;
         }
+        
         .meta-info-text {
             line-height: 1.5;
             margin-bottom: 8px;
-            display: block; /* Memastikan tiap info punya baris sendiri */
+            display: block;
         }
+        
         .meta-info-text i {
             width: 20px;
             color: #475569;
         }
+        
         .required {
             color: red;
         }
+        
         textarea.form-control {
-            white-space: pre-wrap; 
+            white-space: pre-wrap;
             overflow-wrap: break-word;
         }
-
-                /* Styling tambahan untuk elemen di dalam kartu daftar */
+        
+        /* Styling tambahan untuk elemen di dalam kartu daftar */
         .card-package .list-label {
             font-size: 0.7rem;
             text-transform: uppercase;
@@ -135,7 +151,7 @@
             margin-bottom: 4px;
             display: block;
         }
-
+        
         .card-package .list-content {
             font-size: 0.9rem;
             color: #1e293b;
@@ -146,30 +162,131 @@
             border: 1px solid #f1f5f9;
             min-height: 40px;
         }
-
+        
         .card-package .pkg-title {
             color: #1e3c72;
             font-size: 1.15rem;
         }
-
+        
         .card-package .border-divider {
             border-top: 1px dashed #e2e8f0;
             margin: 15px 0;
         }
-
-        /* Merapikan jarak antar tombol aksi */
+        
+        /* Tombol aksi */
         .btn-group-actions {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
         }
-
-        /* Tambahkan di dalam tag <style> */
+        
         .meta-info-text .content-multiline {
             white-space: pre-line;
             display: block;
             margin-top: 4px;
-            padding-left: 20px; /* Opsional: agar teks menjorok setelah ikon */
+            padding-left: 20px;
+        }
+        
+        /* ==========================================
+           MOBILE OPTIMIZATION
+           iPhone 13 / 14 / 15 / 16
+           Android
+        ========================================== */
+        
+        @media (max-width: 768px) {
+        
+            .page-header-panel {
+                padding: 14px;
+            }
+        
+            .page-header-panel h3 {
+                font-size: 1.1rem;
+                margin-bottom: 8px;
+            }
+        
+            .page-header-panel p {
+                font-size: 0.75rem;
+                line-height: 1.4;
+            }
+        
+            .card-form-custom {
+                padding: 12px;
+                margin-bottom: 15px;
+            }
+        
+            .card-package {
+                padding: 12px !important;
+                margin-bottom: 15px;
+            }
+        
+            .section-title {
+                font-size: 0.95rem;
+                margin-bottom: 15px;
+            }
+        
+            .form-label {
+                font-size: 0.8rem;
+            }
+        
+            .form-control,
+            .form-select {
+                font-size: 16px; /* anti zoom Safari */
+                padding: 10px 12px;
+            }
+        
+            .btn-group-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        
+            .btn-group-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        
+            .badge-pagu {
+                width: 100%;
+                text-align: center;
+                margin-top: 10px;
+            }
+        
+            .meta-info-text {
+                font-size: 0.9rem;
+            }
+        
+            .card-package .pkg-title {
+                font-size: 1rem;
+            }
+        }
+        
+        /* Extra Small Device */
+        
+        @media (max-width: 576px) {
+        
+            body {
+                font-size: 14px;
+            }
+        
+            .container-fluid {
+                padding-left: 8px !important;
+                padding-right: 8px !important;
+            }
+        
+            .page-header-panel {
+                border-radius: 10px;
+            }
+        
+            .card-form-custom {
+                border-radius: 10px;
+            }
+        
+            .card-package {
+                border-radius: 10px;
+            }
+        
+            .btn {
+                min-height: 42px;
+            }
         }
 
         
@@ -177,9 +294,9 @@
 </head>
 <body>
 
-<div class="container-fluid p-4">
+<div class="container-fluid p-2 p-md-4">
 
-    <div class="page-header-panel d-flex justify-content-between align-items-center text-white">
+    <div class="page-header-panel d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center text-white gap-3">
         <div>
             <h3 class="mb-1 fw-bold"><i class="fa-solid fa-cubes me-2"></i>Manajemen Paket Pengadaan</h3>
             <p class="mb-0 text-white-50 small">Kelola data program kegiatan, sub kegiatan belanja, penetapan pagu, rancangan RUP, beserta dokumen e-Purchasing.</p>
