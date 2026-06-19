@@ -802,116 +802,194 @@ async function loadPackages() {
 
 async function editPackage(id){
 
-    const { data, error } = await db
-        .from("packages")
-        .select("*")
-        .eq("id", id)
-        .single();
+    try{
 
-    if(error){
-        alert(error.message);
-        return;
+        const profile =
+            await getProfile();
+
+        let query =
+            db
+            .from("packages")
+            .select("*")
+            .eq("id", id);
+
+        if(
+            profile.role !==
+            "SUPER_ADMIN"
+        ){
+            query =
+                query.eq(
+                    "opd_id",
+                    profile.opd_id
+                );
+        }
+
+        const {
+            data,
+            error
+        } =
+        await query.single();
+
+        if(error){
+
+            alert(
+                error.message
+            );
+
+            return;
+        }
+
+        if(!data){
+
+            alert(
+                "Paket tidak ditemukan"
+            );
+
+            return;
+        }
+
+        editingPackageId =
+            data.id;
+
+        document.getElementById(
+            "packageName"
+        ).value =
+            data.package_name || "";
+
+        document.getElementById(
+            "fiscalYear"
+        ).value =
+            data.fiscal_year || "";
+
+        document.getElementById(
+            "budgetCeiling"
+        ).value =
+            data.budget_ceiling || "";
+
+        document.getElementById(
+            "procurementMethod"
+        ).value =
+            data.procurement_method || "";
+
+        document.getElementById(
+            "rupNumber"
+        ).value =
+            data.rup_number || "";
+
+        if(
+            profile.role ===
+            "SUPER_ADMIN"
+        ){
+
+            currentOpdId =
+                data.opd_id;
+
+            const opdSelect =
+                document.getElementById(
+                    "opdSelect"
+                );
+
+            if(opdSelect){
+
+                opdSelect.value =
+                    data.opd_id;
+            }
+        }
+
+        window.scrollTo({
+            top:0,
+            behavior:"smooth"
+        });
+
+    }catch(err){
+
+        console.error(
+            "editPackage",
+            err
+        );
+
+        alert(
+            err.message
+        );
     }
-
-    editingPackageId = id;
-
-    document.getElementById("formTitle").innerHTML =
-        `<i class="fa-solid fa-pen-to-square me-2"></i>Ubah / Edit Data Paket`;
-
-    document.getElementById("saveBtn").innerHTML =
-        `<i class="fa-solid fa-floppy-disk me-2"></i>Perbarui Paket`;
-
-    document.getElementById("rupNumber").value =
-        data.rup_number || "";
-
-    document.getElementById("packageName").value =
-        data.package_name || "";
-
-    document.getElementById("program").value =
-        data.program || "";
-
-    document.getElementById("kegiatan").value =
-        data.kegiatan || "";
-
-    document.getElementById("subKegiatan").value =
-        data.sub_kegiatan || "";
-
-    document.getElementById("budget").value =
-        data.budget_ceiling || "";
-
-    document.getElementById("method").value =
-        data.procurement_method || "ECATALOG";
-
-    document.getElementById("bidangSelect").value =
-        data.bidang_id || "";
-
-    document.getElementById("makSelect").value =
-        data.budget_account_id || "";
-
-    document.getElementById("output").value =
-        data.output || "";
-
-    document.getElementById("dppDate").value =
-        data.dpp_date || "";
-
-    /* ===== FIELD BARU ===== */
-
-    document.getElementById("workDurationDays").value =
-        data.work_duration_days || "";
-
-    document.getElementById("workDurationType").value =
-        data.work_duration_type || "KALENDER";
-
-    document.getElementById("workStartDate").value =
-        data.work_start_date || "";
-
-    document.getElementById("workEndDate").value =
-        data.work_end_date || "";
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
 }
 
-async function deletePackage(
-    id,
-    packageName = ''
-){
+async function deletePackage(id){
 
     const ok =
         confirm(
             "Hapus paket ini ?"
         );
 
-    if(!ok) return;
+    if(!ok){
+        return;
+    }
 
-    const { error } =
-        await db
+    try{
+
+        const profile =
+            await getProfile();
+
+        let query =
+            db
             .from("packages")
             .delete()
             .eq("id", id);
 
-    if(error){
+        if(
+            profile.role !==
+            "SUPER_ADMIN"
+        ){
+            query =
+                query.eq(
+                    "opd_id",
+                    profile.opd_id
+                );
+        }
 
-        alert(
-            error.message
+        const {
+            error
+        } =
+        await query;
+
+        if(error){
+
+            alert(
+                error.message
+            );
+
+            return;
+        }
+
+        await writeAuditLog(
+
+            "PACKAGES",
+
+            "DELETE",
+
+            id,
+
+            `Hapus paket ${id}`
+
         );
 
-        return;
+        await loadPackages();
+
+        alert(
+            "Paket berhasil dihapus"
+        );
+
+    }catch(err){
+
+        console.error(
+            "deletePackage",
+            err
+        );
+
+        alert(
+            err.message
+        );
     }
-
-    await sendNotification(
-        'PACKAGE_DELETED',
-        'Paket Dihapus',
-        packageName || id
-    );
-
-    alert(
-        "Paket berhasil dihapus"
-    );
-
-    await loadPackages();
 }
 
 function clearForm(){
