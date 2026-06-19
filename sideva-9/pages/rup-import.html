@@ -484,102 +484,67 @@ async function init(){
 
 async function loadRupImports(){
 
-    const {
-        data,
-        error
-    } =
-    await rupDb
-    .from('rup_imports')
-    .select('*')
-    .order(
-        'created_at',
-        {
-            ascending:false
+    try{
+
+        const profile =
+            await getProfile();
+
+        let query =
+            rupDb
+            .from('rup_imports')
+            .select('*');
+
+        // ADMIN OPD hanya lihat RUP OPD sendiri
+        if(
+            profile &&
+            profile.role === 'ADMIN_OPD'
+        ){
+            query =
+                query.eq(
+                    'opd_id',
+                    profile.opd_id
+                );
         }
-    );
 
-    if(error){
+        // SUPER ADMIN lihat semua
+        const {
+            data,
+            error
+        } = await query.order(
+            'created_at',
+            {
+                ascending:false
+            }
+        );
 
-        console.error(error);
+        if(error) throw error;
 
-        return;
+        rupImports =
+            data || [];
+
+        renderRupTable();
+
+    }catch(err){
+
+        console.error(
+            'loadRupImports error:',
+            err
+        );
+
+        rupImports = [];
+
+        renderRupTable();
+
+        if(
+            typeof showToast ===
+            'function'
+        ){
+            showToast(
+                'Gagal memuat data RUP',
+                'danger'
+            );
+        }
     }
-
-    let html='';
-
-    (data || [])
-    .forEach(row=>{
-
-        html += `
-
-        <tr>
-
-            <td class="fw-semibold text-secondary">
-                ${row.rup_number || '-'}
-            </td>
-
-            <td>
-                ${row.opd_name || '-'}
-            </td>
-
-            <td class="fw-medium text-dark">
-                ${row.package_name || '-'}
-            </td>
-
-            <td class="fw-bold text-slate-700">
-                Rp ${Number(
-                    row.budget_ceiling || 0
-                ).toLocaleString('id-ID')}
-            </td>
-
-            <td class="text-center">
-                <div class="d-inline-flex gap-1">
-                    <button
-                    class="btn btn-success btn-sm"
-                    onclick="importToPackage('${row.id}')" title="Import ke Paket">
-                    Import
-                    </button>
-                
-                    <button
-                    class="btn btn-warning btn-sm"
-                    onclick="editRup('${row.id}')" title="Edit">
-                    Edit
-                    </button>
-                
-                    <button
-                    class="btn btn-danger btn-sm"
-                    onclick="deleteRup('${row.id}')" title="Hapus">
-                    Hapus
-                    </button>
-                </div>
-            </td>
-
-        </tr>
-
-        `;
-    });
-
-    if(html === ''){
-
-        html = `
-
-        <tr>
-
-            <td colspan="5" class="text-center py-4 text-muted">
-                Belum ada data RUP
-            </td>
-
-        </tr>
-
-        `;
-    }
-
-    document
-        .getElementById(
-            'rupTable'
-        )
-        .innerHTML =
-        html;
 }
 
 async function loadOpdFilter(){
