@@ -646,6 +646,17 @@ async function loadMak(){
     });
 }
 
+function canCreatePackage(role){
+
+    return [
+        "SUPER_ADMIN",
+        "ADMIN_OPD",
+        "PPK",
+        "PPTK"
+    ].includes(role);
+
+}
+
 async function savePackage(){
 
     if(
