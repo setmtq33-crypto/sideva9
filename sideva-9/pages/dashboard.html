@@ -601,7 +601,7 @@ async function loadBudgetChart(){
     ) || 'ALL';
 
  if(
-    profile.role === 'ADMIN_OPD'
+    profile.role !== 'SUPER_ADMIN'
  ){
     selectedOpd =
         profile.opd_id;
@@ -808,7 +808,7 @@ async function loadKPI(){
         ) || 'ALL';
     
      if(
-        profile.role === 'ADMIN_OPD'
+        profile.role !== 'SUPER_ADMIN'
      ){
         selectedOpd =
             profile.opd_id;
@@ -969,8 +969,7 @@ async function loadTopPackages(){
             await getProfile();
 
         if(
-            profile?.role ===
-            'ADMIN_OPD'
+            profile.role !== 'SUPER_ADMIN'
         ){
             selectedOpd =
                 profile.opd_id;
@@ -1080,6 +1079,27 @@ async function loadOpdRanking(){
 
     try{
 
+        const profile =
+            await getProfile();
+
+        if(
+            profile.role !== 'SUPER_ADMIN'
+        ){
+
+            document.getElementById(
+                'rankingOpdTable'
+            ).innerHTML = `
+                <tr>
+                    <td colspan="3"
+                        class="text-center text-muted">
+                        Khusus Super Admin
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
         const { data, error } =
         await dashboardDb
         .from('dashboard_opd_summary')
@@ -1139,6 +1159,27 @@ async function loadPackageRanking(){
 
     try{
 
+        const profile =
+            await getProfile();
+
+        if(
+            profile.role !== 'SUPER_ADMIN'
+        ){
+
+            document.getElementById(
+                'rankingPackageTable'
+            ).innerHTML = `
+                <tr>
+                    <td colspan="3"
+                        class="text-center text-muted">
+                        Khusus Super Admin
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
         const { data, error } =
         await dashboardDb
         .from('dashboard_opd_summary')
@@ -1196,6 +1237,27 @@ async function loadPackageRanking(){
 async function loadEfficiencyRanking(){
 
     try{
+
+        const profile =
+            await getProfile();
+
+        if(
+            profile.role !== 'SUPER_ADMIN'
+        ){
+
+            document.getElementById(
+                'efficiencyTable'
+            ).innerHTML = `
+                <tr>
+                    <td colspan="3"
+                        class="text-center text-muted">
+                        Khusus Super Admin
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
 
         const { data: opds } =
         await dashboardDb
@@ -1310,6 +1372,24 @@ async function loadEfficiencyRanking(){
 async function loadProcurementProgress(){
 
     try{
+
+        const profile =
+            await getProfile();
+
+        if(
+            profile.role !== 'SUPER_ADMIN'
+        ){
+
+            document.getElementById(
+                'procurementProgress'
+            ).innerHTML = `
+                <div class="text-center text-muted py-3">
+                    Khusus Super Admin
+                </div>
+            `;
+
+            return;
+        }
 
         const { data: opds } =
         await dashboardDb
@@ -1433,7 +1513,7 @@ async function loadStatus(){
     ) || 'ALL';
 
  if(
-    profile.role === 'ADMIN_OPD'
+    profile.role !== 'SUPER_ADMIN'
  ){
     selectedOpd =
         profile.opd_id;
@@ -1533,7 +1613,7 @@ async function loadOpdSummary(){
 
     if(
         profile &&
-        profile.role === 'ADMIN_OPD'
+        profile.role !== 'SUPER_ADMIN'
     ){
         query =
             query.eq(
@@ -1599,7 +1679,7 @@ async function loadRecentPackages(){
     ) || 'ALL';
 
  if(
-    profile.role === 'ADMIN_OPD'
+    profile.role !== 'SUPER_ADMIN'
  ){
     selectedOpd =
         profile.opd_id;
