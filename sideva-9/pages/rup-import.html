@@ -515,6 +515,7 @@ async function loadRupImports(){
             .from('rup_imports')
             .select('*');
 
+        // Admin OPD hanya melihat data OPD sendiri
         if(
             profile &&
             profile.role === 'ADMIN_OPD'
@@ -546,15 +547,17 @@ async function loadRupImports(){
             !data ||
             data.length === 0
         ){
+
             html = `
             <tr>
                 <td colspan="6"
-                    class="text-center text-muted">
+                    class="text-center text-muted py-4">
                     Tidak ada data RUP
                 </td>
-            </tr>`;
-        }
-        else{
+            </tr>
+            `;
+
+        }else{
 
             data.forEach(row => {
 
@@ -573,7 +576,7 @@ async function loadRupImports(){
                         ${row.package_name || '-'}
                     </td>
 
-                    <td>
+                    <td class="text-end">
                         ${new Intl.NumberFormat(
                             'id-ID'
                         ).format(
@@ -585,33 +588,48 @@ async function loadRupImports(){
                         ${row.procurement_method || '-'}
                     </td>
 
-                    <td>
+                    <td class="text-nowrap">
 
                         <button
-                            class="btn btn-sm btn-warning"
-                            onclick="editRup('${row.id}')">
+                            class="btn btn-success btn-sm"
+                            onclick="importToPackage('${row.id}')"
+                            title="Import ke Packages">
 
-                            Edit
+                            <i class="bi bi-box-arrow-in-down"></i>
 
                         </button>
 
                         <button
-                            class="btn btn-sm btn-danger"
-                            onclick="deleteRup('${row.id}')">
+                            class="btn btn-warning btn-sm"
+                            onclick="editRup('${row.id}')"
+                            title="Edit">
 
-                            Hapus
+                            <i class="bi bi-pencil-square"></i>
+
+                        </button>
+
+                        <button
+                            class="btn btn-danger btn-sm"
+                            onclick="deleteRup('${row.id}')"
+                            title="Hapus">
+
+                            <i class="bi bi-trash"></i>
 
                         </button>
 
                     </td>
 
-                </tr>`;
+                </tr>
+                `;
             });
+
         }
 
-        document.getElementById(
-            'rupTable'
-        ).innerHTML = html;
+        document
+            .getElementById(
+                'rupTable'
+            )
+            .innerHTML = html;
 
     }
     catch(err){
@@ -621,15 +639,20 @@ async function loadRupImports(){
             err
         );
 
-        document.getElementById(
-            'rupTable'
-        ).innerHTML = `
-        <tr>
-            <td colspan="6"
-                class="text-center text-danger">
-                Gagal memuat data
-            </td>
-        </tr>`;
+        document
+            .getElementById(
+                'rupTable'
+            )
+            .innerHTML = `
+            <tr>
+                <td colspan="6"
+                    class="text-center text-danger py-4">
+
+                    Gagal memuat data RUP
+
+                </td>
+            </tr>
+            `;
     }
 }
 
