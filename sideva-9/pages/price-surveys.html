@@ -66,6 +66,80 @@ h1,h2,h3,h4,h5{
 
 }
 
+.survey-grid{
+    display:grid;
+    grid-template-columns:
+    repeat(
+        auto-fill,
+        minmax(380px,1fr)
+    );
+    gap:18px;
+}
+
+.survey-card{
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:20px;
+    padding:20px;
+    box-shadow:
+    0 8px 24px rgba(0,0,0,.05);
+}
+
+.survey-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.vendor-name{
+    font-weight:700;
+    font-size:1.05rem;
+    color:#111827;
+}
+
+.brand-name{
+    color:#64748b;
+    font-size:.85rem;
+}
+
+.price-box{
+    display:flex;
+    justify-content:space-between;
+    margin-top:15px;
+}
+
+.price-value{
+    font-size:1.2rem;
+    font-weight:800;
+    color:#2563eb;
+}
+
+.winner-badge{
+    background:#dcfce7;
+    color:#166534;
+    border-radius:999px;
+    padding:6px 12px;
+    font-size:.75rem;
+    font-weight:700;
+}
+
+.candidate-badge{
+    background:#fef3c7;
+    color:#92400e;
+    border-radius:999px;
+    padding:6px 12px;
+    font-size:.75rem;
+    font-weight:700;
+}
+
+.survey-actions{
+    display:flex;
+    gap:8px;
+    margin-top:15px;
+}
+    
+
 
 </style>
 </head>
@@ -157,27 +231,9 @@ Tambah Survey
 
 <div class="card-body">
 
-<div class="table-responsive">
-
-<table class="table table-bordered">
-
-<thead>
-<tr>
-<th>Vendor</th>
-<th>Brand</th>
-<th>Survey</th>
-<th>Negosiasi</th>
-<th>Kandidat</th>
-<th>Pemenang</th>
-<th>Tanggal</th>
-<th>Aksi</th>
-</tr>
-</thead>
-
-<tbody id="surveyTable"></tbody>
-
-</table>
-
+<div
+    id="surveyTable"
+    class="survey-grid">
 </div>
 
 </div>
@@ -395,45 +451,172 @@ async function selectItem(id){
 }
 
 function renderSurvey(){
+
     let html = '';
+
     let surveyTotal = 0;
     let negoTotal = 0;
-    
-    let lowest = surveys.length > 0 ? Number(surveys[0].survey_price || 0) : 0;
 
-    surveys.forEach((s)=>{
-        surveyTotal += Number(s.survey_price || 0);
-        negoTotal += Number(s.negotiated_price || 0);
+    let lowest =
+        surveys.length
+        ? Number(
+            surveys[0].survey_price || 0
+          )
+        : 0;
 
-        if(Number(s.survey_price || 0) < lowest){
-            lowest = Number(s.survey_price || 0);
+    surveys.forEach(s=>{
+
+        surveyTotal +=
+            Number(
+                s.survey_price || 0
+            );
+
+        negoTotal +=
+            Number(
+                s.negotiated_price || 0
+            );
+
+        if(
+            Number(
+                s.survey_price || 0
+            ) < lowest
+        ){
+            lowest =
+            Number(
+                s.survey_price || 0
+            );
         }
 
         html += `
-        <tr>
-            <td>${s.vendor_name || ''}</td>
-            <td>${s.brand || ''}</td>
-            <td><b>${rupiah(s.survey_price)}</b></td>
-            <td>${rupiah(s.negotiated_price)}</td>
-            <td>${s.is_candidate ? '✔' : ''}</td>
-            <td>${s.is_winner ? '✔' : ''}</td>
-            <td>${s.survey_date || ''}</td>
-            <td>
-                <button class="btn btn-warning btn-sm" onclick="editSurvey('${s.id}')">Edit</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteSurvey('${s.id}')">Hapus</button>
-            </td>
-        </tr>
+
+        <div class="survey-card">
+
+            <div class="survey-top">
+
+                <div>
+
+                    <div class="vendor-name">
+                        🏪 ${s.vendor_name || '-'}
+                    </div>
+
+                    <div class="brand-name">
+                        ${s.brand || '-'}
+                    </div>
+
+                </div>
+
+                ${
+                    s.is_winner
+                    ? `
+                    <span class="winner-badge">
+                        ⭐ Pemenang
+                    </span>
+                    `
+                    : s.is_candidate
+                    ? `
+                    <span class="candidate-badge">
+                        Kandidat
+                    </span>
+                    `
+                    : ''
+                }
+
+            </div>
+
+            <div class="price-box">
+
+                <div>
+
+                    <small class="text-muted">
+                        Survey
+                    </small>
+
+                    <div class="price-value">
+                        ${rupiah(
+                            s.survey_price
+                        )}
+                    </div>
+
+                </div>
+
+                <div>
+
+                    <small class="text-muted">
+                        Negosiasi
+                    </small>
+
+                    <div class="fw-bold">
+                        ${rupiah(
+                            s.negotiated_price
+                        )}
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="mt-3 text-muted small">
+                📅 ${s.survey_date || '-'}
+            </div>
+
+            <div class="survey-actions">
+
+                <button
+                    class="btn btn-warning btn-sm"
+                    onclick="editSurvey('${s.id}')">
+
+                    Edit
+
+                </button>
+
+                <button
+                    class="btn btn-danger btn-sm"
+                    onclick="deleteSurvey('${s.id}')">
+
+                    Hapus
+
+                </button>
+
+            </div>
+
+        </div>
+
         `;
     });
 
-    document.getElementById('surveyTable').innerHTML = html;
+    document.getElementById(
+        'surveyTable'
+    ).innerHTML = html;
 
-    const count = surveys.length;
-    document.getElementById('surveyCount').innerText = count;
+    const count =
+        surveys.length;
 
-    document.getElementById('avgSurvey').innerText = rupiah(count ? surveyTotal / count : 0);
-    document.getElementById('avgNegotiated').innerText = rupiah(count ? negoTotal / count : 0);
-    document.getElementById('lowestPrice').innerText = rupiah(lowest);
+    document.getElementById(
+        'surveyCount'
+    ).innerText = count;
+
+    document.getElementById(
+        'avgSurvey'
+    ).innerText =
+    rupiah(
+        count
+        ? surveyTotal / count
+        : 0
+    );
+
+    document.getElementById(
+        'avgNegotiated'
+    ).innerText =
+    rupiah(
+        count
+        ? negoTotal / count
+        : 0
+    );
+
+    document.getElementById(
+        'lowestPrice'
+    ).innerText =
+    rupiah(lowest);
 }
 
 function openAddModal(){
