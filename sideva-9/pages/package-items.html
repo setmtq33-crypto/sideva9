@@ -77,7 +77,12 @@ h1,h2,h3,h4,h5{
     </div>
     <div>
         <a href="packages.html" class="btn btn-secondary">Kembali</a>
-        <button class="btn btn-primary" onclick="openAddModal()">Tambah Item</button>
+        <button
+            id="addItemBtn"
+            class="btn btn-primary"
+            onclick="openAddModal()">
+            Tambah Item
+        </button>
     </div>
 </div>
 
@@ -151,15 +156,54 @@ let packageId=null;
 let packageData=null;
 let items=[];
 
+function canManagePackageItems(){
+
+    return [
+
+        'SUPER_ADMIN',
+
+        'ADMIN_OPD',
+
+        'PPTK'
+
+    ].includes(
+
+        profile?.role
+
+    );
+
+}
+
 function rupiah(v){
  return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(v||0);
 }
 
 async function init(){
- profile = await getProfile();
- packageId = new URLSearchParams(location.search).get('id');
- await loadPackage();
- await loadItems();
+
+    profile =
+        await getProfile();
+
+    packageId =
+        new URLSearchParams(
+            location.search
+        ).get('id');
+
+    await loadPackage();
+
+    await loadItems();
+
+    if(
+        !canManagePackageItems()
+    ){
+
+        document
+        .getElementById(
+            'addItemBtn'
+        )
+        ?.remove();
+
+    }
+
 }
 
 async function loadPackage(){
@@ -256,33 +300,81 @@ async function loadItems(){
 }
 
 function render(rows){
- let html='', total=0;
- rows.forEach(r=>{
-  const rowTotal=(Number(r.quantity)||0)*(Number(r.estimated_price)||0);
-  total+=rowTotal;
-  html+=`<tr>
-   <td>${r.item_name||''}</td>
-   <td>${r.specification||''}</td>
-   <td>${r.quantity||0}</td>
-   <td>${r.unit||''}</td>
-   <td>${rupiah(r.estimated_price)}</td>
-   <td>${rupiah(rowTotal)}</td>
-   <td>
-   <button class="btn btn-warning btn-sm" onclick="editItem('${r.id}')">Edit</button>
-   <button
-        class="btn btn-danger btn-sm"
-        onclick="deleteItem(
-            '${r.id}',
-            '${r.item_name}'
-        )">
-        Hapus
-    </button>
-   </td>
-  </tr>`;
- });
- document.getElementById('tbody').innerHTML=html;
- document.getElementById('itemCount').innerText=rows.length;
- document.getElementById('totalValue').innerText=rupiah(total);
+
+    let html = '';
+    let total = 0;
+
+    rows.forEach(r => {
+
+        const rowTotal =
+            (Number(r.quantity) || 0) *
+            (Number(r.estimated_price) || 0);
+
+        total += rowTotal;
+
+        html += `
+        <tr>
+
+            <td>${r.item_name || ''}</td>
+
+            <td>${r.specification || ''}</td>
+
+            <td>${r.quantity || 0}</td>
+
+            <td>${r.unit || ''}</td>
+
+            <td>${rupiah(r.estimated_price)}</td>
+
+            <td>${rupiah(rowTotal)}</td>
+
+            <td>
+
+                ${
+                    canManagePackageItems()
+
+                    ?
+
+                    `
+                    <button
+                        class="btn btn-warning btn-sm"
+                        onclick="editItem('${r.id}')">
+                        Edit
+                    </button>
+
+                    <button
+                        class="btn btn-danger btn-sm"
+                        onclick="deleteItem(
+                            '${r.id}',
+                            '${r.item_name}'
+                        )">
+                        Hapus
+                    </button>
+                    `
+
+                    :
+
+                    `<span class="text-muted">
+                        View Only
+                    </span>`
+                }
+
+            </td>
+
+        </tr>`;
+    });
+
+    document.getElementById(
+        'tbody'
+    ).innerHTML = html;
+
+    document.getElementById(
+        'itemCount'
+    ).innerText = rows.length;
+
+    document.getElementById(
+        'totalValue'
+    ).innerText = rupiah(total);
+
 }
 
 function openAddModal(){
