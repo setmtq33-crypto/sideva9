@@ -292,6 +292,52 @@
     font-size:.75rem;
     font-weight:700;
 }
+
+.top-package-list{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
+.package-rank-card{
+    background:#fff;
+    border:1px solid #eef2f7;
+    border-radius:18px;
+    padding:18px;
+    transition:.25s;
+}
+
+.package-rank-card:hover{
+    transform:translateY(-3px);
+    box-shadow:
+    0 10px 25px rgba(0,0,0,.05);
+}
+
+.package-title{
+    font-weight:700;
+    font-size:1rem;
+    margin-bottom:6px;
+}
+
+.package-opd{
+    color:#64748b;
+    font-size:.85rem;
+    margin-bottom:12px;
+}
+
+.package-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.package-value{
+    color:#2563eb;
+    font-weight:800;
+    font-size:1.05rem;
+}
+
+
     
     
 body {
@@ -715,32 +761,13 @@ body {
                     
                         <div class="card-body p-0">
                     
-                            <div class="table-responsive">
-                    
-                                <table class="table table-hover mb-0">
-                    
-                                    <thead class="table-light">
-                    
-                                        <tr>
-                    
-                                            <th>Nama Paket</th>
-                    
-                                            <th>OPD</th>
-                    
-                                            <th>Pagu</th>
-                    
-                                            <th>Status</th>
-                    
-                                        </tr>
-                    
-                                    </thead>
-                    
-                                    <tbody id="topPackagesTable">
-                    
-                                    </tbody>
-                    
-                                </table>
-                    
+                            <div class="card-body">
+
+                                <div
+                                    id="topPackagesTable"
+                                    class="top-package-list">
+                                </div>
+                            
                             </div>
                     
                         </div>
@@ -1474,30 +1501,51 @@ async function loadTopPackages(){
             'topPackagesTable'
         ).innerHTML =
         (packages || [])
-        .map(pkg => `
-            <tr>
-                <td>
-                    <strong>
+        .map((pkg,index) => `
+        
+        <div class="package-rank-card">
+        
+            <div class="d-flex justify-content-between align-items-start">
+        
+                <div>
+        
+                    <div class="package-title">
+        
+                        ${index + 1}.
                         ${pkg.package_name || '-'}
-                    </strong>
-                </td>
-
-                <td>
-                    ${opdMap[pkg.opd_id] || '-'}
-                </td>
-
-                <td class="fw-bold text-primary">
+        
+                    </div>
+        
+                    <div class="package-opd">
+        
+                        ${opdMap[pkg.opd_id] || '-'}
+        
+                    </div>
+        
+                </div>
+        
+                <span class="badge bg-secondary">
+        
+                    ${pkg.package_status || 'DRAFT'}
+        
+                </span>
+        
+            </div>
+        
+            <div class="package-footer">
+        
+                <div class="package-value">
+        
                     ${rupiah(
                         pkg.budget_ceiling || 0
                     )}
-                </td>
-
-                <td>
-                    <span class="badge bg-secondary">
-                        ${pkg.package_status || 'DRAFT'}
-                    </span>
-                </td>
-            </tr>
+        
+                </div>
+        
+            </div>
+        
+        </div>
+        
         `).join('');
 
     }catch(err){
