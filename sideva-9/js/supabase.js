@@ -9,15 +9,54 @@ async function sendNotification(
     message
 ){
 
+    let profile = null;
+
+    try{
+
+        if(
+            typeof getProfile ===
+            'function'
+        ){
+            profile =
+                await getProfile();
+        }
+
+    }catch(e){
+
+        console.warn(e);
+
+    }
+
+    const fullMessage = `
+👤 User : ${profile?.full_name || '-'}
+
+🎖 Role : ${profile?.role || '-'}
+
+📌 Aktivitas : ${eventType}
+
+📄 Detail : ${message}
+
+🕒 Waktu : ${new Date().toLocaleString('id-ID')}
+`.trim();
+
     try{
 
         const result =
         await window.supabaseClient
-            .from('telegram_notifications')
+            .from(
+                'telegram_notifications'
+            )
             .insert([{
-                event_type: eventType,
-                title: title,
-                message: message
+
+                event_type:
+                    eventType,
+
+                title:
+                    title,
+
+                message:
+                    fullMessage
+
             }]);
 
         console.log(
@@ -42,12 +81,15 @@ async function sendNotification(
             'function'
         ){
 
-            const telegramResult =
-            await sendTelegramMessage(
+            const telegramText =
 `🔔 ${title}
 
-${message}`
-            );
+${fullMessage}`;
+
+            const telegramResult =
+                await sendTelegramMessage(
+                    telegramText
+                );
 
             console.log(
                 'TELEGRAM',
