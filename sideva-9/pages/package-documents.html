@@ -181,6 +181,72 @@ h1,h2,h3,h4,h5{
 
     <div class="local-main-content">
     <div class="card p-4 mb-4 shadow-sm bg-white">
+
+        <div class="row g-3 mb-4">
+
+            <div class="col-md-3">
+                <div class="kpi-modern-card">
+                    <div class="kpi-header">
+                        <div>
+                            <div class="kpi-title">Auto Dokumen</div>
+                            <div class="kpi-number">10</div>
+                            <div class="kpi-footer">Generator SIDEVA</div>
+                        </div>
+                        <div class="kpi-icon-modern kpi-blue">
+                            <i class="bi bi-file-earmark-text"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="col-md-3">
+                <div class="kpi-modern-card">
+                    <div class="kpi-header">
+                        <div>
+                            <div class="kpi-title">Upload Storage</div>
+                            <div id="docUploaded" class="kpi-number">0</div>
+                            <div class="kpi-footer">Dokumen tersimpan</div>
+                        </div>
+                        <div class="kpi-icon-modern kpi-green">
+                            <i class="bi bi-cloud-check"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="col-md-3">
+                <div class="kpi-modern-card">
+                    <div class="kpi-header">
+                        <div>
+                            <div class="kpi-title">Jenis Dokumen</div>
+                            <div id="docTypes" class="kpi-number">0</div>
+                            <div class="kpi-footer">Kategori berkas</div>
+                        </div>
+                        <div class="kpi-icon-modern kpi-orange">
+                            <i class="bi bi-folder2-open"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="col-md-3">
+                <div class="kpi-modern-card">
+                    <div class="kpi-header">
+                        <div>
+                            <div class="kpi-title">Status</div>
+                            <div id="docStatus" class="kpi-number">0%</div>
+                            <div class="kpi-footer">Kelengkapan dokumen</div>
+                        </div>
+                        <div class="kpi-icon-modern kpi-cyan">
+                            <i class="bi bi-patch-check"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+        </div>
+        
+        
         <div class="d-flex justify-content-between align-items-center">
             <div>
                 <span class="badge bg-primary mb-1">Modul Berkas Fisik v9 (Stabil)</span>
@@ -2236,35 +2302,182 @@ async function loadUploadedDocuments() {
 
 // LALU, cari fungsi renderUploadedTable() dan masukkan kode di sini:
 function renderUploadedTable() {
-    const tableBody = document.getElementById('documentsTable');
+
+    const tableBody =
+        document.getElementById(
+            'documentsTable'
+        );
+
     let html = '';
 
     if (documents.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Belum ada dokumen yang diunggah.</td></tr>';
+
+        tableBody.innerHTML =
+        `
+        <tr>
+            <td colspan="5"
+                class="text-center text-muted">
+                Belum ada dokumen yang diunggah.
+            </td>
+        </tr>
+        `;
+
+        const uploadedEl =
+            document.getElementById(
+                'docUploaded'
+            );
+
+        const typesEl =
+            document.getElementById(
+                'docTypes'
+            );
+
+        const statusEl =
+            document.getElementById(
+                'docStatus'
+            );
+
+        if(uploadedEl)
+            uploadedEl.innerText = '0';
+
+        if(typesEl)
+            typesEl.innerText = '0';
+
+        if(statusEl)
+            statusEl.innerText = '0%';
+
         return;
     }
 
     documents.forEach(doc => {
-        // Tombol aksi diletakkan di dalam loop agar variabel 'doc' terbaca
+
         const actionButtons = `
+
             <div class="btn-group">
-                <button class="btn btn-sm btn-info" onclick="downloadDocument('${doc.file_path}')" title="Unduh"><i class="bi bi-download"></i></button>
-                <button class="btn btn-sm btn-warning" onclick="openSignEditor('${doc.id}', '${doc.file_path}')" title="TTD & Cap"><i class="bi bi-pen"></i></button>
-                <button class="btn btn-sm btn-danger" onclick="deleteDocument('${doc.id}', '${doc.file_path}')" title="Hapus"><i class="bi bi-trash"></i></button>
+
+                <button
+                    class="btn btn-sm btn-info"
+                    onclick="downloadDocument('${doc.file_path}')"
+                    title="Unduh">
+
+                    <i class="bi bi-download"></i>
+
+                </button>
+
+                <button
+                    class="btn btn-sm btn-warning"
+                    onclick="openSignEditor('${doc.id}','${doc.file_path}')"
+                    title="TTD & Cap">
+
+                    <i class="bi bi-pen"></i>
+
+                </button>
+
+                <button
+                    class="btn btn-sm btn-danger"
+                    onclick="deleteDocument('${doc.id}','${doc.file_path}')"
+                    title="Hapus">
+
+                    <i class="bi bi-trash"></i>
+
+                </button>
+
             </div>
+
         `;
 
         html += `
+
             <tr>
-                <td><span class="badge bg-secondary">${doc.document_type}</span></td>
-                <td>${doc.file_name}</td>
-                <td>${formatBytes(doc.file_size)}</td>
-                <td>${new Date(doc.created_at).toLocaleDateString('id-ID')}</td>
-                <td>${actionButtons}</td>
-            </tr>`;
+
+                <td>
+                    <span class="badge bg-secondary">
+                        ${doc.document_type}
+                    </span>
+                </td>
+
+                <td>
+                    ${doc.file_name}
+                </td>
+
+                <td>
+                    ${formatBytes(
+                        doc.file_size
+                    )}
+                </td>
+
+                <td>
+                    ${new Date(
+                        doc.created_at
+                    ).toLocaleDateString(
+                        'id-ID'
+                    )}
+                </td>
+
+                <td>
+                    ${actionButtons}
+                </td>
+
+            </tr>
+
+        `;
     });
 
     tableBody.innerHTML = html;
+
+    // ==========================
+    // KPI DOCUMENT CENTER
+    // ==========================
+
+    const uploadedEl =
+        document.getElementById(
+            'docUploaded'
+        );
+
+    const typesEl =
+        document.getElementById(
+            'docTypes'
+        );
+
+    const statusEl =
+        document.getElementById(
+            'docStatus'
+        );
+
+    const jenis =
+        [
+            ...new Set(
+                documents.map(
+                    d => d.document_type
+                )
+            )
+        ];
+
+    if(uploadedEl){
+        uploadedEl.innerText =
+            documents.length;
+    }
+
+    if(typesEl){
+        typesEl.innerText =
+            jenis.length;
+    }
+
+    if(statusEl){
+
+        statusEl.innerText =
+
+            Math.min(
+                100,
+
+                Math.round(
+                    (
+                        documents.length / 10
+                    ) * 100
+                )
+
+            ) + '%';
+    }
 }
 
 document.getElementById('uploadForm').addEventListener('submit', async (e)=>{
