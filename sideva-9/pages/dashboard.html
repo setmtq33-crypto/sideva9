@@ -29,10 +29,140 @@
  
 <link rel="stylesheet" href="../css/app.css">
 
+   
+<style>
 
+:root{
+    --sideva-primary:#2563eb;
+    --sideva-success:#16a34a;
+    --sideva-warning:#f59e0b;
+    --sideva-danger:#ef4444;
+    --sideva-surface:#ffffff;
+}
+
+.content-body{
+    background:#f8fafc;
+    min-height:100vh;
+}
+
+.hero-dashboard{
+    background:
+    linear-gradient(
+        135deg,
+        #2563eb,
+        #1d4ed8
+    );
+    border-radius:24px;
+    padding:32px;
+    color:white;
+    position:relative;
+    overflow:hidden;
+}
+
+.hero-dashboard::after{
+    content:'';
+    position:absolute;
+    right:-80px;
+    top:-80px;
+    width:250px;
+    height:250px;
+    border-radius:50%;
+    background:rgba(255,255,255,.08);
+}
+
+.hero-title{
+    font-size:2rem;
+    font-weight:800;
+    margin-bottom:8px;
+}
+
+.hero-subtitle{
+    opacity:.85;
+    font-size:.95rem;
+}
+
+.modern-card{
+    background:white;
+    border:none;
+    border-radius:20px;
+    padding:24px;
+    box-shadow:
+    0 10px 30px rgba(0,0,0,.05);
+    transition:.25s;
+}
+
+.modern-card:hover{
+    transform:translateY(-4px);
+}
+
+.kpi-modern{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.kpi-icon{
+    width:60px;
+    height:60px;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.4rem;
+}
+
+.kpi-value{
+    font-size:2rem;
+    font-weight:800;
+    line-height:1;
+}
+
+.kpi-label{
+    color:#64748b;
+    font-size:.85rem;
+    margin-bottom:8px;
+}
+
+.bg-kpi-blue{
+    background:#dbeafe;
+    color:#2563eb;
+}
+
+.bg-kpi-green{
+    background:#dcfce7;
+    color:#16a34a;
+}
+
+.bg-kpi-orange{
+    background:#fef3c7;
+    color:#d97706;
+}
+
+.bg-kpi-cyan{
+    background:#cffafe;
+    color:#0891b2;
+}
+
+.section-card{
+    background:white;
+    border:none;
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:
+    0 10px 30px rgba(0,0,0,.05);
+}
+
+.section-header{
+    padding:18px 24px;
+    font-weight:700;
+    border-bottom:1px solid #eef2f7;
+}
+
+.section-body{
+    padding:24px;
+}
 
     
-<style>
 body {
     background-color: var(--bs-body-bg);
     color: var(--bs-body-color);
@@ -179,16 +309,36 @@ body {
         <div class="content-body">
             <div class="container-fluid p-3 p-md-4">
 
-                <div class="row mb-4">
-                    <div class="col-md-12">
-                        <div class="card banner-gradient p-3 shadow-sm">
-                            <div class="card-body">
-                                <span class="badge bg-white text-primary mb-2 fw-bold" style="font-size: 0.75rem;">Portal Pusat Kendali</span>
-                                <h4 class="mb-1">Dashboard Terpadu SIDEVA9</h4>
-                                <div id="welcomeText" class="text-white-50 small">Mengambil data profil log masuk...</div>
+                <div class="hero-dashboard mb-4">
+
+                    <div class="row align-items-center">
+                
+                        <div class="col-md-8">
+                
+                            <div class="hero-title">
+                                SIDEVA9 Procurement Center
                             </div>
+                
+                            <div id="welcomeText"
+                                 class="hero-subtitle">
+                            </div>
+                
                         </div>
+                
+                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                
+                            <div class="small opacity-75">
+                                Sistem Informasi Digital
+                            </div>
+                
+                            <div class="fw-bold">
+                                E-Purchasing Management
+                            </div>
+                
+                        </div>
+                
                     </div>
+                
                 </div>
 
                 <div class="row mb-4 g-3">
