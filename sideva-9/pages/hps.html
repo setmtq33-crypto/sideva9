@@ -108,6 +108,73 @@ h1,h2,h3,h4,h5{
 
 }
 
+
+.kpi-modern-card{
+    background:#fff;
+    border-radius:20px;
+    padding:22px;
+    border:1px solid #e5e7eb;
+    box-shadow:0 8px 24px rgba(0,0,0,.05);
+}
+
+.kpi-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.kpi-title{
+    font-size:.85rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:#64748b;
+}
+
+.kpi-number{
+    font-size:2rem;
+    font-weight:800;
+    margin-top:8px;
+    line-height:1.1;
+}
+
+.kpi-footer{
+    color:#94a3b8;
+    margin-top:8px;
+}
+
+.kpi-icon-modern{
+    width:64px;
+    height:64px;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.6rem;
+}
+
+.kpi-blue{
+    background:#dbeafe;
+    color:#2563eb;
+}
+
+.kpi-green{
+    background:#dcfce7;
+    color:#16a34a;
+}
+
+.kpi-cyan{
+    background:#cffafe;
+    color:#0891b2;
+}
+
+.kpi-orange{
+    background:#fef3c7;
+    color:#d97706;
+}
+
+    
+
 </style>
 
 </head>
@@ -126,11 +193,136 @@ h1,h2,h3,h4,h5{
     </div>
 
     <!-- Statistik HPS -->
-    <div class="row mb-4">
-        <div class="col-md-3"><div class="card p-3"><small>Pagu Paket</small><h5 id="budgetCeiling" class="text-primary">Rp 0</h5></div></div>
-        <div class="col-md-3"><div class="card p-3"><small>Total HPS</small><h5 id="totalHps">Rp 0</h5></div></div>
-        <div class="col-md-3"><div class="card p-3"><small>Efisiensi</small><h5 id="efficiency">Rp 0</h5></div></div>
-        <div class="col-md-3"><div class="card p-3"><small>Persentase</small><h5 id="efficiencyPercent">0%</h5></div></div>
+    <div class="row g-3 mb-4">
+
+        <div class="col-xl-3 col-md-6">
+    
+            <div class="kpi-modern-card">
+    
+                <div class="kpi-header">
+    
+                    <div>
+    
+                        <div class="kpi-title">
+                            Pagu Paket
+                        </div>
+    
+                        <div id="budgetCeiling" class="kpi-number text-primary">
+                            Rp 0
+                        </div>
+    
+                        <div class="kpi-footer">
+                            Nilai anggaran paket
+                        </div>
+    
+                    </div>
+    
+                    <div class="kpi-icon-modern kpi-blue">
+                        <i class="bi bi-wallet2"></i>
+                    </div>
+    
+                </div>
+    
+            </div>
+    
+        </div>
+    
+        <div class="col-xl-3 col-md-6">
+    
+            <div class="kpi-modern-card">
+    
+                <div class="kpi-header">
+    
+                    <div>
+    
+                        <div class="kpi-title">
+                            Total HPS
+                        </div>
+    
+                        <div id="totalHps" class="kpi-number">
+                            Rp 0
+                        </div>
+    
+                        <div class="kpi-footer">
+                            Nilai HPS final
+                        </div>
+    
+                    </div>
+    
+                    <div class="kpi-icon-modern kpi-green">
+                        <i class="bi bi-calculator-fill"></i>
+                    </div>
+    
+                </div>
+    
+            </div>
+    
+        </div>
+    
+        <div class="col-xl-3 col-md-6">
+    
+            <div class="kpi-modern-card">
+    
+                <div class="kpi-header">
+    
+                    <div>
+    
+                        <div class="kpi-title">
+                            Efisiensi
+                        </div>
+    
+                        <div id="efficiency" class="kpi-number text-success">
+                            Rp 0
+                        </div>
+    
+                        <div class="kpi-footer">
+                            Selisih pagu dan HPS
+                        </div>
+    
+                    </div>
+    
+                    <div class="kpi-icon-modern kpi-cyan">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </div>
+    
+                </div>
+    
+            </div>
+    
+        </div>
+    
+        <div class="col-xl-3 col-md-6">
+    
+            <div class="kpi-modern-card">
+    
+                <div class="kpi-header">
+    
+                    <div>
+    
+                        <div class="kpi-title">
+                            Persentase
+                        </div>
+    
+                        <div id="efficiencyPercent" class="kpi-number">
+                            0%
+                        </div>
+    
+                        <div class="kpi-footer">
+                            Tingkat efisiensi
+                        </div>
+    
+                    </div>
+    
+                    <div class="kpi-icon-modern kpi-orange">
+                        <i class="bi bi-bullseye"></i>
+                    </div>
+    
+                </div>
+    
+            </div>
+    
+        </div>
+    
     </div>
 
     <div class="card p-4">
