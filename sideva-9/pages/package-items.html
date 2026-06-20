@@ -63,6 +63,62 @@ h1,h2,h3,h4,h5{
 
 }
 
+.item-grid{
+    display:grid;
+    grid-template-columns:
+    repeat(
+        auto-fill,
+        minmax(350px,1fr)
+    );
+    gap:18px;
+}
+
+.item-card{
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:20px;
+    padding:20px;
+    transition:.25s;
+    box-shadow:
+    0 8px 24px rgba(0,0,0,.05);
+}
+
+.item-card:hover{
+    transform:translateY(-3px);
+}
+
+.item-name{
+    font-size:1.05rem;
+    font-weight:700;
+    color:#111827;
+}
+
+.item-spec{
+    color:#64748b;
+    font-size:.85rem;
+    margin-bottom:12px;
+}
+
+.item-total{
+    color:#2563eb;
+    font-size:1.4rem;
+    font-weight:800;
+}
+
+.item-meta{
+    display:flex;
+    justify-content:space-between;
+    margin:12px 0;
+    font-size:.9rem;
+}
+
+.item-actions{
+    display:flex;
+    gap:8px;
+    margin-top:15px;
+}
+    
+
 
 </style>
 </head>
@@ -95,21 +151,9 @@ h1,h2,h3,h4,h5{
 <div class="card">
 <div class="card-body">
 <input id="searchInput" class="form-control mb-3" placeholder="Cari item...">
-<div class="table-responsive">
-<table class="table table-bordered">
-<thead>
-<tr>
-<th>Nama</th>
-<th>Spesifikasi</th>
-<th>Qty</th>
-<th>Satuan</th>
-<th>Harga</th>
-<th>Total</th>
-<th>Aksi</th>
-</tr>
-</thead>
-<tbody id="tbody"></tbody>
-</table>
+<div
+    id="tbody"
+    class="item-grid">
 </div>
 </div>
 </div>
@@ -313,32 +357,61 @@ function render(rows){
         total += rowTotal;
 
         html += `
-        <tr>
 
-            <td>${r.item_name || ''}</td>
+        <div class="item-card">
 
-            <td>${r.specification || ''}</td>
+            <div class="item-name">
+                📦 ${r.item_name || '-'}
+            </div>
 
-            <td>${r.quantity || 0}</td>
+            <div class="item-spec">
+                ${r.specification || 'Tidak ada spesifikasi'}
+            </div>
 
-            <td>${r.unit || ''}</td>
+            <div class="item-total">
+                ${rupiah(rowTotal)}
+            </div>
 
-            <td>${rupiah(r.estimated_price)}</td>
+            <div class="item-meta">
 
-            <td>${rupiah(rowTotal)}</td>
+                <div>
+                    <small class="text-muted d-block">
+                        Qty
+                    </small>
 
-            <td>
+                    <strong>
+                        ${r.quantity || 0}
+                        ${r.unit || ''}
+                    </strong>
+                </div>
 
-                ${
-                    canManagePackageItems()
+                <div>
+                    <small class="text-muted d-block">
+                        Harga Satuan
+                    </small>
 
-                    ?
+                    <strong>
+                        ${rupiah(r.estimated_price)}
+                    </strong>
+                </div>
 
-                    `
+            </div>
+
+            ${
+                canManagePackageItems()
+
+                ?
+
+                `
+                <div class="item-actions">
+
                     <button
                         class="btn btn-warning btn-sm"
                         onclick="editItem('${r.id}')">
+
+                        <i class="bi bi-pencil-square"></i>
                         Edit
+
                     </button>
 
                     <button
@@ -347,20 +420,28 @@ function render(rows){
                             '${r.id}',
                             '${r.item_name}'
                         )">
+
+                        <i class="bi bi-trash"></i>
                         Hapus
+
                     </button>
-                    `
 
-                    :
+                </div>
+                `
 
-                    `<span class="text-muted">
-                        View Only
-                    </span>`
-                }
+                :
 
-            </td>
+                `
+                <div class="mt-3 text-muted">
+                    View Only
+                </div>
+                `
+            }
 
-        </tr>`;
+        </div>
+
+        `;
+
     });
 
     document.getElementById(
