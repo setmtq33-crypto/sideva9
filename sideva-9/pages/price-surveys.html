@@ -482,47 +482,70 @@ async function editSurvey(id){
 }
 
 async function saveSurvey(){
-alert('1 MASUK SAVE');
 
-const payload = {
-    vendor_name: vendorName.value,
-    brand: brand.value,
-    survey_price: Number(surveyPrice.value || 0),
-    negotiated_price: Number(negotiatedPrice.value || 0),
-    source_url: sourceUrl.value,
-    survey_date: surveyDate.value,
-    notes: notes.value,
-    is_candidate: isCandidate.checked,
-    is_winner: isWinner.checked
-};
+    const payload = {
+        vendor_name: vendorName.value,
+        brand: brand.value,
+        survey_price: Number(
+            surveyPrice.value || 0
+        ),
+        negotiated_price: Number(
+            negotiatedPrice.value || 0
+        ),
+        source_url: sourceUrl.value,
+        survey_date: surveyDate.value,
+        notes: notes.value,
+        is_candidate: isCandidate.checked,
+        is_winner: isWinner.checked
+    };
 
-let result;
+    let result;
 
-if(currentSurveyId){
-    result = await surveyDb
-    .from('price_surveys')
-    .update(payload)
-    .eq('id',currentSurveyId);
-}else{
-    result = await surveyDb
-    .from('price_surveys')
-    .insert({
-        ...payload,
-        tenant_id: profile.tenant_id,
-       
-        package_item_id: selectedItemId
-    });
-}
+    if(currentSurveyId){
 
-if(result.error){
-    alert(result.error.message);
-    return;
-}
+        result = await surveyDb
+            .from('price_surveys')
+            .update(payload)
+            .eq(
+                'id',
+                currentSurveyId
+            );
 
-alert('6 SUKSES');
-modal.hide();
+    }else{
 
-await selectItem(selectedItemId);
+        result = await surveyDb
+            .from('price_surveys')
+            .insert({
+                ...payload,
+                tenant_id:
+                    profile.tenant_id,
+                opd_id:
+                    profile.opd_id,
+                package_item_id:
+                    selectedItemId
+            });
+    }
+
+    if(result.error){
+
+        alert(
+            result.error.message
+        );
+
+        return;
+    }
+
+    modal.hide();
+
+    await selectItem(
+        selectedItemId
+    );
+
+    alert(
+        currentSurveyId
+        ? 'Survey berhasil diperbarui'
+        : 'Survey berhasil disimpan'
+    );
 }
 
 async function deleteSurvey(id){
