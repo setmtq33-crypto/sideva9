@@ -4,6 +4,34 @@ Semua perubahan penting pada SI-DEVA9 dicatat pada dokumen ini.
 
 ⸻
 
+Database
+
+Implementasi struktur database SI-DEVA9 meliputi:
+
+* tenants
+* profiles
+* opds
+* bidangs
+* budget_accounts
+* rup_imports
+* packages
+* package_items
+* price_surveys
+* package_documents
+* package_dpp
+* package_reviews
+* package_hps
+* package_bahpe
+* package_determinations
+* procurement_officers
+* ppkoms
+* audit_logs
+* telegram_notifications
+
+Serta berbagai view dashboard dan procurement monitoring.
+
+
+
 v9.0.0 - Internal Release
 
 Fitur Utama
