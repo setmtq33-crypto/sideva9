@@ -85,6 +85,12 @@ h1,h2,h3,h4,h5{
     0 8px 24px rgba(0,0,0,.05);
 }
 
+.winner-card{
+    border:2px solid #22c55e;
+    box-shadow:
+    0 10px 25px rgba(34,197,94,.15);
+}
+
 .survey-top{
     display:flex;
     justify-content:space-between;
@@ -487,9 +493,12 @@ function renderSurvey(){
             );
         }
 
+        const isWinner =
+            s.is_winner === true;
+        
         html += `
-
-        <div class="survey-card">
+        
+        <div class="survey-card ${isWinner ? 'winner-card' : ''}">
 
             <div class="survey-top">
 
