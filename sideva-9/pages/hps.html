@@ -102,57 +102,145 @@ let packageId = new URLSearchParams(location.search).get('id');
 const rupiah = (v) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(v || 0);
 
 async function init() {
-    if (!packageId) { alert('ID Paket tidak ditemukan'); location.href = 'packages.html'; return; }
-    
-    // 1. Ambil data Paket
-    const { data: pkg, error } = await db
-    .from('packages')
-    .select('*')
-    .eq('id', packageId)
-    .single();
-    
-    if(error){
-        console.error(error);
+
+    if (!packageId) {
+        alert('ID Paket tidak ditemukan');
+        location.href = 'packages.html';
         return;
     }
-    
+
+    /* =========================
+       LOAD PACKAGE
+    ========================= */
+
+    const { data: pkg, error } = await db
+        .from('packages')
+        .select('*')
+        .eq('id', packageId)
+        .single();
+
+    if (error) {
+        console.error(error);
+        alert(error.message);
+        return;
+    }
+
     document.getElementById('packageName').innerText =
         pkg.package_name;
-    
+
     document.getElementById('budgetCeiling').innerText =
         rupiah(pkg.budget_ceiling);
-   
 
-    // 2. Kalkulasi HPS
-    const { data: items } = await db.from('package_items').select('*').eq('package_id', packageId);
+    /* =========================
+       CALCULATE HPS
+    ========================= */
+
+    const { data: items, error: itemError } =
+        await db
+            .from('package_items')
+            .select('*')
+            .eq('package_id', packageId);
+
+    if (itemError) {
+        console.error(itemError);
+        alert(itemError.message);
+        return;
+    }
+
     let totalHps = 0;
     let html = '';
 
     for (const item of (items || [])) {
-        const { data: surveys } = await db.from('price_surveys').select('*').eq('package_item_id', item.id);
-        
-        let hpsUnit = surveys?.length > 0 
-            ? (surveys.reduce((acc, s) => acc + (Number(s.negotiated_price || s.survey_price || 0)), 0) / surveys.length)
-            : Number(item.estimated_price || 0);
 
-        totalHps += (item.quantity * hpsUnit);
-        html += `<tr><td>${item.item_name}</td><td>${item.quantity}</td><td>${rupiah(item.estimated_price)}</td><td>${rupiah(hpsUnit)}</td><td>${rupiah(item.quantity * hpsUnit)}</td></tr>`;
+        const { data: surveys } =
+            await db
+                .from('price_surveys')
+                .select('*')
+                .eq(
+                    'package_item_id',
+                    item.id
+                );
+
+        /* =========================
+           AMBIL PEMENANG
+        ========================= */
+
+        const winner =
+            surveys?.find(
+                s => s.is_winner === true
+            );
+
+        /* =========================
+           HPS UNIT
+           = HARGA NEGOSIASI PEMENANG
+        ========================= */
+
+        const hpsUnit =
+            winner
+                ? Number(
+                    winner.negotiated_price ||
+                    winner.survey_price ||
+                    0
+                )
+                : Number(
+                    item.estimated_price || 0
+                );
+
+        const itemTotal =
+            Number(item.quantity || 0)
+            *
+            hpsUnit;
+
+        totalHps += itemTotal;
+
+        html += `
+        <tr>
+            <td>${item.item_name}</td>
+            <td>${item.quantity}</td>
+            <td>${rupiah(item.estimated_price)}</td>
+            <td>${rupiah(hpsUnit)}</td>
+            <td>${rupiah(itemTotal)}</td>
+        </tr>`;
     }
 
-    document.getElementById('hpsTable').innerHTML = html;
-    
-    // Update Stats
-    const pagu = Number(pkg.budget_ceiling || 0);
-    const eff = pagu - totalHps;
-    document.getElementById('totalHps').innerText = rupiah(totalHps);
-    document.getElementById('efficiency').innerText = rupiah(eff);
-    const percent =
-    pagu > 0
-    ? ((eff / pagu) * 100).toFixed(2)
-    : 0;
-    
-    document.getElementById('efficiencyPercent')
-    .innerText = percent + '%';
+    document.getElementById(
+        'hpsTable'
+    ).innerHTML = html;
+
+    /* =========================
+       STATISTIK
+    ========================= */
+
+    const pagu =
+        Number(
+            pkg.budget_ceiling || 0
+        );
+
+    const efficiency =
+        pagu - totalHps;
+
+    const efficiencyPercent =
+        pagu > 0
+            ? (
+                (efficiency / pagu)
+                * 100
+            ).toFixed(2)
+            : 0;
+
+    document.getElementById(
+        'totalHps'
+    ).innerText =
+        rupiah(totalHps);
+
+    document.getElementById(
+        'efficiency'
+    ).innerText =
+        rupiah(efficiency);
+
+    document.getElementById(
+        'efficiencyPercent'
+    ).innerText =
+        efficiencyPercent + '%';
 }
 
 async function saveHPS() {
