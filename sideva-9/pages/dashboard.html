@@ -162,6 +162,82 @@
     padding:24px;
 }
 
+/* =========================
+   KPI MODERN 2026
+========================= */
+
+.kpi-modern-card{
+    background:#fff;
+    border:none;
+    border-radius:22px;
+    padding:22px;
+    height:100%;
+    box-shadow:
+        0 12px 30px rgba(15,23,42,.06);
+    transition:.25s;
+}
+
+.kpi-modern-card:hover{
+    transform:translateY(-6px);
+}
+
+.kpi-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.kpi-icon-modern{
+    width:58px;
+    height:58px;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.4rem;
+}
+
+.kpi-blue{
+    background:#dbeafe;
+    color:#2563eb;
+}
+
+.kpi-green{
+    background:#dcfce7;
+    color:#16a34a;
+}
+
+.kpi-orange{
+    background:#fef3c7;
+    color:#d97706;
+}
+
+.kpi-cyan{
+    background:#cffafe;
+    color:#0891b2;
+}
+
+.kpi-title{
+    font-size:.82rem;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:#64748b;
+    font-weight:700;
+}
+
+.kpi-number{
+    font-size:2rem;
+    font-weight:800;
+    margin-top:12px;
+    line-height:1;
+}
+
+.kpi-footer{
+    margin-top:10px;
+    font-size:.8rem;
+    color:#94a3b8;
+}
+    
     
 body {
     background-color: var(--bs-body-bg);
@@ -341,30 +417,105 @@ body {
                 
                 </div>
 
-                <div class="row mb-4 g-3">
-                    <div class="col-xl-3 col-lg-4 col-md-6 col-12">
-                        <div class="card h-100 kpi-card"><div class="card-body">
-                            <small class="text-muted text-uppercase fw-bold d-block" style="font-size:0.7rem; letter-spacing: 0.5px;">Jumlah Paket</small>
-                            <div id="totalPackages" class="kpi">0</div>
-                        </div></div>
+                <div class="kpi-modern-card">
+
+                    <div class="kpi-header">
+                
+                        <div class="kpi-title">
+                            Paket Aktif
+                        </div>
+                
+                        <div class="kpi-icon-modern kpi-blue">
+                            <i class="fa-solid fa-boxes-stacked"></i>
+                        </div>
+                
                     </div>
-                    <div class="col-xl-3 col-lg-4 col-md-6 col-12">
-                        <div class="card h-100 kpi-card kpi-primary"><div class="card-body">
-                            <small class="text-muted text-uppercase fw-bold d-block" style="font-size:0.7rem; letter-spacing: 0.5px;">Total Pagu</small>
-                            <div id="totalBudget" class="kpi text-truncate text-primary">Rp0</div>
-                        </div></div>
+                
+                    <div
+                        class="kpi-number"
+                        id="totalPackages">
+                        0
                     </div>
-                    <div class="col-xl-3 col-lg-4 col-md-6 col-12">
-                        <div class="card h-100 kpi-card"><div class="card-body">
-                            <small class="text-muted text-uppercase fw-bold d-block" style="font-size:0.7rem; letter-spacing: 0.5px;">Total HPS</small>
-                            <div id="totalHps" class="kpi text-truncate">Rp0</div>
-                        </div></div>
+                
+                    <div class="kpi-footer">
+                        Paket pengadaan aktif
                     </div>
-                    <div class="col-xl-3 col-lg-4 col-md-6 col-12">
-                        <div class="card h-100 kpi-card kpi-success"><div class="card-body">
-                            <small class="text-muted text-uppercase fw-bold d-block" style="font-size:0.7rem; letter-spacing: 0.5px;">Efisiensi</small>
-                            <div id="efficiency" class="kpi text-success text-truncate">Rp0</div>
-                        </div></div>
+                
+                </div>
+                    <div class="kpi-modern-card">
+
+                        <div class="kpi-header">
+                    
+                            <div class="kpi-title">
+                                Total Pagu
+                            </div>
+                    
+                            <div class="kpi-icon-modern kpi-green">
+                                <i class="fa-solid fa-wallet"></i>
+                            </div>
+                    
+                        </div>
+                    
+                        <div
+                            class="kpi-number"
+                            id="totalBudget">
+                            Rp 0
+                        </div>
+                    
+                        <div class="kpi-footer">
+                            Nilai anggaran seluruh paket
+                        </div>
+                    
+                    </div>
+                    <div class="kpi-modern-card">
+
+                        <div class="kpi-header">
+                    
+                            <div class="kpi-title">
+                                Total HPS
+                            </div>
+                    
+                            <div class="kpi-icon-modern kpi-orange">
+                                <i class="fa-solid fa-calculator"></i>
+                            </div>
+                    
+                        </div>
+                    
+                        <div
+                            class="kpi-number"
+                            id="totalHps">
+                            Rp 0
+                        </div>
+                    
+                        <div class="kpi-footer">
+                            Hasil perhitungan HPS
+                        </div>
+                    
+                    </div>
+                    <div class="kpi-modern-card">
+
+                        <div class="kpi-header">
+                    
+                            <div class="kpi-title">
+                                Efisiensi
+                            </div>
+                    
+                            <div class="kpi-icon-modern kpi-cyan">
+                                <i class="fa-solid fa-chart-line"></i>
+                            </div>
+                    
+                        </div>
+                    
+                        <div
+                            class="kpi-number"
+                            id="totalEfficiency">
+                            Rp 0
+                        </div>
+                    
+                        <div class="kpi-footer">
+                            Selisih pagu dan HPS
+                        </div>
+                    
                     </div>
                     <div class="col-xl-3 col-lg-4 col-md-6 col-12">
                         <div class="card h-100 kpi-card kpi-info">
