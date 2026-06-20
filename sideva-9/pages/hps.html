@@ -173,6 +173,58 @@ h1,h2,h3,h4,h5{
     color:#d97706;
 }
 
+.hps-hero{
+    background:
+    linear-gradient(
+        135deg,
+        #2563eb,
+        #1d4ed8
+    );
+
+    color:white;
+
+    padding:30px;
+
+    border-radius:24px;
+
+    box-shadow:
+    0 12px 32px
+    rgba(37,99,235,.25);
+}
+
+.hero-title{
+    font-size:2rem;
+    font-weight:800;
+    letter-spacing:.5px;
+}
+
+.hero-subtitle{
+    margin-top:8px;
+    opacity:.9;
+    font-size:1rem;
+}
+
+.winner-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+
+    padding:8px 14px;
+
+    border-radius:999px;
+
+    background:
+    rgba(22,163,74,.12);
+
+    color:#15803d;
+
+    font-size:.85rem;
+
+    font-weight:600;
+
+    margin-bottom:14px;
+}
+
     
 
 </style>
@@ -181,15 +233,50 @@ h1,h2,h3,h4,h5{
 <body>
 
 <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h3 class="fw-bold">HPS Engine</h3>
-            <p id="packageName" class="text-muted mb-0">Memuat paket...</p>
+    <div class="hps-hero mb-4">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+    
+            <div>
+    
+                <div class="hero-title">
+                    HPS ENGINE
+                </div>
+    
+                <div
+                    id="packageName"
+                    class="hero-subtitle">
+    
+                    Memuat paket...
+    
+                </div>
+    
+            </div>
+    
+            <div class="d-flex gap-2">
+    
+                <a
+                    href="packages.html"
+                    class="btn btn-light">
+    
+                    <i class="bi bi-arrow-left"></i>
+                    Kembali
+    
+                </a>
+    
+                <button
+                    class="btn btn-warning fw-bold"
+                    onclick="saveHPS()">
+    
+                    <i class="bi bi-shield-check"></i>
+                    Simpan & Kunci HPS
+    
+                </button>
+    
+            </div>
+    
         </div>
-        <div class="gap-2 d-flex">
-            <a href="packages.html" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Kembali</a>
-            <button class="btn btn-primary" onclick="saveHPS()"><i class="bi bi-save"></i> Simpan & Kunci HPS</button>
-        </div>
+    
     </div>
 
     <!-- Statistik HPS -->
@@ -427,6 +514,14 @@ async function init() {
             surveys?.find(
                 s => s.is_winner === true
             );
+        const winnerVendor =
+            winner
+                ? (
+                    winner.vendor_name ||
+                    winner.vendor ||
+                    '-'
+                )
+                : null;
 
         /* =========================
            HPS UNIT
@@ -458,6 +553,14 @@ async function init() {
             <div class="hps-item">
                 📦 ${item.item_name}
             </div>
+
+            ${winnerVendor ? `
+            <div class="winner-badge">
+                🏆 Vendor Pemenang
+                <strong>${winnerVendor}</strong>
+            </div>
+            ` : ''}
+            
         
             <div class="hps-total">
                 ${rupiah(itemTotal)}
