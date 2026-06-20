@@ -412,27 +412,48 @@ async function loadItems(){
 }
 
 function renderItems(){
- let html='';
 
- items.forEach(item=>{
- html += `
- <button
- class="list-group-item list-group-item-action"
- onclick="selectItem('${item.id}')">
- ${item.item_name}
- </button>
- `;
- });
+    let html = '';
 
- itemList.innerHTML = html;
+    items.forEach(item=>{
 
- if(items.length){
-   selectItem(items[0].id);
- }
+        html += `
+
+        <div
+            class="item-selector-card
+            ${selectedItemId === item.id ? 'active' : ''}"
+            onclick="selectItem('${item.id}')">
+
+            <div class="item-selector-title">
+                📦 ${item.item_name}
+            </div>
+
+            <div class="item-selector-meta">
+                ${item.quantity || 0}
+                ${item.unit || ''}
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+    itemList.innerHTML = html;
+
+    if(
+        items.length &&
+        !selectedItemId
+    ){
+        selectItem(
+            items[0].id
+        );
+    }
 }
 
 async function selectItem(id){
     selectedItemId = id;
+    renderItems();
     console.log('SELECT ITEM DIPANGGIL', id);
 
     const item = items.find(x => x.id === id);
