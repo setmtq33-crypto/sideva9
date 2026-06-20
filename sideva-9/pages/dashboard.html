@@ -237,6 +237,61 @@
     font-size:.8rem;
     color:#94a3b8;
 }
+
+/* =========================
+   TOP PACKAGE 2026
+========================= */
+
+.top-package-list{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
+.package-rank-card{
+    background:#fff;
+    border:1px solid #eef2f7;
+    border-radius:18px;
+    padding:18px;
+    transition:.25s;
+}
+
+.package-rank-card:hover{
+    transform:translateY(-3px);
+    box-shadow:
+        0 10px 25px rgba(0,0,0,.05);
+}
+
+.package-title{
+    font-weight:700;
+    font-size:1rem;
+    margin-bottom:8px;
+}
+
+.package-opd{
+    font-size:.85rem;
+    color:#64748b;
+    margin-bottom:12px;
+}
+
+.package-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.package-value{
+    font-weight:800;
+    color:#2563eb;
+    font-size:1.05rem;
+}
+
+.status-modern{
+    border-radius:999px;
+    padding:6px 12px;
+    font-size:.75rem;
+    font-weight:700;
+}
     
     
 body {
@@ -541,42 +596,105 @@ body {
                 
                 </div>
                     
-                    <div class="col-xl-3 col-lg-4 col-md-6 col-12">
-                        <div class="card h-100 kpi-card kpi-info">
-                            <div class="card-body">
-                                <small class="text-muted text-uppercase fw-bold d-block">
-                                    Ready Procure
-                                </small>
-                                <div id="readyProcurement" class="kpi text-info">0</div>
+                    <div class="col-xl-4 col-md-4">
+
+                        <div class="kpi-modern-card">
+                    
+                            <div class="kpi-header">
+                    
+                                <div>
+                    
+                                    <div class="kpi-title">
+                                        Ready Procurement
+                                    </div>
+                    
+                                    <div
+                                        id="readyProcurement"
+                                        class="kpi-number">
+                                        0
+                                    </div>
+                    
+                                    <div class="kpi-footer">
+                                        Paket siap pengadaan
+                                    </div>
+                    
+                                </div>
+                    
+                                <div class="kpi-icon-modern kpi-cyan">
+                                    <i class="fa-solid fa-rocket"></i>
+                                </div>
+                    
                             </div>
+                    
                         </div>
+                    
                     </div>
                     
-                    <!-- OPD AKTIF -->
+                    <div class="col-xl-4 col-md-4">
                     
-                    <div class="col-xl-3 col-lg-4 col-md-6 col-12">
-                        <div class="card h-100 kpi-card">
-                            <div class="card-body">
-                                <small class="text-muted text-uppercase fw-bold d-block">
-                                    OPD Aktif
-                                </small>
-                                <div id="totalOpd" class="kpi">0</div>
+                        <div class="kpi-modern-card">
+                    
+                            <div class="kpi-header">
+                    
+                                <div>
+                    
+                                    <div class="kpi-title">
+                                        OPD Aktif
+                                    </div>
+                    
+                                    <div
+                                        id="totalOpd"
+                                        class="kpi-number">
+                                        0
+                                    </div>
+                    
+                                    <div class="kpi-footer">
+                                        Organisasi aktif
+                                    </div>
+                    
+                                </div>
+                    
+                                <div class="kpi-icon-modern kpi-blue">
+                                    <i class="fa-solid fa-building"></i>
+                                </div>
+                    
                             </div>
+                    
                         </div>
+                    
                     </div>
                     
-                    <!-- BIDANG AKTIF -->
+                    <div class="col-xl-4 col-md-4">
                     
-                    <div class="col-xl-3 col-lg-4 col-md-6 col-12">
-                        <div class="card h-100 kpi-card kpi-success">
-                            <div class="card-body">
-                                <small class="text-muted text-uppercase fw-bold d-block">
-                                    Bidang Aktif
-                                </small>
-                                <div id="totalBidang" class="kpi">0</div>
+                        <div class="kpi-modern-card">
+                    
+                            <div class="kpi-header">
+                    
+                                <div>
+                    
+                                    <div class="kpi-title">
+                                        Bidang Aktif
+                                    </div>
+                    
+                                    <div
+                                        id="totalBidang"
+                                        class="kpi-number">
+                                        0
+                                    </div>
+                    
+                                    <div class="kpi-footer">
+                                        Struktur bidang aktif
+                                    </div>
+                    
+                                </div>
+                    
+                                <div class="kpi-icon-modern kpi-green">
+                                    <i class="fa-solid fa-sitemap"></i>
+                                </div>
+                    
                             </div>
+                    
                         </div>
-                    </div>
                     
                     </div>
 
