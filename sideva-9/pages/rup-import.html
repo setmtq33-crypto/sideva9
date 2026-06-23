@@ -842,15 +842,28 @@ async function saveRup(){
         )
         .single();
 
+        console.log(
+            'currentOpdId',
+            currentOpdId
+        );
+        
+        console.log(
+            'opd',
+            opd
+        );
+        
+        console.log(
+            'opdError',
+            opdError
+        );
+        
         if(
             opdError ||
             !opd
         ){
-
             alert(
                 'OPD tidak ditemukan'
             );
-
             return;
         }
 
