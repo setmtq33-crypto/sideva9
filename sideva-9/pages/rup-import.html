@@ -801,28 +801,51 @@ async function saveRup(){
         return;
     }
 
-    let opd_id = profile.opd_id;
-    let finalOpdName = opdName;
+    // ======================
+    // RESOLVE OPD
+    // ======================
 
-    // SUPER ADMIN boleh pilih OPD
+    const currentOpdId =
+        localStorage.getItem(
+            'global_opd_id'
+        ) ||
+        profile.opd_id;
+
+    let opd_id = null;
+    let finalOpdName = null;
+
     if(
         profile.role ===
         'SUPER_ADMIN'
     ){
 
+        if(!currentOpdId){
+
+            alert(
+                'Pilih OPD terlebih dahulu'
+            );
+
+            return;
+        }
+
         const {
-            data: opd
+            data: opd,
+            error: opdError
         } = await rupDb
         .from('opds')
         .select(
             'id,name,sirup_name'
         )
-        .or(
-            `name.eq.${opdName},sirup_name.eq.${opdName}`
+        .eq(
+            'id',
+            currentOpdId
         )
         .single();
 
-        if(!opd){
+        if(
+            opdError ||
+            !opd
+        ){
 
             alert(
                 'OPD tidak ditemukan'
@@ -839,9 +862,9 @@ async function saveRup(){
 
     }else{
 
-        // selain SUPER_ADMIN pakai OPD login
         const {
-            data: opd
+            data: opd,
+            error: opdError
         } = await rupDb
         .from('opds')
         .select(
@@ -853,12 +876,28 @@ async function saveRup(){
         )
         .single();
 
-        if(opd){
+        if(
+            opdError ||
+            !opd
+        ){
 
-            finalOpdName =
-                opd.name;
+            alert(
+                'OPD login tidak ditemukan'
+            );
+
+            return;
         }
+
+        opd_id =
+            opd.id;
+
+        finalOpdName =
+            opd.name;
     }
+
+    // ======================
+    // INSERT / UPDATE
+    // ======================
 
     let query;
 
@@ -953,17 +992,20 @@ async function saveRup(){
         return;
     }
 
+    const isEdit =
+        !!editingRupId;
+
     await writeAuditLog(
 
         'RUP_IMPORT',
 
-        editingRupId
+        isEdit
             ? 'UPDATE'
             : 'CREATE',
 
         editingRupId,
 
-        editingRupId
+        isEdit
             ? `Update RUP ${rupNumber}`
             : `Import RUP ${rupNumber}`
 
@@ -977,7 +1019,7 @@ async function saveRup(){
 
     alert(
 
-        editingRupId
+        isEdit
         ? 'RUP berhasil diperbarui'
         : 'RUP berhasil disimpan'
 
