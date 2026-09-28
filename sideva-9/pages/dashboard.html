@@ -473,6 +473,101 @@ body {
 @media (max-width: 991.98px) {
     .main-content { margin-left: 0 !important; }
 }
+
+/* =====================================================
+   DASHBOARD PAKET PER BIDANG
+===================================================== */
+
+.bidang-dashboard-card{
+    background:#fff;
+    border:1px solid #eef2f7;
+    border-radius:20px;
+    padding:20px;
+    height:100%;
+    transition:.25s;
+    position:relative;
+    overflow:hidden;
+}
+
+.bidang-dashboard-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 12px 28px rgba(15,23,42,.08);
+}
+
+.bidang-dashboard-card::before{
+    content:'';
+    position:absolute;
+    left:0;
+    top:0;
+    bottom:0;
+    width:4px;
+    background:#2563eb;
+}
+
+.bidang-title{
+    font-weight:800;
+    font-size:1rem;
+    color:#1e293b;
+    margin-bottom:4px;
+}
+
+.bidang-opd{
+    font-size:.75rem;
+    color:#94a3b8;
+    margin-bottom:18px;
+}
+
+.bidang-package-number{
+    font-size:2rem;
+    font-weight:800;
+    color:#2563eb;
+    line-height:1;
+}
+
+.bidang-package-label{
+    font-size:.75rem;
+    color:#64748b;
+    margin-top:5px;
+}
+
+.bidang-budget{
+    font-size:.95rem;
+    font-weight:800;
+    color:#0f172a;
+}
+
+.bidang-progress{
+    height:7px;
+    border-radius:20px;
+    background:#eef2f7;
+    overflow:hidden;
+}
+
+.bidang-progress-bar{
+    height:100%;
+    border-radius:20px;
+    background:linear-gradient(
+        90deg,
+        #2563eb,
+        #60a5fa
+    );
+}
+
+.bidang-status-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:.78rem;
+    margin-top:10px;
+}
+
+.bidang-status-badge{
+    border-radius:999px;
+    padding:4px 9px;
+    font-size:.7rem;
+    font-weight:700;
+}
+    
 </style>
 </head>
 <body>
@@ -772,6 +867,43 @@ body {
                     
                         </div>
                     
+                    </div>
+                
+                </div>
+
+                <!-- =====================================================
+                     DASHBOARD PAKET PER BIDANG
+                ===================================================== -->
+                
+                <div class="card shadow-sm border-0 mb-4">
+                
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                
+                        <div>
+                            <i class="fa-solid fa-sitemap text-primary me-2"></i>
+                            Paket Pengadaan per Bidang
+                        </div>
+                
+                        <span class="badge bg-primary">
+                            <i class="fa-solid fa-layer-group me-1"></i>
+                            Monitoring Bidang
+                        </span>
+                
+                    </div>
+                
+                    <div class="card-body">
+                
+                        <div
+                            id="bidangPackageDashboard"
+                            class="row g-3">
+                
+                            <div class="col-12 text-center text-muted py-4">
+                                <div class="spinner-border spinner-border-sm me-2"></div>
+                                Memuat data bidang...
+                            </div>
+                
+                        </div>
+                
                     </div>
                 
                 </div>
@@ -1241,6 +1373,8 @@ async function init(){
 
     await loadTopPackages();
 
+    await loadBidangPackageDashboard();
+
     await loadOpdRanking();
 
     await loadPackageRanking();
@@ -1567,6 +1701,444 @@ async function loadTopPackages(){
         </tr>
         `;
     }
+}
+
+// =====================================================
+// DASHBOARD PAKET PER BIDANG
+// =====================================================
+
+async function loadBidangPackageDashboard(){
+
+    try{
+
+        const profile =
+            await getProfile();
+
+        let selectedOpd =
+            localStorage.getItem(
+                'global_opd_id'
+            ) || 'ALL';
+
+        /*
+         * ADMIN OPD
+         * hanya melihat bidang OPD sendiri
+         */
+        if(
+            profile.role !== 'SUPER_ADMIN'
+        ){
+            selectedOpd =
+                profile.opd_id;
+        }
+
+        /*
+         * AMBIL BIDANG
+         */
+        let bidangQuery =
+            dashboardDb
+            .from('bidangs')
+            .select(`
+                id,
+                name,
+                opd_id
+            `)
+            .order(
+                'name',
+                { ascending:true }
+            );
+
+        if(
+            selectedOpd !== 'ALL'
+        ){
+            bidangQuery =
+                bidangQuery.eq(
+                    'opd_id',
+                    selectedOpd
+                );
+        }
+
+        const {
+            data: bidangs,
+            error: bidangError
+        } = await bidangQuery;
+
+        if(bidangError)
+            throw bidangError;
+
+
+        /*
+         * AMBIL PAKET
+         */
+        let packageQuery =
+            dashboardDb
+            .from('packages')
+            .select(`
+                id,
+                package_name,
+                budget_ceiling,
+                package_status,
+                opd_id,
+                bidang_id
+            `);
+
+        if(
+            selectedOpd !== 'ALL'
+        ){
+            packageQuery =
+                packageQuery.eq(
+                    'opd_id',
+                    selectedOpd
+                );
+        }
+
+        const {
+            data: packages,
+            error: packageError
+        } = await packageQuery;
+
+        if(packageError)
+            throw packageError;
+
+
+        /*
+         * MAP PAKET PER BIDANG
+         */
+        const bidangMap = {};
+
+        (bidangs || []).forEach(
+            bidang => {
+
+                bidangMap[bidang.id] = {
+
+                    id:
+                        bidang.id,
+
+                    name:
+                        bidang.name,
+
+                    opd_id:
+                        bidang.opd_id,
+
+                    packages: [],
+
+                    totalBudget:
+                        0
+
+                };
+
+            }
+        );
+
+
+        /*
+         * MASUKKAN PAKET KE BIDANG
+         */
+        (packages || []).forEach(
+            pkg => {
+
+                /*
+                 * Paket tanpa bidang
+                 * tidak dimasukkan ke kartu bidang
+                 */
+                if(
+                    !pkg.bidang_id
+                ){
+                    return;
+                }
+
+                if(
+                    !bidangMap[pkg.bidang_id]
+                ){
+                    return;
+                }
+
+                bidangMap[
+                    pkg.bidang_id
+                ].packages.push(pkg);
+
+                bidangMap[
+                    pkg.bidang_id
+                ].totalBudget +=
+                    Number(
+                        pkg.budget_ceiling || 0
+                    );
+
+            }
+        );
+
+
+        /*
+         * UBAH OBJECT → ARRAY
+         */
+        const bidangData =
+            Object.values(
+                bidangMap
+            );
+
+
+        /*
+         * URUTKAN BERDASARKAN JUMLAH PAKET
+         */
+        bidangData.sort(
+            (a,b) =>
+                b.packages.length -
+                a.packages.length
+        );
+
+
+        /*
+         * RENDER
+         */
+        const container =
+            document.getElementById(
+                'bidangPackageDashboard'
+            );
+
+        if(
+            !bidangData.length
+        ){
+
+            container.innerHTML = `
+                <div class="col-12">
+
+                    <div class="text-center text-muted py-4">
+
+                        <i class="fa-solid fa-folder-open fs-2 mb-2"></i>
+
+                        <div>
+                            Belum ada data bidang.
+                        </div>
+
+                    </div>
+
+                </div>
+            `;
+
+            return;
+        }
+
+
+        let html = '';
+
+
+        bidangData.forEach(
+            bidang => {
+
+                const total =
+                    bidang.packages.length;
+
+                const ready =
+                    bidang.packages.filter(
+                        p =>
+                        p.package_status ===
+                        'READY_PROCUREMENT'
+                    ).length;
+
+                const hps =
+                    bidang.packages.filter(
+                        p =>
+                        p.package_status ===
+                        'HPS_COMPLETE'
+                    ).length;
+
+                const survey =
+                    bidang.packages.filter(
+                        p =>
+                        p.package_status ===
+                        'SURVEY_COMPLETE'
+                    ).length;
+
+                const draft =
+                    bidang.packages.filter(
+                        p =>
+                        p.package_status ===
+                        'DRAFT'
+                    ).length;
+
+
+                const progress =
+                    total > 0
+                    ? Math.round(
+                        (
+                            ready /
+                            total
+                        ) * 100
+                    )
+                    : 0;
+
+
+                html += `
+
+                <div class="col-xl-3 col-lg-4 col-md-6">
+
+                    <div class="bidang-dashboard-card">
+
+                        <div class="d-flex justify-content-between align-items-start">
+
+                            <div>
+
+                                <div class="bidang-title">
+
+                                    <i class="fa-solid fa-sitemap text-primary me-1"></i>
+
+                                    ${bidang.name || '-'}
+
+                                </div>
+
+                                <div class="bidang-opd">
+
+                                    Unit / Bidang Pengelola Paket
+
+                                </div>
+
+                            </div>
+
+                            <span class="badge bg-primary">
+                                ${total}
+                            </span>
+
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <div class="bidang-package-number">
+
+                                ${total}
+
+                            </div>
+
+                            <div class="bidang-package-label">
+
+                                TOTAL PAKET
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <div class="d-flex justify-content-between mb-1">
+
+                                <span class="small text-muted">
+
+                                    Total Pagu
+
+                                </span>
+
+                                <strong class="bidang-budget">
+
+                                    ${rupiah(
+                                        bidang.totalBudget
+                                    )}
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="bidang-progress mb-2">
+
+                            <div
+                                class="bidang-progress-bar"
+                                style="width:${progress}%">
+                            </div>
+
+                        </div>
+
+
+                        <div class="bidang-status-row">
+
+                            <span class="text-muted">
+
+                                Progress Ready
+
+                            </span>
+
+                            <strong class="text-primary">
+
+                                ${progress}%
+
+                            </strong>
+
+                        </div>
+
+
+                        <div class="d-flex flex-wrap gap-1 mt-3">
+
+                            <span
+                                class="bidang-status-badge bg-warning-subtle text-warning-emphasis">
+
+                                Draft ${draft}
+
+                            </span>
+
+                            <span
+                                class="bidang-status-badge bg-info-subtle text-info-emphasis">
+
+                                Survey ${survey}
+
+                            </span>
+
+                            <span
+                                class="bidang-status-badge bg-primary-subtle text-primary">
+
+                                HPS ${hps}
+
+                            </span>
+
+                            <span
+                                class="bidang-status-badge bg-success-subtle text-success">
+
+                                Ready ${ready}
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                `;
+
+            }
+        );
+
+
+        container.innerHTML =
+            html;
+
+
+    }catch(error){
+
+        console.error(
+            'loadBidangPackageDashboard:',
+            error
+        );
+
+        document.getElementById(
+            'bidangPackageDashboard'
+        ).innerHTML = `
+
+            <div class="col-12">
+
+                <div class="alert alert-danger">
+
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+
+                    Gagal memuat dashboard paket per bidang.
+
+                </div>
+
+            </div>
+
+        `;
+
+    }
+
 }
 
 async function loadOpdRanking(){
