@@ -1714,60 +1714,109 @@ async function loadBidangPackageDashboard(){
         const profile =
             await getProfile();
 
+        if(!profile){
+
+            console.warn(
+                'Profile tidak ditemukan'
+            );
+
+            return;
+
+        }
+
+
+        // =============================================
+        // TENTUKAN OPD AKTIF
+        // =============================================
+
         let selectedOpd =
             localStorage.getItem(
                 'global_opd_id'
             ) || 'ALL';
 
-        /*
-         * ADMIN OPD
-         * hanya melihat bidang OPD sendiri
-         */
-        if(
-            profile.role !== 'SUPER_ADMIN'
-        ){
-            selectedOpd =
-                profile.opd_id;
-        }
 
         /*
-         * AMBIL BIDANG
+         * SUPER ADMIN
+         * mengikuti OPD global yang dipilih
          */
+        if(
+            profile.role === 'SUPER_ADMIN'
+        ){
+
+            selectedOpd =
+                localStorage.getItem(
+                    'global_opd_id'
+                ) || 'ALL';
+
+        }
+        else{
+
+            /*
+             * ADMIN / USER OPD
+             * hanya melihat OPD sendiri
+             */
+            selectedOpd =
+                profile.opd_id;
+
+        }
+
+
+        // =============================================
+        // LOAD BIDANG
+        // =============================================
+
         let bidangQuery =
             dashboardDb
             .from('bidangs')
             .select(`
                 id,
-                name,
+                bidang_name,
                 opd_id
             `)
             .order(
-                'name',
-                { ascending:true }
+                'bidang_name',
+                {
+                    ascending: true
+                }
             );
 
+
         if(
+            selectedOpd &&
             selectedOpd !== 'ALL'
         ){
+
             bidangQuery =
                 bidangQuery.eq(
                     'opd_id',
                     selectedOpd
                 );
+
         }
+
 
         const {
             data: bidangs,
             error: bidangError
         } = await bidangQuery;
 
-        if(bidangError)
+
+        if(bidangError){
+
+            console.error(
+                'ERROR LOAD BIDANG:',
+                bidangError
+            );
+
             throw bidangError;
 
+        }
 
-        /*
-         * AMBIL PAKET
-         */
+
+        // =============================================
+        // LOAD PAKET
+        // =============================================
+
         let packageQuery =
             dashboardDb
             .from('packages')
@@ -1780,45 +1829,64 @@ async function loadBidangPackageDashboard(){
                 bidang_id
             `);
 
+
         if(
+            selectedOpd &&
             selectedOpd !== 'ALL'
         ){
+
             packageQuery =
                 packageQuery.eq(
                     'opd_id',
                     selectedOpd
                 );
+
         }
+
 
         const {
             data: packages,
             error: packageError
         } = await packageQuery;
 
-        if(packageError)
+
+        if(packageError){
+
+            console.error(
+                'ERROR LOAD PACKAGES BIDANG:',
+                packageError
+            );
+
             throw packageError;
 
+        }
 
-        /*
-         * MAP PAKET PER BIDANG
-         */
+
+        // =============================================
+        // MAP BIDANG
+        // =============================================
+
         const bidangMap = {};
+
 
         (bidangs || []).forEach(
             bidang => {
 
-                bidangMap[bidang.id] = {
+                bidangMap[
+                    bidang.id
+                ] = {
 
                     id:
                         bidang.id,
 
                     name:
-                        bidang.name,
+                        bidang.bidang_name,
 
                     opd_id:
                         bidang.opd_id,
 
-                    packages: [],
+                    packages:
+                        [],
 
                     totalBudget:
                         0
@@ -1829,31 +1897,39 @@ async function loadBidangPackageDashboard(){
         );
 
 
-        /*
-         * MASUKKAN PAKET KE BIDANG
-         */
+        // =============================================
+        // MASUKKAN PAKET KE BIDANG
+        // =============================================
+
         (packages || []).forEach(
             pkg => {
 
-                /*
-                 * Paket tanpa bidang
-                 * tidak dimasukkan ke kartu bidang
-                 */
                 if(
                     !pkg.bidang_id
                 ){
+
                     return;
+
                 }
 
+
                 if(
-                    !bidangMap[pkg.bidang_id]
+                    !bidangMap[
+                        pkg.bidang_id
+                    ]
                 ){
+
                     return;
+
                 }
+
 
                 bidangMap[
                     pkg.bidang_id
-                ].packages.push(pkg);
+                ].packages.push(
+                    pkg
+                );
+
 
                 bidangMap[
                     pkg.bidang_id
@@ -1866,18 +1942,20 @@ async function loadBidangPackageDashboard(){
         );
 
 
-        /*
-         * UBAH OBJECT → ARRAY
-         */
+        // =============================================
+        // OBJECT → ARRAY
+        // =============================================
+
         const bidangData =
             Object.values(
                 bidangMap
             );
 
 
-        /*
-         * URUTKAN BERDASARKAN JUMLAH PAKET
-         */
+        // =============================================
+        // URUTKAN
+        // =============================================
+
         bidangData.sort(
             (a,b) =>
                 b.packages.length -
@@ -1885,19 +1963,37 @@ async function loadBidangPackageDashboard(){
         );
 
 
-        /*
-         * RENDER
-         */
+        // =============================================
+        // CONTAINER
+        // =============================================
+
         const container =
             document.getElementById(
                 'bidangPackageDashboard'
             );
+
+
+        if(!container){
+
+            console.warn(
+                'Element #bidangPackageDashboard tidak ditemukan'
+            );
+
+            return;
+
+        }
+
+
+        // =============================================
+        // JIKA BELUM ADA BIDANG
+        // =============================================
 
         if(
             !bidangData.length
         ){
 
             container.innerHTML = `
+
                 <div class="col-12">
 
                     <div class="text-center text-muted py-4">
@@ -1911,11 +2007,17 @@ async function loadBidangPackageDashboard(){
                     </div>
 
                 </div>
+
             `;
 
             return;
+
         }
 
+
+        // =============================================
+        // RENDER
+        // =============================================
 
         let html = '';
 
@@ -1926,32 +2028,36 @@ async function loadBidangPackageDashboard(){
                 const total =
                     bidang.packages.length;
 
+
                 const ready =
                     bidang.packages.filter(
                         p =>
-                        p.package_status ===
-                        'READY_PROCUREMENT'
+                            p.package_status ===
+                            'READY_PROCUREMENT'
                     ).length;
+
 
                 const hps =
                     bidang.packages.filter(
                         p =>
-                        p.package_status ===
-                        'HPS_COMPLETE'
+                            p.package_status ===
+                            'HPS_COMPLETE'
                     ).length;
+
 
                 const survey =
                     bidang.packages.filter(
                         p =>
-                        p.package_status ===
-                        'SURVEY_COMPLETE'
+                            p.package_status ===
+                            'SURVEY_COMPLETE'
                     ).length;
+
 
                 const draft =
                     bidang.packages.filter(
                         p =>
-                        p.package_status ===
-                        'DRAFT'
+                            p.package_status ===
+                            'DRAFT'
                     ).length;
 
 
@@ -1968,139 +2074,144 @@ async function loadBidangPackageDashboard(){
 
                 html += `
 
-                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="col-xl-3 col-lg-4 col-md-6">
 
-                    <div class="bidang-dashboard-card">
+                        <div class="bidang-dashboard-card h-100">
 
-                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="d-flex justify-content-between align-items-start">
 
-                            <div>
+                                <div>
 
-                                <div class="bidang-title">
+                                    <div class="bidang-title">
 
-                                    <i class="fa-solid fa-sitemap text-primary me-1"></i>
+                                        <i class="fa-solid fa-sitemap text-primary me-1"></i>
 
-                                    ${bidang.name || '-'}
+                                        ${bidang.name || '-'}
+
+                                    </div>
+
+                                    <div class="bidang-opd">
+
+                                        Unit / Bidang Pengelola Paket
+
+                                    </div>
 
                                 </div>
 
-                                <div class="bidang-opd">
+                                <span class="badge bg-primary">
 
-                                    Unit / Bidang Pengelola Paket
-
-                                </div>
-
-                            </div>
-
-                            <span class="badge bg-primary">
-                                ${total}
-                            </span>
-
-                        </div>
-
-
-                        <div class="mb-3">
-
-                            <div class="bidang-package-number">
-
-                                ${total}
-
-                            </div>
-
-                            <div class="bidang-package-label">
-
-                                TOTAL PAKET
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="mb-3">
-
-                            <div class="d-flex justify-content-between mb-1">
-
-                                <span class="small text-muted">
-
-                                    Total Pagu
+                                    ${total}
 
                                 </span>
 
-                                <strong class="bidang-budget">
+                            </div>
 
-                                    ${rupiah(
-                                        bidang.totalBudget
-                                    )}
+
+                            <div class="mb-3">
+
+                                <div class="bidang-package-number">
+
+                                    ${total}
+
+                                </div>
+
+                                <div class="bidang-package-label">
+
+                                    TOTAL PAKET
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="mb-3">
+
+                                <div class="d-flex justify-content-between mb-1">
+
+                                    <span class="small text-muted">
+
+                                        Total Pagu
+
+                                    </span>
+
+                                    <strong class="bidang-budget">
+
+                                        Rp ${Number(
+                                            bidang.totalBudget || 0
+                                        ).toLocaleString('id-ID')}
+
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="bidang-progress mb-2">
+
+                                <div
+                                    class="bidang-progress-bar"
+                                    style="width:${progress}%">
+                                </div>
+
+                            </div>
+
+
+                            <div class="bidang-status-row">
+
+                                <span class="text-muted">
+
+                                    Progress Ready
+
+                                </span>
+
+                                <strong class="text-primary">
+
+                                    ${progress}%
 
                                 </strong>
 
                             </div>
 
-                        </div>
+
+                            <div class="d-flex flex-wrap gap-1 mt-3">
+
+                                <span
+                                    class="bidang-status-badge bg-warning-subtle text-warning-emphasis">
+
+                                    Draft ${draft}
+
+                                </span>
 
 
-                        <div class="bidang-progress mb-2">
+                                <span
+                                    class="bidang-status-badge bg-info-subtle text-info-emphasis">
 
-                            <div
-                                class="bidang-progress-bar"
-                                style="width:${progress}%">
+                                    Survey ${survey}
+
+                                </span>
+
+
+                                <span
+                                    class="bidang-status-badge bg-primary-subtle text-primary">
+
+                                    HPS ${hps}
+
+                                </span>
+
+
+                                <span
+                                    class="bidang-status-badge bg-success-subtle text-success">
+
+                                    Ready ${ready}
+
+                                </span>
+
                             </div>
 
                         </div>
 
-
-                        <div class="bidang-status-row">
-
-                            <span class="text-muted">
-
-                                Progress Ready
-
-                            </span>
-
-                            <strong class="text-primary">
-
-                                ${progress}%
-
-                            </strong>
-
-                        </div>
-
-
-                        <div class="d-flex flex-wrap gap-1 mt-3">
-
-                            <span
-                                class="bidang-status-badge bg-warning-subtle text-warning-emphasis">
-
-                                Draft ${draft}
-
-                            </span>
-
-                            <span
-                                class="bidang-status-badge bg-info-subtle text-info-emphasis">
-
-                                Survey ${survey}
-
-                            </span>
-
-                            <span
-                                class="bidang-status-badge bg-primary-subtle text-primary">
-
-                                HPS ${hps}
-
-                            </span>
-
-                            <span
-                                class="bidang-status-badge bg-success-subtle text-success">
-
-                                Ready ${ready}
-
-                            </span>
-
-                        </div>
-
                     </div>
-
-                </div>
 
                 `;
 
@@ -2112,30 +2223,40 @@ async function loadBidangPackageDashboard(){
             html;
 
 
-    }catch(error){
+    }
+    catch(error){
 
         console.error(
             'loadBidangPackageDashboard:',
             error
         );
 
-        document.getElementById(
-            'bidangPackageDashboard'
-        ).innerHTML = `
 
-            <div class="col-12">
+        const container =
+            document.getElementById(
+                'bidangPackageDashboard'
+            );
 
-                <div class="alert alert-danger">
 
-                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+        if(container){
 
-                    Gagal memuat dashboard paket per bidang.
+            container.innerHTML = `
+
+                <div class="col-12">
+
+                    <div class="alert alert-danger">
+
+                        <i class="fa-solid fa-triangle-exclamation me-2"></i>
+
+                        Gagal memuat dashboard paket per bidang.
+
+                    </div>
 
                 </div>
 
-            </div>
+            `;
 
-        `;
+        }
 
     }
 
